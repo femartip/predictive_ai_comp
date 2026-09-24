@@ -1,0 +1,26 @@
+[tool.poetry]
+package-mode = false
+
+[project]
+name = "predictive-ai-comp"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "femartip",email = "fmarper@vrain.upv.es"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "huggingface-hub (>=1.32.0,<2.0.0)",
+    "pandas (>=3.0.6,<4.0.0)",
+    "pyarrow (>=25.0.1,<26.0.0)",
+    "matplotlib (>=3.11.2,<4.0.0)"
+]
+
+
+[dependency-groups]
+dev = [
+    "ipykernel (>=7.3.0,<8.0.0)",
+    "nbconvert (>=7.17.1,<8.0.0)",
+    "nbformat (>=5.11.1,<6.0.0)",
+]

@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Dataset (downloaded from Hugging Face, ~12 GB)
+data/

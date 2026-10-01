@@ -2450,4 +2450,4 @@ test = ["pytest", "ruff"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "c3f7559d9dad4ff336ca52d8fca6534e0f092672f4e74977e7a2ddd9ff31c02c"
+content-hash = "4450de00d5054bcc175a053a56938a58fc0cc3557b3c4725a7bbc6d4a472c05c"

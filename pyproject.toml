@@ -14,7 +14,8 @@ dependencies = [
     "huggingface-hub (>=1.32.0,<2.0.0)",
     "pandas (>=3.0.6,<4.0.0)",
     "pyarrow (>=25.0.1,<26.0.0)",
-    "matplotlib (>=3.11.2,<4.0.0)"
+    "matplotlib (>=3.11.2,<4.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)"
 ]
 
 

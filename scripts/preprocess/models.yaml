@@ -1,0 +1,14 @@
+
+
+"Alibaba Qwen3-Coder 480B":
+  model_family: Qwen3-Coder
+  params_total_b: 480
+  params_active_b: 35
+  architecture: moe              
+  model_type: instruct
+  thinking: false                
+  open_weights: true             
+  knowledge_cutoff: null         
+  context_window: 262144         
+  multimodal_input: false        
+  source: https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct

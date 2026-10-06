@@ -100,3 +100,38 @@ swe_rebench
 - Agentic and multi-turn.
 - Just one system 
 - High number of attempts per item.
+
+
+## Preprocessing
+
+- item_id (benchmark:instance_id) [data]
+- benchmark [data]
+- subject_id [data]
+- score: mean over runs, in [0, 1] [data]
+- n_runs [data]
+- score_type: binary / fraction / mixed before averaging [bench]
+- Question (contiene todo: System prompt + user prompt + image_url con markers especificos -> [system]\n<system prompt>\n\n[user]\n<user message> y <image:PATH> ) [data]
+- ground_truth [data]
+- eval_type: exact_match / multiple_choice / judge / unit_tests [derived from grading rule]
+- domain [bench]
+- modality: from the benchmark plus condition [bench + data]
+- multi_turn [bench]
+- programming_language: null when not code [data / bench]
+- benchmark_release_date: stand-in for item_date [bench]
+- provider [data]
+- Model_family [curated] -> En model.yaml
+- model_name [data]
+- params_total_b, params_active_b [curated] -> model.yaml
+- Architecture (MoE or dense)[curated] -> model.yaml
+- Model_type (Instruct, base, thinking)[curated] -> model.yaml
+- Thinking [curated/data] -> model.yaml o dataset
+- reasoning_effort [data, mostly empty as usually not reported] 
+- Open_weights [curated]
+- release_date [data]
+- Knowledge_cutoff [curated] -> model.yaml
+- Context_window [curated] -> model.yaml
+- Multimodal_input [currated] -> si modelo multimodal o no, differente del item
+- agentic [bench: subject_type]
+- harness, harness_version [data, mostly empty]
+- Tools (still need to settle in the specific columns)
+- access_date [data]

@@ -1,4 +1,11 @@
+# Curated model metadata, keyed by the build's normalized_name and shared across benchmarks.
+# model_type is the training type, one of:
+#   base     - pretrained only; continues text, no instruction following
+#   instruct - post-trained to follow instructions / chat (SFT, preference tuning)
+#   thinking - post-trained to reason before answering, including models where thinking can be switched off
+#              (Qwen3, Gemini 2.5 Flash). Whether a given run thought is the separate `thinking` column.
 
+# ---- SWE RE-BENCH ----
 
 "Alibaba Qwen3-Coder 480B":
   model_family: Qwen3-Coder
@@ -12,3 +19,772 @@
   context_window: 262144         
   multimodal_input: false        
   source: https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct
+
+# ---- MMDocRAG ----
+
+"Alibaba QVQ-Max":
+  model_family: QVQ
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: true
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://qwenlm.github.io/blog/qvq-max-preview/
+
+"Alibaba QwQ Plus":
+  model_family: QwQ
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: true
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://help.aliyun.com/zh/model-studio/models
+
+"Alibaba Qwen Max":
+  model_family: Qwen2.5
+  params_total_b: null
+  params_active_b: null
+  architecture: moe
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://qwenlm.github.io/blog/qwen2.5-max/
+
+"Alibaba Qwen Plus":
+  model_family: Qwen
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://help.aliyun.com/zh/model-studio/models
+
+"Alibaba Qwen-VL Max":
+  model_family: Qwen-VL
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://help.aliyun.com/zh/model-studio/models
+
+"Alibaba Qwen-VL Plus":
+  model_family: Qwen-VL
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://help.aliyun.com/zh/model-studio/models
+
+"Alibaba Qwen2.5 3B":
+  model_family: Qwen2.5
+  params_total_b: 3
+  params_active_b: 3
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen2.5-3B-Instruct
+
+"Alibaba Qwen2.5 7B":
+  model_family: Qwen2.5
+  params_total_b: 7
+  params_active_b: 7
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
+
+"Alibaba Qwen2.5 14B":
+  model_family: Qwen2.5
+  params_total_b: 14
+  params_active_b: 14
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen2.5-14B-Instruct
+
+"Alibaba Qwen2.5 32B":
+  model_family: Qwen2.5
+  params_total_b: 32
+  params_active_b: 32
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct
+
+"Alibaba Qwen2.5 72B":
+  model_family: Qwen2.5
+  params_total_b: 72
+  params_active_b: 72
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen2.5-72B-Instruct
+
+"Alibaba Qwen2.5-VL 7B":
+  model_family: Qwen2.5-VL
+  params_total_b: 7
+  params_active_b: 7
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct
+
+"Alibaba Qwen2.5-VL 32B":
+  model_family: Qwen2.5-VL
+  params_total_b: 32
+  params_active_b: 32
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/Qwen/Qwen2.5-VL-32B-Instruct
+
+"Alibaba Qwen2.5-VL 72B":
+  model_family: Qwen2.5-VL
+  params_total_b: 72
+  params_active_b: 72
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/Qwen/Qwen2.5-VL-72B-Instruct
+
+"Alibaba Qwen3 4B":
+  model_family: Qwen3
+  params_total_b: 4
+  params_active_b: 4
+  architecture: dense
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen3-4B
+
+"Alibaba Qwen3 8B":
+  model_family: Qwen3
+  params_total_b: 8
+  params_active_b: 8
+  architecture: dense
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen3-8B
+
+"Alibaba Qwen3 14B":
+  model_family: Qwen3
+  params_total_b: 14
+  params_active_b: 14
+  architecture: dense
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen3-14B
+
+"Alibaba Qwen3 32B":
+  model_family: Qwen3
+  params_total_b: 32
+  params_active_b: 32
+  architecture: dense
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen3-32B
+
+"Alibaba Qwen3 30B A3B":
+  model_family: Qwen3
+  params_total_b: 30
+  params_active_b: 3
+  architecture: moe
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen3-30B-A3B
+
+"Alibaba Qwen3 235B A22B":
+  model_family: Qwen3
+  params_total_b: 235
+  params_active_b: 22
+  architecture: moe
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/Qwen/Qwen3-235B-A22B
+
+"Anthropic Claude 3.5 Sonnet":
+  model_family: Claude 3.5
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-04"
+  context_window: 200000
+  multimodal_input: true
+  source: https://docs.anthropic.com/en/docs/about-claude/models
+
+"DeepSeek Janus-Pro 7B":
+  model_family: Janus-Pro
+  params_total_b: 7
+  params_active_b: 7
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 4096
+  multimodal_input: true
+  source: https://huggingface.co/deepseek-ai/Janus-Pro-7B
+
+"DeepSeek R1":
+  model_family: DeepSeek-R1
+  params_total_b: 671
+  params_active_b: 37
+  architecture: moe
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/deepseek-ai/DeepSeek-R1
+
+"DeepSeek R1 Distill Llama 70B":
+  model_family: DeepSeek-R1-Distill
+  params_total_b: 70
+  params_active_b: 70
+  architecture: dense
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+
+"DeepSeek R1 Distill Qwen 32B":
+  model_family: DeepSeek-R1-Distill
+  params_total_b: 32
+  params_active_b: 32
+  architecture: dense
+  model_type: thinking
+  thinking: true
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+
+"DeepSeek V3":
+  model_family: DeepSeek-V3
+  params_total_b: 671
+  params_active_b: 37
+  architecture: moe
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V3
+
+"Google Gemini 1.5 Pro":
+  model_family: Gemini 1.5
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: null
+  context_window: 2097152
+  multimodal_input: true
+  source: https://ai.google.dev/gemini-api/docs/models
+
+"Google Gemini 2.0 Flash":
+  model_family: Gemini 2.0
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-08"
+  context_window: 1048576
+  multimodal_input: true
+  source: https://ai.google.dev/gemini-api/docs/models
+
+"Google Gemini 2.0 Flash Thinking":
+  model_family: Gemini 2.0
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: true
+  open_weights: false
+  knowledge_cutoff: "2024-08"
+  context_window: 1048576
+  multimodal_input: true
+  source: https://ai.google.dev/gemini-api/docs/models
+
+"Google Gemini 2.0 Pro":
+  model_family: Gemini 2.0
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-08"
+  context_window: 2097152
+  multimodal_input: true
+  source: https://ai.google.dev/gemini-api/docs/models
+
+"Google Gemini 2.5 Flash":
+  model_family: Gemini 2.5
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: null
+  open_weights: false
+  knowledge_cutoff: "2025-01"
+  context_window: 1048576
+  multimodal_input: true
+  source: https://ai.google.dev/gemini-api/docs/models
+
+"Google Gemini 2.5 Pro":
+  model_family: Gemini 2.5
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: true
+  open_weights: false
+  knowledge_cutoff: "2025-01"
+  context_window: 1048576
+  multimodal_input: true
+  source: https://ai.google.dev/gemini-api/docs/models
+
+"Meta Llama 3.1 8B":
+  model_family: Llama 3.1
+  params_total_b: 8
+  params_active_b: 8
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: "2023-12"
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+
+"Meta Llama 3.2 3B":
+  model_family: Llama 3.2
+  params_total_b: 3
+  params_active_b: 3
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: "2023-12"
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
+
+"Meta Llama 3.3 70B":
+  model_family: Llama 3.3
+  params_total_b: 70
+  params_active_b: 70
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: "2023-12"
+  context_window: 131072
+  multimodal_input: false
+  source: https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct
+
+"Meta Llama 4 Maverick":
+  model_family: Llama 4
+  params_total_b: 400
+  params_active_b: 17
+  architecture: moe
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: "2024-08"
+  context_window: 1048576
+  multimodal_input: true
+  source: https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct
+
+"Meta Llama 4 Scout":
+  model_family: Llama 4
+  params_total_b: 109
+  params_active_b: 17
+  architecture: moe
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: "2024-08"
+  context_window: 10485760
+  multimodal_input: true
+  source: https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Instruct
+
+"Mistral 7B":
+  model_family: Mistral
+  params_total_b: 7
+  params_active_b: 7
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: false
+  source: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
+
+"Mistral Mixtral 8x7B":
+  model_family: Mixtral
+  params_total_b: 46.7
+  params_active_b: 12.9
+  architecture: moe
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
+
+"Mistral Small 24B":
+  model_family: Mistral Small 3
+  params_total_b: 24
+  params_active_b: 24
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: 32768
+  multimodal_input: false
+  source: https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501
+
+"OpenAI GPT-4":
+  model_family: GPT-4
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2023-12"
+  context_window: 128000
+  multimodal_input: true
+  source: https://platform.openai.com/docs/models/gpt-4-turbo
+
+"OpenAI GPT-4.1":
+  model_family: GPT-4.1
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-06"
+  context_window: 1047576
+  multimodal_input: true
+  source: https://platform.openai.com/docs/models/gpt-4.1
+
+"OpenAI GPT-4.1 mini":
+  model_family: GPT-4.1
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-06"
+  context_window: 1047576
+  multimodal_input: true
+  source: https://platform.openai.com/docs/models/gpt-4.1-mini
+
+"OpenAI GPT-4.1 nano":
+  model_family: GPT-4.1
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-06"
+  context_window: 1047576
+  multimodal_input: true
+  source: https://platform.openai.com/docs/models/gpt-4.1-nano
+
+"OpenAI GPT-4o":
+  model_family: GPT-4o
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2023-10"
+  context_window: 128000
+  multimodal_input: true
+  source: https://platform.openai.com/docs/models/gpt-4o
+
+"OpenAI GPT-4o mini":
+  model_family: GPT-4o
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2023-10"
+  context_window: 128000
+  multimodal_input: true
+  source: https://platform.openai.com/docs/models/gpt-4o-mini
+
+"OpenAI o3-mini":
+  model_family: o3
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: true
+  open_weights: false
+  knowledge_cutoff: "2023-10"
+  context_window: 200000
+  multimodal_input: false
+  source: https://platform.openai.com/docs/models/o3-mini
+
+"OpenBMB MiniCPM-o 2.6":
+  model_family: MiniCPM-o
+  params_total_b: 8.7
+  params_active_b: 8.7
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/openbmb/MiniCPM-o-2_6
+
+"OpenGVLab InternVL2.5 8B":
+  model_family: InternVL2.5
+  params_total_b: 8
+  params_active_b: 8
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL2_5-8B
+
+"OpenGVLab InternVL2.5 26B":
+  model_family: InternVL2.5
+  params_total_b: 26
+  params_active_b: 26
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL2_5-26B
+
+"OpenGVLab InternVL2.5 38B":
+  model_family: InternVL2.5
+  params_total_b: 38
+  params_active_b: 38
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL2_5-38B
+
+"OpenGVLab InternVL2.5 78B":
+  model_family: InternVL2.5
+  params_total_b: 78
+  params_active_b: 78
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL2_5-78B
+
+"OpenGVLab InternVL3 8B":
+  model_family: InternVL3
+  params_total_b: 8
+  params_active_b: 8
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL3-8B
+
+"OpenGVLab InternVL3 9B":
+  model_family: InternVL3
+  params_total_b: 9
+  params_active_b: 9
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL3-9B
+
+"OpenGVLab InternVL3 14B":
+  model_family: InternVL3
+  params_total_b: 14
+  params_active_b: 14
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL3-14B
+
+"OpenGVLab InternVL3 38B":
+  model_family: InternVL3
+  params_total_b: 38
+  params_active_b: 38
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL3-38B
+
+"OpenGVLab InternVL3 78B":
+  model_family: InternVL3
+  params_total_b: 78
+  params_active_b: 78
+  architecture: dense
+  model_type: instruct
+  thinking: false
+  open_weights: true
+  knowledge_cutoff: null
+  context_window: null
+  multimodal_input: true
+  source: https://huggingface.co/OpenGVLab/InternVL3-78B
+
+"xAI Grok 3":
+  model_family: Grok 3
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: instruct
+  thinking: false
+  open_weights: false
+  knowledge_cutoff: "2024-11"
+  context_window: 131072
+  multimodal_input: false
+  source: https://docs.x.ai/docs/models
+
+"xAI Grok 3 Mini":
+  model_family: Grok 3
+  params_total_b: null
+  params_active_b: null
+  architecture: null
+  model_type: thinking
+  thinking: true
+  open_weights: false
+  knowledge_cutoff: "2024-11"
+  context_window: 131072
+  multimodal_input: false
+  source: https://docs.x.ai/docs/models

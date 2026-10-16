@@ -22,16 +22,19 @@ Decisions:
   categorical through the joins and the file is written in chunks; one in-memory frame would exhaust RAM.
 """
 
+import hashlib
 import json
 import re
 import tarfile
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path, PurePosixPath
 
 import pandas as pd
-from common import COLUMNS, DATA, OUT, benchmark_columns, load_metadata, subject_columns
+from huggingface_hub import HfApi, hf_hub_download
+from common import COLUMNS, DATA, OUT, benchmark_columns, huggingface_provenance, load_metadata, subject_columns
 
 B = "mmdocrag"
-DIR = DATA / B
-RAW = DIR / "raw"
+REPO = "aims-foundations/measurement-db"
 IMAGE_MARKER = "<image:{}>"  # parse with re.findall(r"<image:([^>]+)>", question)
 SYSTEM_PROMPT = {"pure-text": "pure_text_infer.txt", "multimodal": "multimodal_infer.txt"}
 MODALITY = {"pure-text": "text", "multimodal": "image;text"}
@@ -64,9 +67,41 @@ THINKING = {
 }
 
 
-def system_prompts():
+def cached_source_files(provenance):
+    """Fetch the required files into the Hub cache at the run's pinned revision."""
+    filenames = sorted(set(provenance["source_files"]))
+
+    def download(filename):
+        return Path(hf_hub_download(
+            repo_id=REPO, filename=filename, repo_type="dataset",
+            revision=provenance["source_revision"],
+        ))
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(zip(filenames, pool.map(download, filenames)))
+
+
+def source_files(revision):
+    """Select raw inputs from the same revision as the formatted tables."""
+    api = HfApi()
+    responses = sorted(
+        entry.path for entry in api.list_repo_tree(
+            REPO, path_in_repo=f"{B}/raw/resp", repo_type="dataset", revision=revision,
+        ) if RESP_FILE.fullmatch(PurePosixPath(entry.path).name)
+    )
+    archives = sorted(
+        entry.path for entry in api.list_repo_tree(
+            REPO, path_in_repo=f"{B}/raw/reproducibility", repo_type="dataset", revision=revision,
+        ) if PurePosixPath(entry.path).match("source-*.tar.gz")
+    )
+    if not responses or len(archives) != 1:
+        raise ValueError(f"Expected raw responses and one prompt archive at {revision}; "
+                         f"found {len(responses)} response files and {len(archives)} archives")
+    return responses, archives[0]
+
+
+def system_prompts(archive):
     """Inference system prompts from the pinned upstream source archive, read as upstream does (unstripped)."""
-    archive = next((RAW / "reproducibility").glob("source-*.tar.gz"))
     with tarfile.open(archive) as tar:
         members = {m.name.rsplit("/", 1)[-1]: m for m in tar.getmembers() if "/prompt_bank/" in m.name}
         return {mode: tar.extractfile(members[name]).read().decode("utf-8") for mode, name in SYSTEM_PROMPT.items()}
@@ -85,12 +120,12 @@ def user_message(q, mode):
     return f"{texts}\n{images}The user question is: {q['question']}"
 
 
-def build_items():
+def build_items(evaluations, archive):
     """One row per (q_id, mode, n_quotes) with the exact model input and the judge's references."""
-    system = system_prompts()
+    system = system_prompts(archive)
     rows = []
     for n in (15, 20):
-        for line in open(RAW / f"evaluation_{n}.jsonl", encoding="utf-8"):
+        for line in open(evaluations[n], encoding="utf-8"):
             q = json.loads(line)
             for mode in SYSTEM_PROMPT:
                 rows.append({
@@ -105,10 +140,10 @@ def build_items():
     return items.astype({c: "category" for c in text})
 
 
-def api_errors():
+def api_errors(paths):
     """(model, test_condition, q_id) of raw outputs that are API errors: an error field or an empty response."""
     rows = []
-    for path in (RAW / "resp").glob("*.jsonl"):
+    for path in paths:
         m = RESP_FILE.match(path.name)
         if m is None:  # pure-text OCR runs
             continue
@@ -117,11 +152,11 @@ def api_errors():
             if "error" in r or not (r.get("response") or "").strip():
                 rows.append({"model": m["model"].lower(), "test_condition": f"{m['mode']}/quotes{m['n']}",
                              "q_id": r["q_id"]})
-    return pd.DataFrame(rows).drop_duplicates()
+    return pd.DataFrame(rows, columns=["model", "test_condition", "q_id"]).drop_duplicates()
 
 
-def write_chunked(df, chunk=20_000):
-    """common.write's checks, but streamed to disk chunk by chunk instead of serialised as one string."""
+def write_chunked(df, provenance, chunk=20_000):
+    """Stream the long prompts to JSONL and record provenance for the completed output."""
     missing = set(COLUMNS) - set(df.columns)
     assert not missing, f"missing columns: {sorted(missing)}"
     assert df.item_id.str.startswith(f"{B}:").all()
@@ -130,24 +165,42 @@ def write_chunked(df, chunk=20_000):
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / f"{B}.jsonl"
     df = df[COLUMNS]
-    # Row by row: pandas.to_json builds each chunk as one string, then copies it again for lines=True.
-    with open(path, "w", encoding="utf-8") as fh:
+    with path.open("w", encoding="utf-8") as fh:
         for start in range(0, len(df), chunk):
             part = df.iloc[start:start + chunk].astype(object)
             for row in part.where(part.notna(), None).itertuples(index=False):
                 fh.write(json.dumps(dict(zip(COLUMNS, row)), ensure_ascii=False) + "\n")
+    with path.open("rb") as fh:
+        checksum = hashlib.file_digest(fh, "sha256").hexdigest()
+    manifest = {
+        "benchmark": B, **provenance, "output_file": path.name,
+        "output_rows": len(df), "output_sha256": checksum,
+    }
+    (OUT / f"{B}.manifest.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8",
+    )
     return path
 
 
 def main():
-    meta = load_metadata(B)
-    subjects = pd.read_parquet(DIR / "subjects.parquet")
+    tables = {name: f"{B}/formatted_tables/{name}.parquet" for name in ("items", "subjects", "responses")}
+    evaluations = {n: f"{B}/raw/evaluation_{n}.jsonl" for n in (15, 20)}
+    provenance = huggingface_provenance(REPO, tables.values())
+    revision = provenance["source_revision"]
+    response_files, archive = source_files(revision)
+    provenance["source_files"] = sorted([
+        *tables.values(), f"{B}/metadata.yaml", *evaluations.values(), archive, *response_files,
+    ])
+    print(f"Loading {B} from Hugging Face revision {revision}", flush=True)
+    files = cached_source_files(provenance)
+    meta = load_metadata(B, REPO, revision)
+    subjects = pd.read_parquet(files[tables["subjects"]])
     finetuned = subjects.display_name.str.endswith("-ft")
     subjects = subjects[~finetuned]
     assert set(subjects.display_name) == set(THINKING), "THINKING must cover exactly the retained subjects"
 
-    resp = pd.read_parquet(DIR / "response.parquet")
-    raw_ids = pd.read_parquet(DIR / "items.parquet", columns=["item_id", "raw_item_id"])
+    resp = pd.read_parquet(files[tables["responses"]])
+    raw_ids = pd.read_parquet(files[tables["items"]], columns=["item_id", "raw_item_id"])
     resp = (resp.merge(raw_ids, on="item_id")
             .assign(q_id=lambda d: d.raw_item_id.str.removeprefix("q_id::").astype(int))
             .merge(subjects[["subject_id", "display_name"]], on="subject_id"))  # inner: drops fine-tuned
@@ -155,13 +208,13 @@ def main():
     n_unscored = resp.response.isna().sum()
     resp = resp.dropna(subset=["response"])
 
-    errors = api_errors().assign(api_error=True)
+    errors = api_errors([files[name] for name in response_files]).assign(api_error=True)
     resp = (resp.assign(model=resp.display_name.str.lower())
             .merge(errors, on=["model", "test_condition", "q_id"], how="left"))
     n_api = resp.api_error.fillna(False).astype(bool).sum()
     resp = resp[~resp.api_error.fillna(False).astype(bool)]
 
-    items = build_items()
+    items = build_items({n: files[name] for n, name in evaluations.items()}, files[archive])
     subj = subject_columns(subjects)
     variant = subjects.set_index("subject_id").display_name
     subj["thinking"] = subj.subject_id.map(variant).map(THINKING)
@@ -178,7 +231,7 @@ def main():
                   programming_language=None, tools=None, **bench))
     assert len(df) == len(resp), "lost rows when joining items or subjects"
 
-    path = write_chunked(df)
+    path = write_chunked(df, provenance)
     print(f"{len(df):,} rows ({df.subject_id.nunique()} subjects × {df.item_id.nunique():,} items) → "
           f"{path.relative_to(DATA.parent)}\n"
           f"dropped: {finetuned.sum()} fine-tuned subjects; of the remaining {n_total:,} responses, "

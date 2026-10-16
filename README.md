@@ -36,16 +36,25 @@ The dataset is **gated**. Before downloading:
    poetry run hf auth whoami   # should print your username
    ```
 
-### 4. Download the data
-
-The notebooks expect the dataset in `data/` at the repository root. `data/` is git-ignored.
-
-**Everything (≈ 12 GB).** This includes each benchmark's `raw/` upstream source snapshots and
-`reproduction_checks/` re-run pilots:
+### 4. Run preprocessing (automatic downloads)
 
 ```bash
-poetry run hf download aims-foundations/measurement-db --repo-type dataset --local-dir data
+poetry run python scripts/preprocess/mmdocrag.py
+poetry run python scripts/preprocess/swe_rebench.py
+poetry run python scripts/preprocess/real_webagents.py
+poetry run python scripts/preprocess/researchcodebench.py
 ```
+
+On every run, each script:
+
+1. Checks the latest revision of `aims-foundations/measurement-db` and pins that commit for the run.
+2. Loads the required files, downloading missing inputs into the Hugging Face cache and reusing
+   cached files when available. MMDocRAG also fetches raw answers, quote sets, and the prompt source
+   archive; SWE-rebench also fetches raw trajectories for error filtering.
+3. Rebuilds and overwrites `data/processed/<benchmark>.jsonl`.
+4. Writes `data/processed/<benchmark>.manifest.json` with the source repository, exact revision,
+   load timestamp, source table paths, output row count, and output SHA-256. MMDocRAG and SWE-rebench
+   additionally record every source file used, including metadata and raw inputs.
 
 
 ## Analysis

@@ -1,9 +1,13 @@
 """Shared layout for the per-benchmark assessor files (JSON Lines): one row per (subject, item)."""
 
+import hashlib
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 import yaml
+from huggingface_hub import HfApi, hf_hub_download
 
 ROOT = next(p for p in [Path(__file__).resolve(), *Path(__file__).resolve().parents] if (p / "pyproject.toml").exists())
 DATA = ROOT / "data"
@@ -30,8 +34,18 @@ MODEL_FIELDS = ["model_family", "params_total_b", "params_active_b", "architectu
                 "open_weights", "knowledge_cutoff", "context_window", "multimodal_input"]
 
 
-def load_metadata(benchmark):
-    return yaml.safe_load((DATA / benchmark / "metadata.yaml").read_text())["benchmark"]
+def load_metadata(benchmark, repository=None, revision=None):
+    """Load benchmark metadata locally or from a Hugging Face dataset revision."""
+    if repository is None:
+        path = DATA / benchmark / "metadata.yaml"
+    else:
+        path = Path(hf_hub_download(
+            repo_id=repository,
+            filename=f"{benchmark}/metadata.yaml",
+            repo_type="dataset",
+            revision=revision,
+        ))
+    return yaml.safe_load(path.read_text(encoding="utf-8"))["benchmark"]
 
 
 def benchmark_columns(meta):
@@ -66,7 +80,26 @@ def subject_columns(subjects):
     return pd.DataFrame(rows)
 
 
-def write(df, benchmark):
+def huggingface_provenance(repository, source_tables):
+    """Capture the exact Hugging Face dataset version used by a conversion."""
+    revision = HfApi().dataset_info(repository).sha
+    return {
+        "loaded_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "source_repository": repository,
+        "source_revision": revision,
+        "source_tables": list(source_tables),
+    }
+
+
+def _sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def write(df, benchmark, provenance=None):
     missing = set(COLUMNS) - set(df.columns)
     assert not missing, f"missing columns: {sorted(missing)}"
     assert df.item_id.str.startswith(f"{benchmark}:").all()
@@ -75,4 +108,19 @@ def write(df, benchmark):
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / f"{benchmark}.jsonl"
     df[COLUMNS].to_json(path, orient="records", lines=True, force_ascii=False)
+
+    if provenance is not None:
+        manifest = {
+            "benchmark": benchmark,
+            **provenance,
+            "output_file": path.name,
+            "output_rows": len(df),
+            "output_sha256": _sha256(path),
+        }
+        manifest_path = OUT / f"{benchmark}.manifest.json"
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
     return path

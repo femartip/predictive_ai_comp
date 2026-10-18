@@ -43,6 +43,8 @@ poetry run python scripts/preprocess/mmdocrag.py
 poetry run python scripts/preprocess/swe_rebench.py
 poetry run python scripts/preprocess/real_webagents.py
 poetry run python scripts/preprocess/researchcodebench.py
+poetry run python scripts/preprocess/matharena.py
+poetry run python scripts/preprocess/multi_swebench.py
 ```
 
 On every run, each script:
@@ -50,7 +52,9 @@ On every run, each script:
 1. Checks the latest revision of `aims-foundations/measurement-db` and pins that commit for the run.
 2. Loads the required files, downloading missing inputs into the Hugging Face cache and reusing
    cached files when available. MMDocRAG also fetches raw answers, quote sets, and the prompt source
-   archive; SWE-rebench also fetches raw trajectories for error filtering.
+   archive; SWE-rebench also fetches raw trajectories for error filtering; MathArena also fetches the
+   solution traces (API-failure filtering) and the images, written to `data/matharena/images/`;
+   Multi-SWE-bench also fetches every run's `results.json` and predictions (empty-patch outcomes).
 3. Rebuilds and overwrites `data/processed/<benchmark>.jsonl`.
 4. Writes `data/processed/<benchmark>.manifest.json` with the source repository, exact revision,
    load timestamp, source table paths, output row count, and output SHA-256. MMDocRAG and SWE-rebench
@@ -109,6 +113,28 @@ swe_rebench
 - Agentic and multi-turn.
 - Just one system 
 - High number of attempts per item.
+
+Per-benchmark notebooks, with the evidence behind each preprocessing script's decisions:
+[`swe_rebench.ipynb`](scripts/analysis/swe_rebench.ipynb), [`mmdocrag.ipynb`](scripts/analysis/mmdocrag.ipynb),
+[`matharena.ipynb`](scripts/analysis/matharena.ipynb), [`multi_swebench.ipynb`](scripts/analysis/multi_swebench.ipynb).
+
+matharena (from `matharena.ipynb`):
+- 1,755 items but 680 problems: proof problems are split into grading criteria, and final-answer problems
+  appear under up to 7 prompt wordings (one per model configuration). `raw_item_id` is not a key.
+- 109 problem texts recur across competition releases (e.g. `aime_2025` / `aime_2025_I`): split by `content_hash`.
+- 52 of 104 subjects have no normalized name, provider or release date; they are 79 base models once filled.
+- 138 attempts are empty solutions graded 0 (API failures, mostly one Claude Opus 4.7 batch): dropped.
+
+multi-swe-bench (from `multi_swebench.ipynb`):
+- The build keeps only resolved/unresolved instances and silently drops a quarter of the submissions: 11,692
+  empty patches, 8,667 non-empty patches without a test report, 96 unavailable patches.
+- Empty patches are model failures and enter as 0 (resolve rate 0.148 → 0.123); the rest stay out because
+  the results files do not tell patch failures from environment failures.
+- 82 subjects = 20 models × 11 scaffolds; harness names are harmonised (`MSWE-Agent` → `MSWE-agent`).
+
+`scripts/preprocess/models.yaml` covers every subject of the six benchmarks except MMDocRAG's fine-tuned
+models (dropped by its script). Every entry has the same fields; `provider` and `release_date` only fill
+blanks in the build, and `null` means unknown or not verified.
 
 
 ## Preprocessing

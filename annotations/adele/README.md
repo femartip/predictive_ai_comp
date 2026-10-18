@@ -55,4 +55,4 @@ v2 codes: MMe, MMp, MMs, MSc, MSm, PLe, PLp, PLs, SNk, SNp, SPa, SPv.
 - **Licences.** Both sources are gated. This folder holds only derived levels and ids, no item text; the battery's
   terms ask not to reveal its examples.
 
-Exported by `pipeline/export_adele.py` in the assessor repository.
+Exported by `pipeline/export_adele.py` in the assessor repository (not available in this repository yet).

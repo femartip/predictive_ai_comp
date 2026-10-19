@@ -60,6 +60,14 @@ On every run, each script:
    load timestamp, source table paths, output row count, and output SHA-256. MMDocRAG and SWE-rebench
    additionally record every source file used, including metadata and raw inputs.
 
+### 5. Build the model table 
+
+```bash
+poetry run python scripts/preprocess/epoch_models_csv.py            # add --offline to reuse cached downloads
+```
+
+Writes `data/processed/models.csv`, one row per `normalized_name` in the benchmark files, with model attributes (parameters, architecture, context window, knowledge cutoff, thinking mode…) from Epoch AI, models.dev, ReleasedModels and the Hugging Face Hub; each value's origin is in a `*_source` column. Join it to any `<benchmark>.jsonl` on `normalized_name`.
+
 
 ## Analysis
 

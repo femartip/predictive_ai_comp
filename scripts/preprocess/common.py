@@ -12,7 +12,6 @@ from huggingface_hub import HfApi, hf_hub_download
 ROOT = next(p for p in [Path(__file__).resolve(), *Path(__file__).resolve().parents] if (p / "pyproject.toml").exists())
 DATA = ROOT / "data"
 OUT = DATA / "processed"
-MODELS_FILE = Path(__file__).with_name("models.yaml")
 
 COLUMNS = [
     # IDs
@@ -22,16 +21,13 @@ COLUMNS = [
     # Item
     "question", "ground_truth", "eval_type", "domain", "modality", "multi_turn", "programming_language",
     "benchmark_release_date",
-    # Model
-    "provider", "model_family", "model_name", "normalized_name", "params_total_b", "params_active_b", "architecture", "model_type",
-    "thinking", "reasoning_effort", "open_weights", "release_date", "knowledge_cutoff", "context_window",
-    "multimodal_input",
+    # Model: identity only. Model attributes live in data/processed/models.csv (scripts/preprocess/epoch_models_csv.py);
+    # join on normalized_name. thinking and reasoning_effort describe the run, not the model.
+    "model_name", "normalized_name", "thinking", "reasoning_effort",
     # Setup
     "agentic", "harness", "harness_version", "tools", "access_date",
 ]
 
-MODEL_FIELDS = ["model_family", "params_total_b", "params_active_b", "architecture", "model_type", "thinking",
-                "open_weights", "knowledge_cutoff", "context_window", "multimodal_input"]
 
 
 def load_metadata(benchmark, repository=None, revision=None):
@@ -60,30 +56,14 @@ def benchmark_columns(meta):
     }
 
 
-def load_curated():
-    """Curated model attributes from models.yaml, keyed by normalized_name; empty if the file is absent."""
-    return (yaml.safe_load(MODELS_FILE.read_text(encoding="utf-8")) or {}) if MODELS_FILE.exists() else {}
-
-
 def subject_columns(subjects):
-    """Model and setup columns per subject_id: build fields plus the curated models.yaml entry, if any."""
-    curated = load_curated()
-    missing = sorted(set(subjects.normalized_name) - set(curated))
-    if missing and curated:
-        print(f"warning: no curated entry in {MODELS_FILE.name} for {missing}")
-    rows = []
-    for s in subjects.itertuples():
-        model = curated.get(s.normalized_name, {})
-        row = {"subject_id": s.subject_id, "provider": s.provider, "model_name": s.display_name,
-               "normalized_name": s.normalized_name,
-               "reasoning_effort": s.reasoning_effort, "release_date": s.release_date, "harness": s.harness,
-               "harness_version": s.harness_version, "access_date": s.access_date}
-        row |= {f: model.get(f) for f in MODEL_FIELDS}
-        # A model without a thinking mode has no reasoning effort to set.
-        if pd.isna(row["reasoning_effort"]) and model.get("thinking") is False:
-            row["reasoning_effort"] = "none"
-        rows.append(row)
-    return pd.DataFrame(rows)
+    """Model identity and run setup per subject_id, from the build's subjects table. thinking (did this run
+    think) is unknown here; benchmark scripts that can tell set it."""
+    return pd.DataFrame({
+        "subject_id": subjects.subject_id, "model_name": subjects.display_name,
+        "normalized_name": subjects.normalized_name, "thinking": None, "reasoning_effort": subjects.reasoning_effort,
+        "harness": subjects.harness, "harness_version": subjects.harness_version, "access_date": subjects.access_date,
+    }).reset_index(drop=True)
 
 
 def huggingface_provenance(repository, source_tables):

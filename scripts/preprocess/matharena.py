@@ -16,11 +16,11 @@ Decisions:
   first criterion only) and are kept.
 - Subjects: half of the build's subjects have a blank normalized_name. NAMES fills it with the model's
   canonical name (the build's convention: "<Provider> <Model>"; variants such as reasoning effort, dated
-  snapshots or agent setups map to the base model, as the build does for its filled names). Provider and
-  release_date then come from models.yaml where the build leaves them blank; reasoning_effort from the
-  "(low|medium|high|xhigh|max)" suffix of the display name (the build's own effort_pattern).
+  snapshots or agent setups map to the base model, as the build does for its filled names). reasoning_effort
+  comes from the "(low|medium|high|xhigh|max)" suffix of the display name (the build's own effort_pattern).
+  Model attributes (provider, release date, size…) are in data/processed/models.csv, joined on normalized_name.
 - thinking is set per variant: True when the name marks reasoning (Think, Thinking, Reasoning, an effort
-  level, R1 and its distills, o-series), otherwise the model's default from models.yaml.
+  level, R1 and its distills, o-series), False for "Instruct" variants, otherwise unknown.
 - MathArena's agent setups (display names with "Agent"/"agent") are multi-turn and agentic; every other run
   is a single turn.
 - score = mean over the released attempts (trials); n_runs = how many.
@@ -32,9 +32,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pandas as pd
-import yaml
 from huggingface_hub import hf_hub_download
-from common import DATA, benchmark_columns, huggingface_provenance, load_curated, load_metadata, subject_columns, write
+from common import DATA, benchmark_columns, huggingface_provenance, load_metadata, subject_columns, write
 
 B = "matharena"
 REPO = "aims-foundations/measurement-db"
@@ -117,25 +116,20 @@ def cached_source_files(provenance):
 
 
 def fill_subjects(subjects):
-    """Fill normalized_name, provider, release_date and reasoning_effort where the build leaves them blank."""
-    curated = load_curated()
+    """Fill normalized_name and reasoning_effort where the build leaves them blank."""
     s = subjects.copy()
     blank = s.normalized_name.isna()
     missing = sorted(set(s.display_name[blank]) - set(NAMES))
     assert not missing, f"NAMES has no entry for {missing}"
     s.loc[blank, "normalized_name"] = s.display_name[blank].map(NAMES)
-    for field in ("provider", "release_date"):
-        fallback = s.normalized_name.map(lambda n: (curated.get(n) or {}).get(field))
-        s[field] = s[field].fillna(fallback)
     effort = s.display_name.str.extract(EFFORT, expand=False).str.lower()
     s["reasoning_effort"] = s.reasoning_effort.fillna(effort)
     return s
 
 
 def thinking(subjects):
-    """Per-variant thinking: name markers first, else the model's default in models.yaml (None if switchable)."""
-    curated = load_curated()
-    value = subjects.normalized_name.map(lambda n: (curated.get(n) or {}).get("thinking")).astype(object)
+    """Per-variant thinking from the display name: reasoning markers → True, "Instruct" → False, else None."""
+    value = pd.Series(None, index=subjects.index, dtype=object)
     value[subjects.display_name.str.contains(THINKING_MARK)] = True
     value[subjects.display_name.str.contains("Instruct")] = False
     return value.where(value.notna(), None)

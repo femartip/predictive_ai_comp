@@ -14,8 +14,7 @@ Decisions:
 - thinking is set per released variant: the build's normalized_name merges e.g. qwen3-8b and qwen3-8b-no-think.
   Open-weight models are checked against <think> blocks in their raw outputs. Closed API models hide their
   reasoning, so their values are assumed from the model name and the API's documented default (see THINKING).
-- release_date is the build's, unchanged, except that a month-only date (qwen-plus: 2023-09) is padded to the
-  first of the month (2023-09-01) so every subject has YYYY-MM-DD.
+- Model attributes (provider, release date, size…) are in data/processed/models.csv, joined on normalized_name.
 - modality is per item: text for pure-text, image;text for multimodal.
 - score = the judge's grade (mean of five 0-5 dimensions / 5); one run per (subject, item).
 - The output repeats each ~10k-character question once per subject (~3.5 GB), so text columns stay
@@ -220,8 +219,6 @@ def main():
     variant = subjects.set_index("subject_id").display_name
     subj["thinking"] = subj.subject_id.map(variant).map(THINKING)
     subj["reasoning_effort"] = subj.reasoning_effort.where(subj.thinking, "none")
-    month_only = subj.release_date.str.fullmatch(r"\d{4}-\d{2}")
-    subj.loc[month_only, "release_date"] += "-01"
 
     bench = benchmark_columns(meta)
     bench.pop("modality")  # set per item

@@ -162,6 +162,7 @@ def write_chunked(df, provenance, chunk=20_000):
     assert df.item_id.str.startswith(f"{B}:").all()
     assert not df.duplicated(["item_id", "subject_id"]).any(), "duplicate (item, subject) rows"
     assert df.score.between(0, 1).all(), "score outside [0, 1]"
+    assert df.normalized_name.notna().all(), "rows without normalized_name"
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / f"{B}.jsonl"
     df = df[COLUMNS]

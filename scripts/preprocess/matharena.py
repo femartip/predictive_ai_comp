@@ -34,7 +34,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from huggingface_hub import hf_hub_download
-from common import DATA, MODELS_FILE, benchmark_columns, huggingface_provenance, load_metadata, subject_columns, write
+from common import DATA, benchmark_columns, huggingface_provenance, load_curated, load_metadata, subject_columns, write
 
 B = "matharena"
 REPO = "aims-foundations/measurement-db"
@@ -118,7 +118,7 @@ def cached_source_files(provenance):
 
 def fill_subjects(subjects):
     """Fill normalized_name, provider, release_date and reasoning_effort where the build leaves them blank."""
-    curated = yaml.safe_load(MODELS_FILE.read_text(encoding="utf-8")) or {}
+    curated = load_curated()
     s = subjects.copy()
     blank = s.normalized_name.isna()
     missing = sorted(set(s.display_name[blank]) - set(NAMES))
@@ -134,7 +134,7 @@ def fill_subjects(subjects):
 
 def thinking(subjects):
     """Per-variant thinking: name markers first, else the model's default in models.yaml (None if switchable)."""
-    curated = yaml.safe_load(MODELS_FILE.read_text(encoding="utf-8")) or {}
+    curated = load_curated()
     value = subjects.normalized_name.map(lambda n: (curated.get(n) or {}).get("thinking")).astype(object)
     value[subjects.display_name.str.contains(THINKING_MARK)] = True
     value[subjects.display_name.str.contains("Instruct")] = False

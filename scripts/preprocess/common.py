@@ -23,7 +23,7 @@ COLUMNS = [
     "question", "ground_truth", "eval_type", "domain", "modality", "multi_turn", "programming_language",
     "benchmark_release_date",
     # Model
-    "provider", "model_family", "model_name", "params_total_b", "params_active_b", "architecture", "model_type",
+    "provider", "model_family", "model_name", "normalized_name", "params_total_b", "params_active_b", "architecture", "model_type",
     "thinking", "reasoning_effort", "open_weights", "release_date", "knowledge_cutoff", "context_window",
     "multimodal_input",
     # Setup
@@ -60,16 +60,22 @@ def benchmark_columns(meta):
     }
 
 
+def load_curated():
+    """Curated model attributes from models.yaml, keyed by normalized_name; empty if the file is absent."""
+    return (yaml.safe_load(MODELS_FILE.read_text(encoding="utf-8")) or {}) if MODELS_FILE.exists() else {}
+
+
 def subject_columns(subjects):
-    """Model and setup columns per subject_id: build fields plus the curated models.yaml entry."""
-    curated = yaml.safe_load(MODELS_FILE.read_text()) or {}
+    """Model and setup columns per subject_id: build fields plus the curated models.yaml entry, if any."""
+    curated = load_curated()
     missing = sorted(set(subjects.normalized_name) - set(curated))
-    if missing:
+    if missing and curated:
         print(f"warning: no curated entry in {MODELS_FILE.name} for {missing}")
     rows = []
     for s in subjects.itertuples():
         model = curated.get(s.normalized_name, {})
         row = {"subject_id": s.subject_id, "provider": s.provider, "model_name": s.display_name,
+               "normalized_name": s.normalized_name,
                "reasoning_effort": s.reasoning_effort, "release_date": s.release_date, "harness": s.harness,
                "harness_version": s.harness_version, "access_date": s.access_date}
         row |= {f: model.get(f) for f in MODEL_FIELDS}
@@ -105,6 +111,7 @@ def write(df, benchmark, provenance=None):
     assert df.item_id.str.startswith(f"{benchmark}:").all()
     assert not df.duplicated(["item_id", "subject_id"]).any(), "duplicate (item, subject) rows"
     assert df.score.between(0, 1).all(), "score outside [0, 1]"
+    assert df.normalized_name.notna().all(), "rows without normalized_name"
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / f"{benchmark}.jsonl"
     df[COLUMNS].to_json(path, orient="records", lines=True, force_ascii=False)

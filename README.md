@@ -39,26 +39,39 @@ The dataset is **gated**. Before downloading:
 ### 4. Run preprocessing (automatic downloads)
 
 ```bash
-poetry run python scripts/preprocess/mmdocrag.py
-poetry run python scripts/preprocess/swe_rebench.py
-poetry run python scripts/preprocess/real_webagents.py
-poetry run python scripts/preprocess/researchcodebench.py
-poetry run python scripts/preprocess/matharena.py
-poetry run python scripts/preprocess/multi_swebench.py
+poetry run python scripts/preprocess/measurement_db.py
 ```
 
-On every run, each script:
+On every run, the script:
 
 1. Checks the latest revision of `aims-foundations/measurement-db` and pins that commit for the run.
-2. Loads the required files, downloading missing inputs into the Hugging Face cache and reusing
-   cached files when available. MMDocRAG also fetches raw answers, quote sets, and the prompt source
-   archive; SWE-rebench also fetches raw trajectories for error filtering; MathArena also fetches the
-   solution traces (API-failure filtering) and the images, written to `data/matharena/images/`;
-   Multi-SWE-bench also fetches every run's `results.json` and predictions (empty-patch outcomes).
-3. Rebuilds and overwrites `data/processed/<benchmark>.jsonl`.
-4. Writes `data/processed/<benchmark>.manifest.json` with the source repository, exact revision,
-   load timestamp, source table paths, output row count, and output SHA-256. MMDocRAG and SWE-rebench
-   additionally record every source file used, including metadata and raw inputs.
+2. Discovers every top-level benchmark directory. There is no hard-coded benchmark list or inclusion flag.
+3. Downloads the standardized benchmark, item, subject, response, metadata, and optional trace tables into
+   the Hugging Face cache, reusing cached files when available. It downloads a benchmark's `assets.parquet`
+   only after its item manifests show that assets are referenced and every declared MIME type is supported.
+4. Processes referenced assets by exact MIME subtype and appends either their verbatim content or a local
+   multimodal-model description to the corresponding question. Descriptions are cached; unsupported types
+   fail explicitly, and genuinely unknown binary payloads are stored as content-addressed artifacts.
+5. Writes one row per released response to `data/processed/<benchmark>.jsonl`, preserving `response_id`,
+   `trial`, `test_condition`, `interactors`, and the matching trace when released.
+6. Normalizes graded scores to `[0, 1]`, where 1 is better, while retaining `raw_score` and the effective
+   item-level `response_scale`. Fully unbounded, unordered, or directionless scales cannot be normalized and
+   are reported as skipped.
+7. Writes a per-benchmark manifest and `data/processed/measurement_db.manifest.json` with the source
+   repository, exact revision, load timestamp, normalization policy, asset recipes/limits, output counts, and
+   output SHA-256 values.
+
+For a small end-to-end check of asset conversion, run:
+
+```bash
+poetry run python scripts/preprocess/measurement_db_asset_trial.py
+```
+
+This uses 20 fixed source items covering all 26 supported MIME types, reads only their selected Parquet rows,
+and writes one deterministic released response per item under `data/processed/asset_trial/`. The trial
+intentionally filters each source manifest to the fixed assets listed in the script, so asset-heavy items do
+not pull hundreds of unrelated files into the check. An uncached first run still downloads the configured local
+image, audio, and video model weights needed by those samples.
 
 ### 5. Build the model table 
 
@@ -150,9 +163,13 @@ blanks in the build, and `null` means unknown or not verified.
 - item_id (benchmark:instance_id) [data]
 - benchmark [data]
 - subject_id [data]
-- score: mean over runs, in [0, 1] [data]
-- n_runs [data]
-- score_type: binary / fraction / mixed before averaging [bench]
+- response_id and trial: identify the exact released attempt [data]
+- test_condition and interactors: complete the observation key [data]
+- score: normalized to [0, 1], where 1 is better [derived]
+- raw_score and response_scale: released grade and its effective item-level scale [data]
+- n_runs: number of released trials for the observation cell [derived]
+- score_type: binary / fraction / mixed / other declared benchmark type [bench]
+- trace: raw released model output, null when no trace was published [data]
 - Question (contiene todo: System prompt + user prompt + image_url con markers especificos -> [system]\n<system prompt>\n\n[user]\n<user message> y <image:PATH> ) [data]
 - ground_truth [data]
 - eval_type: exact_match / multiple_choice / judge / unit_tests [derived from grading rule]

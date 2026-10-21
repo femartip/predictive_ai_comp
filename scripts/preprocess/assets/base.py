@@ -21,7 +21,7 @@ AssetFamily = Literal["image", "audio", "video", "text", "application"]
 
 DEFAULT_IMAGE_MODEL = "Qwen/Qwen2.5-VL-7B-Instruct"
 DEFAULT_AUDIO_MODEL = "Qwen/Qwen2-Audio-7B-Instruct"
-DEFAULT_VIDEO_MODEL = "Qwen/Qwen2.5-Omni-7B"
+DEFAULT_VIDEO_MODEL = "Qwen/Qwen2.5-Omni-3B"
 LOCAL_PROCESSOR_REVISION = "asset-processors-v1"
 
 
@@ -72,6 +72,7 @@ class AssetLimits:
     max_octet_stream_bytes: int | None = None
     max_archive_depth: int = 3
     max_video_frames: int = 16
+    max_video_frame_pixels: int = 448 * 448
     max_obj_render_faces: int = 50_000
     max_printable_strings: int = 200
 
@@ -174,7 +175,7 @@ class AssetDescriptionCache:
 
 
 class AssetProcessingContext:
-    """Own configuration, artifacts, cache, and at most one loaded 7B model."""
+    """Own configuration, artifacts, cache, and at most one loaded multimodal model."""
 
     def __init__(
         self,
@@ -407,21 +408,50 @@ class AssetProcessingContext:
             messages = [{"role": "user", "content": [
                 {
                     "type": "video",
-                    "video": Path(temporary_name).as_uri(),
-                    "nframes": self.limits.max_video_frames,
+                    "video": temporary_name,
                 },
                 {"type": "text", "text": prompt},
             ]}]
-            inputs = processor.apply_chat_template(
-                messages,
-                load_audio_from_video=True,
-                add_generation_prompt=True,
-                tokenize=True,
-                return_dict=True,
+            # Generic audio-from-video templating adds a separate audio token,
+            # but Omni consumes the soundtrack within the video token itself.
+            from transformers.audio_utils import load_audio
+
+            text = processor.apply_chat_template(
+                messages, add_generation_prompt=True, tokenize=False,
+            )
+            sampling_rate = processor.feature_extractor.sampling_rate
+            audio = load_audio(temporary_name, sampling_rate=sampling_rate)
+            inputs = processor(
+                text=text,
+                videos=[temporary_name],
+                audio=[audio],
+                sampling_rate=sampling_rate,
                 return_tensors="pt",
                 padding=True,
                 use_audio_in_video=True,
-            ).to(model.device)
+                videos_kwargs={
+                    "do_sample_frames": True,
+                    "fps": 2.0,
+                    "max_frames": self.limits.max_video_frames,
+                    "size": {
+                        "shortest_edge": min(128 * 28 * 28, self.limits.max_video_frame_pixels),
+                        "longest_edge": self.limits.max_video_frame_pixels,
+                    },
+                    "cap_pixels_per_frame": True,
+                },
+            )
+            text_config = model.config.get_text_config()
+            context_limit = min(
+                processor.tokenizer.model_max_length, text_config.max_position_embeddings,
+            )
+            input_tokens = inputs.input_ids.size(1)
+            if input_tokens + 2048 > context_limit:
+                raise ValueError(
+                    f"Video requires {input_tokens} input tokens plus 2048 output tokens, "
+                    f"exceeding the {context_limit}-token context. Split this video into "
+                    "shorter clips to preserve its soundtrack and visual content."
+                )
+            inputs = inputs.to(model.device)
             generated = model.generate(
                 **inputs,
                 use_audio_in_video=True,

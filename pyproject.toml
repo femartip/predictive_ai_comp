@@ -1,6 +1,14 @@
 [tool.poetry]
 package-mode = false
 
+[[tool.poetry.source]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+priority = "explicit"
+
+[tool.poetry.dependencies]
+torch = {source = "pytorch-cu128"}
+torchvision = {source = "pytorch-cu128"}
 [project]
 name = "predictive-ai-comp"
 version = "0.1.0"
@@ -22,14 +30,15 @@ dependencies = [
     "openexr (>=3.3.0,<4.0.0)",
     "pillow (>=11.0.0,<13.0.0)",
     "soundfile (>=0.13.0,<1.0.0)",
-    "torch (==2.6.0)",
+    "torch (==2.7.0)",
     "transformers (>=4.51.3,<6.0.0)",
     "av (>=14.0.0,<17.0.0)",
     "charset-normalizer (>=3.4.0,<4.0.0)",
     "pymupdf (>=1.25.0,<2.0.0)",
     "sqlparse (>=0.5.0,<1.0.0)",
-    "torchvision (==0.21.0)",
-    "trimesh (>=4.6.0,<5.0.0)"
+    "torchvision (==0.22.0)",
+    "trimesh (>=4.6.0,<5.0.0)",
+    "torchcodec (==0.5.0)"
 ]
 
 

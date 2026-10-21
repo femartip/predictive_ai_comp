@@ -22,12 +22,9 @@ from common import OUT, benchmark_columns, huggingface_provenance, subject_colum
 
 REPOSITORY = "aims-foundations/measurement-db"
 TABLES = ("benchmarks", "items", "subjects", "responses")
-NORMALIZATION_POLICY = {
-    "bounded": "linear min-max; reversed when lower_is_better",
-    "one_sided_better_at_bound": "1 / (1 + distance_from_finite_bound)",
-    "one_sided_better_at_infinity": "distance_from_finite_bound / (1 + distance_from_finite_bound)",
-    "single_discrete_value": "1",
-    "unsupported": "fully unbounded, unordered, or directionless scales are skipped",
+NORMALIZATION_METADATA = {
+    "per_item_field": "normalization_policy",
+    "description": "Each observation records only its applied normalization formula and parameters.",
 }
 
 
@@ -79,13 +76,36 @@ def normalization_mode(scale: dict) -> tuple[str, float | None, float | None, st
     if kind == "interval":
         minimum = _finite_bound(scale.get("min"), "minimum")
         maximum = _finite_bound(scale.get("max"), "maximum")
-        if minimum is None and maximum is None:
-            raise UnsupportedScaleError("fully unbounded interval")
         if minimum is not None and maximum is not None and maximum < minimum:
             raise UnsupportedScaleError(f"interval maximum {maximum} is below minimum {minimum}")
         return "interval", minimum, maximum, direction
 
     raise UnsupportedScaleError(f"unsupported scale kind {kind!r}")
+
+
+
+def applied_normalization_policy(scale: dict) -> dict:
+    """Describe only the transform selected for this item's concrete scale."""
+    _, minimum, maximum, direction = normalization_mode(scale)
+    policy = {"direction": direction}
+    if minimum is None and maximum is None:
+        return {**policy, "method": "logistic", "formula": "1 / (1 + exp(-sign * raw_score))",
+                "parameters": {"sign": 1 if direction == "higher_is_better" else -1,
+                               "center": 0, "temperature": 1}}
+    if minimum == maximum:
+        return {**policy, "method": "constant", "formula": "1",
+                "parameters": {"value": minimum}}
+    if minimum is not None and maximum is not None:
+        formula = ("(raw_score - min) / (max - min)" if direction == "higher_is_better"
+                   else "(max - raw_score) / (max - min)")
+        return {**policy, "method": "linear_min_max", "formula": formula,
+                "parameters": {"min": minimum, "max": maximum}, "clip": [0, 1]}
+    better_at_bound = ((minimum is not None and direction == "lower_is_better")
+                       or (maximum is not None and direction == "higher_is_better"))
+    return {**policy, "method": "reciprocal_distance" if better_at_bound else "distance_ratio",
+            "formula": "1 / (1 + distance)" if better_at_bound else "distance / (1 + distance)",
+            "distance": "max(raw_score - bound, 0)" if minimum is not None else "max(bound - raw_score, 0)",
+            "parameters": {"bound": minimum if minimum is not None else maximum}, "clip": [0, 1]}
 
 
 def normalize_scores(raw_score: pd.Series, response_scale: pd.Series) -> pd.Series:
@@ -101,7 +121,16 @@ def normalize_scores(raw_score: pd.Series, response_scale: pd.Series) -> pd.Seri
         mask = graded & response_scale.eq(encoded_scale)
         values = raw_score.loc[mask].astype(float)
 
-        if minimum == maximum:
+        if minimum is None and maximum is None:
+            signed = values if direction == "higher_is_better" else -values
+            # Evaluate sigmoid without exponentiating a positive number, so
+            # extreme scores cannot overflow. Fixed parameters avoid dependence
+            # on the response batch or the set of subjects being compared.
+            exp_negative_abs = (-signed.abs()).map(math.exp)
+            result = (1 / (1 + exp_negative_abs)).where(
+                signed >= 0, exp_negative_abs / (1 + exp_negative_abs),
+            )
+        elif minimum == maximum:
             result = pd.Series(1.0, index=values.index)
         elif minimum is not None and maximum is not None:
             result = (values - minimum) / (maximum - minimum)
@@ -211,6 +240,11 @@ def build_output(
         )
 
     output["score"] = normalize_scores(output.raw_score, output.response_scale)
+    policies = {
+        encoded: applied_normalization_policy(json.loads(encoded))
+        for encoded in output.response_scale.dropna().unique()
+    }
+    output["normalization_policy"] = output.response_scale.map(policies)
     output["benchmark"] = benchmark
     output["programming_language"] = None
     output["tools"] = None
@@ -341,6 +375,11 @@ def process_benchmark(
         for batch in reader:
             output = batch.to_pandas()
             output["score"] = normalize_scores(output.raw_score, output.response_scale)
+            policies = {
+                encoded: applied_normalization_policy(json.loads(encoded))
+                for encoded in output.response_scale.dropna().unique()
+            }
+            output["normalization_policy"] = output.response_scale.map(policies)
             output["benchmark"] = benchmark
             output["programming_language"] = None
             output["tools"] = None
@@ -357,7 +396,7 @@ def process_benchmark(
         revision=revision,
         loaded_at_utc=loaded_at_utc,
     )
-    provenance["normalization"] = NORMALIZATION_POLICY
+    provenance["normalization"] = NORMALIZATION_METADATA
     if asset_stats is not None:
         provenance["asset_processing"] = {
             **asset_stats,
@@ -387,7 +426,7 @@ def write_collection_manifest(revision: str, loaded_at_utc: str, discovered: lis
         "source_repository": REPOSITORY,
         "source_revision": revision,
         "discovery": "every top-level repository directory",
-        "normalization": NORMALIZATION_POLICY,
+        "normalization": NORMALIZATION_METADATA,
         "benchmarks_discovered": len(discovered),
         "benchmarks_written": len(outputs),
         "benchmarks_skipped": len(skipped),

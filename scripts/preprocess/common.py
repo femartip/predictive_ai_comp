@@ -34,7 +34,7 @@ OBSERVATION_COLUMNS = [
     # IDs and observation key
     "response_id", "item_id", "benchmark", "subject_id", "trial", "test_condition", "interactors",
     # Target. score is normalized; raw_score is the released value.
-    "score", "raw_score", "response_scale", "n_runs", "score_type",
+    "score", "raw_score", "response_scale", "normalization_policy", "n_runs", "score_type",
     # Released model output
     "trace",
     # Item

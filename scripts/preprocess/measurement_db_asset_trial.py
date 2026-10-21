@@ -3,7 +3,8 @@
 The 20 source items below cover all 26 currently supported MIME subtypes. Only
 the explicitly listed asset references are retained from each source manifest;
 this prevents asset-heavy items from turning the validation run into a full
-benchmark download. One deterministic released response is written per item.
+benchmark download. One deterministic released response is written per item with a supported scale.
+Benchmarks with unsupported scales are recorded as skipped in the manifest.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ from huggingface_hub import HfApi, HfFileSystem
 from assets import AssetProcessingContext, SUPPORTED_MEDIA_TYPES, recipe_provenance
 from assets.pipeline import add_asset_descriptions, parse_manifest
 from common import OUT, huggingface_provenance, load_metadata, write_observations
-from measurement_db import REPOSITORY, build_output, utc_now
+from measurement_db import NORMALIZATION_METADATA, REPOSITORY, UnsupportedScaleError, build_output, utc_now
 
 
 TRIAL_OUT = OUT / "asset_trial"
@@ -425,6 +426,7 @@ def process_trial_benchmark(
         revision=revision,
         loaded_at_utc=loaded_at_utc,
     )
+    provenance["normalization"] = NORMALIZATION_METADATA
     provenance["asset_trial"] = {
         "selection": "20 source items fixed in scripts/preprocess/measurement_db_asset_trial.py",
         "one_response_per_item": "lowest (trial, subject_id, response_id)",
@@ -468,18 +470,31 @@ def main() -> None:
         flush=True,
     )
     outputs = []
+    skipped = []
     asset_context = AssetProcessingContext(OUT / "asset_descriptions.sqlite3")
     try:
         for position, (benchmark, samples) in enumerate(sorted(grouped.items()), 1):
             print(f"[{position}/{len(grouped)}] {benchmark}: {len(samples)} item(s)", flush=True)
-            result = process_trial_benchmark(
-                benchmark,
-                samples,
-                api,
-                revision,
-                loaded_at_utc,
-                asset_context,
-            )
+            try:
+                result = process_trial_benchmark(
+                    benchmark,
+                    samples,
+                    api,
+                    revision,
+                    loaded_at_utc,
+                    asset_context,
+                )
+            except UnsupportedScaleError as error:
+                skipped.append({
+                    "benchmark": benchmark,
+                    "reason": str(error),
+                    "items": len(samples),
+                    "media_types": sorted({
+                        asset["media_type"] for sample in samples for asset in sample["assets"]
+                    }),
+                })
+                print(f"  skipped output: {error}", flush=True)
+                continue
             outputs.append(result)
             print(
                 f"  wrote {result['items']} rows using {result['assets']} selected assets",
@@ -493,9 +508,15 @@ def main() -> None:
         "source_repository": REPOSITORY,
         "source_revision": revision,
         "selection": "fixed 20-item asset trial",
-        "items": len(TRIAL_ITEMS),
-        "covered_media_types": sorted(SUPPORTED_MEDIA_TYPES),
+        "normalization": NORMALIZATION_METADATA,
+        "selected_items": len(TRIAL_ITEMS),
+        "selected_media_types": sorted(SUPPORTED_MEDIA_TYPES),
+        "items": sum(result["items"] for result in outputs),
+        "covered_media_types": sorted({
+            media_type for result in outputs for media_type in result["media_types"]
+        }),
         "outputs": outputs,
+        "skipped": skipped,
     }
     TRIAL_OUT.mkdir(parents=True, exist_ok=True)
     manifest_path = TRIAL_OUT / "asset_trial.manifest.json"

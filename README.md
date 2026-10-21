@@ -55,8 +55,12 @@ On every run, the script:
 5. Writes one row per released response to `data/processed/<benchmark>.jsonl`, preserving `response_id`,
    `trial`, `test_condition`, `interactors`, and the matching trace when released.
 6. Normalizes graded scores to `[0, 1]`, where 1 is better, while retaining `raw_score` and the effective
-   item-level `response_scale`. Fully unbounded, unordered, or directionless scales cannot be normalized and
-   are reported as skipped.
+   item-level `response_scale` and a `normalization_policy` containing only the applied formula and
+   its parameters for that item. Fully unbounded numeric scales use `sigmoid(s * raw_score)`, with
+   `s = 1` for higher-is-better and `s = -1` for lower-is-better. This fixed transform maps zero to 0.5,
+   uses temperature 1, and is independent of batching or the subjects present. It preserves score order
+   but does not imply calibrated probabilities or comparable difficulty across benchmarks; extreme scores
+   can saturate numerically at 0 or 1. Unordered or directionless scales are reported as skipped.
 7. Writes a per-benchmark manifest and `data/processed/measurement_db.manifest.json` with the source
    repository, exact revision, load timestamp, normalization policy, asset recipes/limits, output counts, and
    output SHA-256 values.
@@ -68,10 +72,24 @@ poetry run python scripts/preprocess/measurement_db_asset_trial.py
 ```
 
 This uses 20 fixed source items covering all 26 supported MIME types, reads only their selected Parquet rows,
-and writes one deterministic released response per item under `data/processed/asset_trial/`. The trial
+and writes one deterministic released response per item with a supported scale under
+`data/processed/asset_trial/`. Benchmarks with unsupported scales are recorded as skipped in the trial
+manifest, which reports the items and MIME types actually written separately from the selected coverage. The trial
 intentionally filters each source manifest to the fixed assets listed in the script, so asset-heavy items do
 not pull hundreds of unrelated files into the check. An uncached first run still downloads the configured local
 image, audio, and video model weights needed by those samples.
+
+To export the saved trial questions, reference answers, task descriptions, selected assets, and recorded
+scores as plain text, run:
+
+```bash
+poetry run python scripts/preprocess/export_asset_trial_text.py
+```
+
+This writes `trial_questions_complete.txt` and `trial_questions_reading_guide.txt` alongside the trial
+outputs. The complete export preserves full question and ground-truth text; the reading guide explicitly
+excerpts large asset sections. It verifies the saved JSONL hashes and uses metadata from the cached source
+revision, without rerunning models.
 
 ### 5. Build the model table 
 

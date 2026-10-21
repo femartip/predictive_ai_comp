@@ -79,17 +79,6 @@ intentionally filters each source manifest to the fixed assets listed in the scr
 not pull hundreds of unrelated files into the check. An uncached first run still downloads the configured local
 image, audio, and video model weights needed by those samples.
 
-To export the saved trial questions, reference answers, task descriptions, selected assets, and recorded
-scores as plain text, run:
-
-```bash
-poetry run python scripts/preprocess/export_asset_trial_text.py
-```
-
-This writes `trial_questions_complete.txt` and `trial_questions_reading_guide.txt` alongside the trial
-outputs. The complete export preserves full question and ground-truth text; the reading guide explicitly
-excerpts large asset sections. It verifies the saved JSONL hashes and uses metadata from the cached source
-revision, without rerunning models.
 
 ### 5. Build the model table 
 

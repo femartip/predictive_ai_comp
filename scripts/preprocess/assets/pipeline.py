@@ -110,7 +110,7 @@ def _generate_missing(
             FROM assets a JOIN missing_assets m USING (asset_id)
             ORDER BY m.media_type, a.asset_id
             """
-        ).fetch_record_batch(rows_per_batch=16)
+        ).to_arrow_reader(batch_size=16)
         found = set()
         for batch in reader:
             for row in batch.to_pandas().itertuples(index=False):

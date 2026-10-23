@@ -42,28 +42,148 @@ The dataset is **gated**. Before downloading:
 poetry run python scripts/preprocess/measurement_db.py
 ```
 
-On every run, the script:
+Category membership is saved in `scripts/preprocess/measurement_db_categories.json`. Normal runs read this
+local catalog and use its pinned dataset revision; they do not scan remote benchmarks to classify them.
+With no category flags, every benchmark in the catalog runs. To run only selected portions:
 
-1. Checks the latest revision of `aims-foundations/measurement-db` and pins that commit for the run.
-2. Discovers every top-level benchmark directory. There is no hard-coded benchmark list or inclusion flag.
-3. Downloads the standardized benchmark, item, subject, response, metadata, and optional trace tables into
+```bash
+# Benchmarks that reference no assets
+poetry run python scripts/preprocess/measurement_db.py --no-assets
+
+# Benchmarks with image assets
+poetry run python scripts/preprocess/measurement_db.py --asset-image
+
+# Benchmarks with audio OR video assets
+poetry run python scripts/preprocess/measurement_db.py --asset-audio --asset-video
+```
+
+Available flags are `--no-assets`, `--asset-image`, `--asset-audio`, `--asset-model`, `--asset-text`,
+`--asset-video`, and `--asset-application`. Categories follow the source MIME major type: `model/obj`
+belongs to `asset-model`, even though its handler renders images; `application/pdf`, JSON, SQL, Parquet,
+SQLite, NumPy, and archives belong to `asset-application`. CSV, Markdown, plain text, Python, and shell
+scripts belong to `asset-text`.
+
+Flags combine with OR. A benchmark with multiple asset types runs if any selected category matches, and
+all its items and referenced assets are processed. For example, selecting audio also processes video
+when a matched benchmark contains both. A benchmark is listed once even when several flags match.
+The collection manifest records the selected categories and the number of benchmarks excluded.
+
+`alignment_faking` and `annotating_errors_wcf` are explicitly excluded from all selections, including
+the default full run. Their reasons are recorded in the catalog's `excluded_benchmarks` mapping and
+in each run manifest. Refreshing the catalog preserves exclusions. There are 279 eligible benchmarks
+at the current pinned revision (213 without assets).
+
+Each execution gets a separate folder, grouped by its selected categories:
+
+```text
+data/processed/measurement_db/
+  no-assets/
+    <UTC-timestamp>_<unique-id>/
+      abstract_reason.jsonl
+      ...
+      measurement_db.manifest.json
+      measurement_db_categories.json
+      README.txt
+  asset-application/
+    <UTC-timestamp>_<unique-id>/
+      ...
+  asset-audio+asset-video/
+    <UTC-timestamp>_<unique-id>/
+      ...
+  all/
+    <UTC-timestamp>_<unique-id>/
+      ...
+```
+
+Repeated runs create new folders. Category combinations use a sorted, consistent name; no category flags
+(or explicitly selecting all categories) use `all`. A mixed benchmark is written once inside the current
+run, and its actual categories appear in the run manifest. Separate runs remain independent even when
+both include the same benchmark. Use `--output-root PATH` to change the parent of these category folders.
+
+Each run folder contains its own JSONLs, one compact `measurement_db.manifest.json`, a category-catalog
+snapshot, and a README. There are no per-benchmark manifest files. The run manifest stores shared source
+metadata once and lists only each benchmark's name, filename, row count, and categories.
+Any exported binary files are placed under its `assets/` folder, so the entire run can be shared as one
+archive. Model downloads and the reusable asset-description cache remain outside the run folder.
+The script prints the run path at startup and a ready-to-copy `tar` command when finished. For example:
+
+```bash
+tar -czf no-assets.tar.gz -C data/processed/measurement_db/no-assets RUN_ID
+```
+
+Replace `RUN_ID` with the folder name printed by the script. The run manifest is checkpointed after each
+benchmark and records `running`, `complete`, `failed`, or `interrupted`, along with completed outputs and
+any skipped or failed benchmark. Previously generated files in the flat `data/processed/` directory are
+left in place; this layout applies to new executions.
+
+To continue an interrupted run in the same folder:
+
+```bash
+poetry run python scripts/preprocess/measurement_db.py \
+  --resume data/processed/measurement_db/no-assets/RUN_ID
+```
+
+Replace `RUN_ID` with the existing run folder's name. Resume uses that folder's saved category selection,
+catalog, and dataset revision. Completed JSONLs and recorded skips are retained; the unfinished benchmark
+starts again from its beginning, and missing or unexpectedly empty completed outputs are rebuilt.
+Progress is appended to the existing `run.log`. A completed run with all its outputs present requires no
+further benchmark processing.
+The same folder cannot be processed by two instances at once. With `--resume`, omit category flags,
+`--category-file`, `--output-root`, and `--refresh-categories`; memory and batch settings can still be changed.
+
+Progress, processing stages, and full Python tracebacks are printed to the console and saved in the run's
+`run.log`. The manifest records the current benchmark before processing starts, so it remains identifiable
+even if the process is terminated externally. A terminal message of `Killed` indicates external termination
+(for example, an OS memory kill); Python cannot catch SIGKILL or generate a traceback for it.
+
+Output batches default to 256 response rows to bound the amount of question text held at once. DuckDB
+uses four worker threads and a 4 GB working-memory budget, leaving room for Python/Arrow allocations.
+These can be adjusted with `--threads` and `--memory-limit`; the budget does not cap the total process RAM.
+For benchmarks without referenced assets, question text streams directly from Parquet rather than being
+loaded into pandas in full. Run counts are calculated before attaching question text, keeping
+large text columns out of the window calculation.
+If a benchmark still uses too much memory, reduce the batch size:
+
+```bash
+poetry run python scripts/preprocess/measurement_db.py --no-assets --batch-size 64
+```
+
+The batch size changes memory use, not which responses are included. Rows remain separate runs.
+
+To explicitly rebuild the catalog from the latest dataset revision, run:
+
+```bash
+poetry run python scripts/preprocess/measurement_db.py --refresh-categories
+```
+
+The refresh reads only item-manifest columns, never response tables or binary asset payloads, and exits
+after writing the catalog. It records source MIME types and item counts for each benchmark, along with
+the source revision and refresh timestamp. Use `--category-file PATH` to read or refresh another catalog.
+A failed refresh leaves the existing catalog intact.
+
+On every preprocessing run, the script:
+
+1. Loads the dataset revision and benchmark names from the local category catalog.
+2. Selects benchmarks matching any requested category, or selects all benchmarks when no flags are given.
+3. Downloads the standardized benchmark, item, subject, response, and metadata tables into
    the Hugging Face cache, reusing cached files when available. It downloads a benchmark's `assets.parquet`
    only after its item manifests show that assets are referenced and every declared MIME type is supported.
+   Model traces are not downloaded, read, joined, or exported, including in the asset-trial script.
 4. Processes referenced assets by exact MIME subtype and appends either their verbatim content or a local
    multimodal-model description to the corresponding question. Descriptions are cached; unsupported types
    fail explicitly, and genuinely unknown binary payloads are stored as content-addressed artifacts.
-5. Writes one row per released response to `data/processed/<benchmark>.jsonl`, preserving `response_id`,
-   `trial`, `test_condition`, `interactors`, and the matching trace when released.
+5. Writes one row per released response to `<run-folder>/<benchmark>.jsonl`, preserving `response_id`,
+   `trial`, `test_condition`, and `interactors`.
 6. Normalizes graded scores to `[0, 1]`, where 1 is better, while retaining `raw_score` and the effective
-   item-level `response_scale` and a `normalization_policy` containing only the applied formula and
-   its parameters for that item. Fully unbounded numeric scales use `sigmoid(s * raw_score)`, with
+   item-level `response_scale` and a `normalization_policy` containing only the policy name
+   (for example, `"linear_min_max"` or `"logistic"`). Fully unbounded numeric scales use `sigmoid(s * raw_score)`, with
    `s = 1` for higher-is-better and `s = -1` for lower-is-better. This fixed transform maps zero to 0.5,
    uses temperature 1, and is independent of batching or the subjects present. It preserves score order
    but does not imply calibrated probabilities or comparable difficulty across benchmarks; extreme scores
    can saturate numerically at 0 or 1. Unordered or directionless scales are reported as skipped.
-7. Writes a per-benchmark manifest and `data/processed/measurement_db.manifest.json` with the source
-   repository, exact revision, load timestamp, normalization policy, asset recipes/limits, output counts, and
-   output SHA-256 values.
+7. Updates the single `<run-folder>/measurement_db.manifest.json` with the shared source repository,
+   revision and run timestamps, selected categories, status, compact benchmark entries, and any skips or
+   failures. It creates no per-benchmark sidecars.
 
 For a small end-to-end check of asset conversion, run:
 
@@ -74,7 +194,8 @@ poetry run python scripts/preprocess/measurement_db_asset_trial.py
 This uses 20 fixed source items covering all 26 supported MIME types, reads only their selected Parquet rows,
 and writes one deterministic released response per item with a supported scale under
 `data/processed/asset_trial/`. Benchmarks with unsupported scales are recorded as skipped in the trial
-manifest, which reports the items and MIME types actually written separately from the selected coverage. The trial
+manifest, which reports the items and MIME types actually written separately from the selected coverage.
+The trial also writes only this one manifest, with no per-benchmark sidecars. The trial
 intentionally filters each source manifest to the fixed assets listed in the script, so asset-heavy items do
 not pull hundreds of unrelated files into the check. An uncached first run still downloads the configured local
 image, audio, and video model weights needed by those samples.
@@ -176,7 +297,6 @@ blanks in the build, and `null` means unknown or not verified.
 - raw_score and response_scale: released grade and its effective item-level scale [data]
 - n_runs: number of released trials for the observation cell [derived]
 - score_type: binary / fraction / mixed / other declared benchmark type [bench]
-- trace: raw released model output, null when no trace was published [data]
 - Question (contiene todo: System prompt + user prompt + image_url con markers especificos -> [system]\n<system prompt>\n\n[user]\n<user message> y <image:PATH> ) [data]
 - ground_truth [data]
 - eval_type: exact_match / multiple_choice / judge / unit_tests [derived from grading rule]

@@ -1,30 +1,39 @@
-"""Download and convert every benchmark in the AIMS Measurement DB.
+"""Download and convert selected benchmarks in the AIMS Measurement DB.
 
-The repository revision is pinned once per run. Each output row is one released
-response, so repeated trials and traces remain attached to the correct attempt.
+The local category catalog pins the repository revision. Each output row is one released
+response, so repeated trials remain distinct. Model traces are not downloaded or exported.
 """
 
+import argparse
+import fcntl
 import json
+import logging
 import math
+import os
+import sys
+import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+from shlex import quote
+from uuid import uuid4
 
 import duckdb
 import pandas as pd
+import pyarrow.parquet as pq
 import yaml
 from huggingface_hub import HfApi, hf_hub_download
-from huggingface_hub.hf_api import RepoFolder
 
-from assets import AssetProcessingContext, handler_for, recipe_provenance
+from assets import AssetProcessingContext, handler_for
 from assets.pipeline import add_asset_descriptions, manifest_references
-from common import OUT, benchmark_columns, huggingface_provenance, subject_columns, write_observation_batches
+from common import OUT, benchmark_columns, subject_columns, write_observation_batches
+from measurement_db_categories import CATEGORY_FILE, CATEGORIES, REPOSITORY, build_catalog, load_catalog, select_benchmarks
 
 
-REPOSITORY = "aims-foundations/measurement-db"
 TABLES = ("benchmarks", "items", "subjects", "responses")
 NORMALIZATION_METADATA = {
     "per_item_field": "normalization_policy",
-    "description": "Each observation records only its applied normalization formula and parameters.",
+    "description": "Each observation records only the name of its applied normalization policy.",
 }
 
 
@@ -84,28 +93,18 @@ def normalization_mode(scale: dict) -> tuple[str, float | None, float | None, st
 
 
 
-def applied_normalization_policy(scale: dict) -> dict:
-    """Describe only the transform selected for this item's concrete scale."""
+def applied_normalization_policy(scale: dict) -> str:
+    """Return only the name of the transform applied to this item's scale."""
     _, minimum, maximum, direction = normalization_mode(scale)
-    policy = {"direction": direction}
     if minimum is None and maximum is None:
-        return {**policy, "method": "logistic", "formula": "1 / (1 + exp(-sign * raw_score))",
-                "parameters": {"sign": 1 if direction == "higher_is_better" else -1,
-                               "center": 0, "temperature": 1}}
+        return "logistic"
     if minimum == maximum:
-        return {**policy, "method": "constant", "formula": "1",
-                "parameters": {"value": minimum}}
+        return "constant"
     if minimum is not None and maximum is not None:
-        formula = ("(raw_score - min) / (max - min)" if direction == "higher_is_better"
-                   else "(max - raw_score) / (max - min)")
-        return {**policy, "method": "linear_min_max", "formula": formula,
-                "parameters": {"min": minimum, "max": maximum}, "clip": [0, 1]}
+        return "linear_min_max"
     better_at_bound = ((minimum is not None and direction == "lower_is_better")
                        or (maximum is not None and direction == "higher_is_better"))
-    return {**policy, "method": "reciprocal_distance" if better_at_bound else "distance_ratio",
-            "formula": "1 / (1 + distance)" if better_at_bound else "distance / (1 + distance)",
-            "distance": "max(raw_score - bound, 0)" if minimum is not None else "max(bound - raw_score, 0)",
-            "parameters": {"bound": minimum if minimum is not None else maximum}, "clip": [0, 1]}
+    return "reciprocal_distance" if better_at_bound else "distance_ratio"
 
 
 def normalize_scores(raw_score: pd.Series, response_scale: pd.Series) -> pd.Series:
@@ -186,7 +185,6 @@ def build_output(
     items: pd.DataFrame,
     subjects: pd.DataFrame,
     responses: pd.DataFrame,
-    traces: pd.DataFrame | None,
 ) -> pd.DataFrame:
     """Convert standardized Measurement DB tables to the common observation layout."""
     if len(benchmark_table) != 1 or benchmark_table.iloc[0].benchmark_id != benchmark:
@@ -227,18 +225,6 @@ def build_output(
         raise ValueError(f"{benchmark}: responses reference missing subjects")
     output = output.drop(columns="_subject_join")
 
-    if traces is None:
-        output["trace"] = None
-    else:
-        if traces.response_id.duplicated().any():
-            raise ValueError(f"{benchmark}: duplicate trace response_id values")
-        output = output.merge(
-            traces[["response_id", "trace"]],
-            on="response_id",
-            how="left",
-            validate="one_to_one",
-        )
-
     output["score"] = normalize_scores(output.raw_score, output.response_scale)
     policies = {
         encoded: applied_normalization_policy(json.loads(encoded))
@@ -256,18 +242,9 @@ def build_output(
     return output
 
 
-def discover_benchmarks(api: HfApi, revision: str) -> list[str]:
-    """Return every top-level directory; there is intentionally no allow/deny list."""
-    entries = api.list_repo_tree(REPOSITORY, repo_type="dataset", revision=revision, recursive=False)
-    return sorted(entry.path for entry in entries if isinstance(entry, RepoFolder))
-
-
 def source_files(api: HfApi, benchmark: str, revision: str) -> list[str]:
     files = [f"{benchmark}/formatted_tables/{name}.parquet" for name in TABLES]
     files.append(f"{benchmark}/metadata.yaml")
-    trace = f"{benchmark}/formatted_tables/traces.parquet"
-    if api.file_exists(REPOSITORY, trace, repo_type="dataset", revision=revision):
-        files.append(trace)
     assets = f"{benchmark}/formatted_tables/assets.parquet"
     if api.file_exists(REPOSITORY, assets, repo_type="dataset", revision=revision):
         files.append(assets)
@@ -293,7 +270,15 @@ def process_benchmark(
     loaded_at_utc: str,
     output_dir: Path | None = None,
     asset_context: AssetProcessingContext | None = None,
+    batch_size: int = 256,
+    logger: logging.Logger | None = None,
+    memory_limit: str = '4GB',
+    threads: int = 4,
 ) -> dict:
+    if batch_size < 1 or threads < 1:
+        raise ValueError("batch_size and threads must be positive")
+    logger = logger or logging.getLogger(__name__)
+    logger.info("%s: reading source tables", benchmark)
     filenames = source_files(api, benchmark, revision)
     asset_name = f"{benchmark}/formatted_tables/assets.parquet"
     # Inspect the much smaller items table before downloading a potentially
@@ -303,41 +288,69 @@ def process_benchmark(
     prefix = f"{benchmark}/formatted_tables/"
     table = lambda name: pd.read_parquet(paths[f"{prefix}{name}.parquet"])
     metadata = yaml.safe_load(paths[f"{benchmark}/metadata.yaml"].read_text(encoding="utf-8"))["benchmark"]
-    trace_name = f"{prefix}traces.parquet"
     benchmark_table = table("benchmarks")
     if len(benchmark_table) != 1 or benchmark_table.iloc[0].benchmark_id != benchmark:
         raise ValueError(f"{benchmark}: invalid benchmarks table")
-    items = table("items")
-    asset_stats = None
+    items_path = paths[f"{prefix}items.parquet"]
+    metadata_columns = ['item_id', 'grading_criterion', 'verifier']
+    if 'asset_manifest' in pq.read_schema(items_path).names:
+        metadata_columns.append('asset_manifest')
+    # Large question columns stay in Parquet unless asset expansion needs them.
+    items = pd.read_parquet(items_path, columns=metadata_columns)
     owned_asset_context = None
-    if asset_name in filenames:
-        references = manifest_references(items)
+    references = manifest_references(items)
+    stream_questions = references.empty
+    if stream_questions:
+        filenames = [name for name in filenames if name != asset_name]
+        items['content'] = None
+        logger.info("%s: question text will stream directly from Parquet", benchmark)
+    else:
+        content = pd.read_parquet(items_path, columns=['item_id', 'content'])
+        items = items.merge(content, on='item_id', validate='one_to_one')
+        if asset_name not in filenames:
+            raise ValueError(f"{benchmark}: item manifests reference assets but assets.parquet is missing")
         for media_type in references.media_type.unique():
             handler_for(media_type)
         paths.update(download_files([asset_name], revision))
         if asset_context is None:
-            owned_asset_context = AssetProcessingContext(OUT / "asset_descriptions.sqlite3")
+            owned_asset_context = AssetProcessingContext(
+                OUT / "asset_descriptions.sqlite3", artifact_root=(output_dir or OUT) / "assets",
+            )
             asset_context = owned_asset_context
         try:
-            items, asset_stats = add_asset_descriptions(items, paths[asset_name], asset_context)
+            items, _ = add_asset_descriptions(items, paths[asset_name], asset_context)
         finally:
             if owned_asset_context is not None:
                 owned_asset_context.close()
+    logger.info("%s: preparing joins and score normalization", benchmark)
     item_data = item_columns(items, benchmark, metadata["response_scale"])
     subject_data = subject_columns(table("subjects"))
 
-    connection = duckdb.connect()
+    logger.info("%s: DuckDB memory limit %s, threads %s", benchmark, memory_limit, threads)
+    connection = duckdb.connect(config={
+        'memory_limit': memory_limit,
+        'threads': threads,
+        'preserve_insertion_order': False,
+    })
+    # Keep large question text on the probe side; hash tables contain narrow metadata.
+    connection.execute("SET disabled_optimizers = 'join_order,build_side_probe_side'")
     connection.register("item_data", item_data)
     connection.register("subject_data", subject_data)
+    if stream_questions:
+        connection.from_parquet(str(items_path)).project('item_id, content').create_view('item_questions')
+        question_select = 'q.content'
+        item_source = 'item_questions q JOIN item_data i ON q.item_id = i.source_item_id'
+    else:
+        question_select = 'i.question'
+        item_source = 'item_data i'
     connection.from_parquet(str(paths[f"{prefix}responses.parquet"])).create_view("responses")
-    trace_select = "NULL::VARCHAR AS trace"
-    trace_join = ""
-    if trace_name in paths:
-        connection.from_parquet(str(paths[trace_name])).project("response_id, trace").create_view("traces")
-        trace_select = "t.trace"
-        trace_join = "LEFT JOIN traces t ON r.response_id = t.response_id"
-
     query = f"""
+        WITH response_runs AS MATERIALIZED (
+            SELECT *, count(*) OVER (
+                PARTITION BY subject_id, item_id, test_condition, interactors
+            ) AS n_runs
+            FROM responses
+        )
         SELECT
             r.response_id,
             i.item_id,
@@ -346,11 +359,8 @@ def process_benchmark(
             r.test_condition,
             r.interactors,
             r.response AS raw_score,
-            count(*) OVER (
-                PARTITION BY r.subject_id, r.item_id, r.test_condition, r.interactors
-            ) AS n_runs,
-            {trace_select},
-            i.question,
+            r.n_runs,
+            {question_select} AS question,
             i.ground_truth,
             i.eval_type,
             i.response_scale,
@@ -361,17 +371,18 @@ def process_benchmark(
             s.harness,
             s.harness_version,
             s.access_date
-        FROM responses r
-        JOIN item_data i ON r.item_id = i.source_item_id
+        FROM {item_source}
+        JOIN response_runs r ON r.item_id = i.source_item_id
         JOIN subject_data s ON r.subject_id = s.subject_id
-        {trace_join}
     """
     source_rows = connection.execute("SELECT count(*) FROM responses").fetchone()[0]
-    reader = connection.execute(query).fetch_record_batch(rows_per_batch=50_000)
+    logger.info("%s: streaming %s responses in batches of %s", benchmark, f"{source_rows:,}", batch_size)
+    reader = connection.execute(query).to_arrow_reader(batch_size=batch_size)
     constants = benchmark_columns(metadata)
-    stats = {"rows": 0, "graded_rows": 0, "trace_rows": 0}
+    stats = {"rows": 0, "graded_rows": 0}
 
     def output_batches():
+        last_progress = 0.0
         for batch in reader:
             output = batch.to_pandas()
             output["score"] = normalize_scores(output.raw_score, output.response_scale)
@@ -387,26 +398,14 @@ def process_benchmark(
                 output[column] = value
             stats["rows"] += len(output)
             stats["graded_rows"] += int(output.score.notna().sum())
-            stats["trace_rows"] += int(output.trace.notna().sum())
+            now = time.monotonic()
+            if now - last_progress >= 5:
+                logger.info("%s: decoded %s/%s response rows", benchmark, f"{stats['rows']:,}", f"{source_rows:,}")
+                last_progress = now
             yield output
 
-    provenance = huggingface_provenance(
-        REPOSITORY,
-        filenames,
-        revision=revision,
-        loaded_at_utc=loaded_at_utc,
-    )
-    provenance["normalization"] = NORMALIZATION_METADATA
-    if asset_stats is not None:
-        provenance["asset_processing"] = {
-            **asset_stats,
-            **asset_context.provenance(),
-            "recipes": recipe_provenance(asset_stats["media_types"], asset_context),
-            "descriptions_replace_assets": True,
-            "manifest_order": "ordinal",
-        }
     try:
-        path = write_observation_batches(output_batches(), benchmark, provenance, output_dir=output_dir)
+        path = write_observation_batches(output_batches(), benchmark, output_dir=output_dir)
     finally:
         connection.close()
     if stats["rows"] != source_rows:
@@ -414,65 +413,319 @@ def process_benchmark(
     return {
         "benchmark": benchmark,
         **stats,
-        "asset_processing": asset_stats,
         "output_file": path.name,
     }
 
 
-def write_collection_manifest(revision: str, loaded_at_utc: str, discovered: list[str], outputs: list[dict], skipped: list[dict]):
-    OUT.mkdir(parents=True, exist_ok=True)
+def create_run_directory(output_root: Path, categories: list[str], started_at: str) -> Path:
+    """Allocate an independent folder; repeated or concurrent runs never overwrite."""
+    selected = sorted(set(categories))
+    label = 'all' if set(selected) == set(CATEGORIES) else '+'.join(selected)
+    timestamp = datetime.fromisoformat(started_at.replace('Z', '+00:00')).astimezone(timezone.utc)
+    run_id = timestamp.strftime('%Y%m%dT%H%M%SZ') + '_' + uuid4().hex[:8]
+    directory = output_root / label / run_id
+    directory.mkdir(parents=True, exist_ok=False)
+    return directory
+
+
+def write_collection_manifest(
+    revision: str, loaded_at_utc: str, discovered: list[str], outputs: list[dict], skipped: list[dict],
+    *, selection: dict | None = None, output_dir: Path | None = None,
+    status: str = 'complete', error: dict | None = None,
+    current_benchmark: str | None = None,
+):
+    destination = output_dir if output_dir is not None else OUT
+    destination.mkdir(parents=True, exist_ok=True)
     manifest = {
+        "run_id": destination.name,
+        "status": status,
+        "current_benchmark": current_benchmark,
         "loaded_at_utc": loaded_at_utc,
+        "finished_at_utc": None if status == 'running' else utc_now(),
         "source_repository": REPOSITORY,
         "source_revision": revision,
-        "discovery": "every top-level repository directory",
-        "normalization": NORMALIZATION_METADATA,
+        "selection": {
+            key: value for key, value in (selection or {}).items()
+            if key in {'requested_categories', 'match', 'benchmarks_selected', 'benchmarks_excluded', 'catalog_snapshot', 'excluded_benchmarks'}
+        },
         "benchmarks_discovered": len(discovered),
         "benchmarks_written": len(outputs),
         "benchmarks_skipped": len(skipped),
-        "outputs": outputs,
+        "outputs": [
+            {key: entry[key] for key in ('benchmark', 'output_file', 'rows', 'categories') if key in entry}
+            for entry in outputs
+        ],
         "skipped": skipped,
     }
-    path = OUT / "measurement_db.manifest.json"
-    path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    if error is not None:
+        manifest['error'] = error
+    path = destination / "measurement_db.manifest.json"
+    temporary = path.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary.replace(path)
     return path
 
 
-def main() -> None:
-    api = HfApi()
-    revision = api.dataset_info(REPOSITORY).sha
-    loaded_at_utc = utc_now()
-    benchmarks = discover_benchmarks(api, revision)
-    print(f"Found {len(benchmarks)} benchmark directories at {revision}", flush=True)
+@contextmanager
+def run_lock(run_dir: Path):
+    """Prevent two processes from updating the same run, even after an OS kill."""
+    with (run_dir / '.run.lock').open('a+', encoding='utf-8') as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RuntimeError(f'Run folder is already active: {run_dir}') from error
+        try:
+            handle.seek(0)
+            handle.truncate()
+            handle.write(str(os.getpid()) + '\n')
+            handle.flush()
+            yield
+        finally:
+            fcntl.flock(handle, fcntl.LOCK_UN)
 
-    outputs = []
-    skipped = []
-    asset_context = AssetProcessingContext(OUT / "asset_descriptions.sqlite3")
+
+def load_resume_state(run_dir: Path):
+    """Restore the pinned catalog and trust only completed, present JSONL files."""
+    path = run_dir / 'measurement_db.manifest.json'
+    manifest = json.loads(path.read_text(encoding='utf-8'))
+    if manifest.get('source_repository') != REPOSITORY:
+        raise ValueError(f'{path}: unexpected source repository')
+    snapshot = manifest.get('selection', {}).get('catalog_snapshot', 'measurement_db_categories.json')
+    snapshot_path = (run_dir / snapshot).resolve()
+    if not snapshot_path.is_relative_to(run_dir.resolve()):
+        raise ValueError('Catalog snapshot must be inside the resumed run folder')
+    catalog = load_catalog(snapshot_path)
+    if catalog['source_revision'] != manifest.get('source_revision'):
+        raise ValueError('Run manifest and catalog snapshot have different source revisions')
+    requested = manifest.get('selection', {}).get('requested_categories')
+    if not requested or set(requested) - set(CATEGORIES):
+        raise ValueError('Run manifest has no valid category selection')
+    if not isinstance(manifest.get('loaded_at_utc'), str):
+        raise ValueError('Run manifest has no original start timestamp')
+    outputs, missing, seen = [], [], set()
+    for entry in manifest.get('outputs', []):
+        name = entry['benchmark']
+        if name not in catalog['benchmarks'] or name in seen:
+            raise ValueError(f'Invalid or repeated completed benchmark: {name}')
+        seen.add(name)
+        if entry.get('output_file') != f'{name}.jsonl':
+            raise ValueError(f'{name}: unexpected output filename in resume manifest')
+        output = run_dir / entry['output_file']
+        if output.is_file() and (output.stat().st_size > 0 or entry.get('rows') == 0):
+            outputs.append(entry)
+        else:
+            missing.append(name)
+    return catalog, manifest, outputs, missing
+
+
+@contextmanager
+def run_logging(run_dir: Path):
+    """Flush progress and full Python tracebacks to both stdout and one run log."""
+    logger = logging.Logger(f'measurement_db.{run_dir.name}', level=logging.INFO)
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%dT%H:%M:%SZ')
+    formatter.converter = time.gmtime
+    handlers = [logging.StreamHandler(sys.stdout), logging.FileHandler(run_dir / 'run.log', encoding='utf-8')]
+    for handler in handlers:
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
     try:
-        for position, benchmark in enumerate(benchmarks, 1):
-            print(f"[{position}/{len(benchmarks)}] {benchmark}", flush=True)
-            try:
-                result = process_benchmark(
-                    benchmark,
-                    api,
-                    revision,
-                    loaded_at_utc,
-                    asset_context=asset_context,
-                )
-            except UnsupportedScaleError as error:
-                skipped.append({"benchmark": benchmark, "reason": str(error)})
-                print(f"  skipped: {error}", flush=True)
-                continue
-            outputs.append(result)
-            print(
-                f"  wrote {result['rows']:,} rows ({result['trace_rows']:,} with traces) to {result['output_file']}",
-                flush=True,
-            )
+        yield logger
     finally:
-        asset_context.close()
+        for handler in handlers:
+            handler.close()
+            logger.removeHandler(handler)
 
-    manifest = write_collection_manifest(revision, loaded_at_utc, benchmarks, outputs, skipped)
-    print(f"Finished: {len(outputs)} written, {len(skipped)} skipped -> {manifest}")
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    for category in CATEGORIES:
+        parser.add_argument(
+            '--' + category, dest='categories', action='append_const', const=category,
+            help=f'Include benchmarks categorized as {category}; flags combine with OR.',
+        )
+    parser.add_argument('--resume', type=Path, metavar='RUN_FOLDER',
+                        help='Continue an existing run, keeping its catalog, revision, and completed outputs.')
+    parser.add_argument('--category-file', type=Path,
+                        help='Local benchmark category catalog (also pins the dataset revision).')
+    parser.add_argument('--output-root', type=Path,
+                        help='Parent for category/run folders (default: data/processed/measurement_db).')
+    parser.add_argument('--batch-size', type=int, default=256,
+                        help='Maximum response rows per output batch (default: 256); reduce for large questions.')
+    parser.add_argument('--memory-limit', default='4GB',
+                        help='DuckDB working-memory budget, leaving room for Python/Arrow (default: 4GB).')
+    parser.add_argument('--threads', type=int, default=4,
+                        help='DuckDB worker threads (default: 4).')
+    parser.add_argument('--refresh-categories', action='store_true',
+                        help='Rebuild the category catalog from the latest dataset revision and exit.')
+    args = parser.parse_args(argv)
+    if args.batch_size < 1 or args.threads < 1:
+        parser.error('--batch-size and --threads must be positive')
+    if args.refresh_categories and args.categories:
+        parser.error('--refresh-categories cannot be combined with category selection flags')
+    if args.resume and (args.categories or args.output_root or args.category_file or args.refresh_categories):
+        parser.error('--resume restores its saved selection; do not combine with category, catalog, output-root, or refresh options')
+    return args
+
+
+def execute_run(args, run_dir: Path, catalog: dict, *, previous=None, outputs=None, missing=None):
+    """Run only unfinished benchmarks; callers hold the run-folder lock."""
+    revision = catalog['source_revision']
+    loaded_at_utc = previous['loaded_at_utc'] if previous is not None else args.started_at
+    requested = previous['selection']['requested_categories'] if previous is not None else args.categories
+    discovered = sorted(catalog['benchmarks'])
+    benchmarks = select_benchmarks(catalog, requested)
+    selection = {
+        'requested_categories': sorted(set(requested or CATEGORIES)),
+        'match': 'any',
+        'benchmarks_selected': len(benchmarks),
+        'benchmarks_excluded': len(discovered) - len(benchmarks),
+        'excluded_benchmarks': catalog['excluded_benchmarks'],
+        'catalog_snapshot': previous['selection'].get('catalog_snapshot', 'measurement_db_categories.json') if previous else 'measurement_db_categories.json',
+    }
+    if previous is None:
+        (run_dir / 'measurement_db_categories.json').write_text(
+            json.dumps(catalog, indent=2, ensure_ascii=False) + '\n', encoding='utf-8',
+        )
+        (run_dir / 'README.txt').write_text(
+            'Measurement DB preprocessing run\n'
+            f'Run ID: {run_dir.name}\n'
+            f'Started (UTC): {loaded_at_utc}\n'
+            f'Selected categories: {", ".join(selection["requested_categories"])}\n'
+            f'Dataset revision: {revision}\n'
+            f'Excluded benchmarks: {", ".join(catalog["excluded_benchmarks"]) or "none"}\n\n'
+            'A benchmark is selected when ANY requested category matches. Each selected\n'
+            'benchmark includes all of its items and assets, even if it has other categories.\n'
+            'The run manifest records actual categories per benchmark, output files, and run status.\n'
+            'Each benchmark has its own JSONL; one compact manifest describes this entire run.\n'
+            'Model traces are not downloaded or included in the JSONLs.\n'
+            'The catalog snapshot records category\n'
+            'membership at this dataset revision. Exported binary artifacts are under assets/.\n'
+            'Model weights and shared processing caches are outside this folder.\n\n'
+            'Progress and Python tracebacks are saved in run.log and printed in the console.\n'
+            'If the OS kills Python, the log and current_benchmark show where progress stopped;\n'
+            'a SIGKILL cannot be caught by Python or saved as a traceback.\n\n'
+            'To resume from the repository directory:\n'
+            f'poetry run python scripts/preprocess/measurement_db.py --resume {quote(str(run_dir.resolve()))}\n'
+            'Completed JSONLs and recorded skips are retained; the unfinished benchmark restarts.\n\n'
+            'To share: compress this entire run folder, including its manifests and assets/.\n',
+            encoding='utf-8',
+        )
+    outputs = list(outputs or [])
+    skipped = [entry for entry in previous.get('skipped', []) if entry['benchmark'] in benchmarks] if previous else []
+    missing = missing or []
+    current_benchmark = None
+
+    def checkpoint(status='running', error=None):
+        return write_collection_manifest(
+            revision, loaded_at_utc, discovered, outputs, skipped, selection=selection,
+            output_dir=run_dir, status=status, error=error,
+            current_benchmark=current_benchmark if status == 'running' else None,
+        )
+
+    with run_logging(run_dir) as logger:
+        done = {entry['benchmark'] for entry in outputs}
+        already_skipped = {entry['benchmark'] for entry in skipped}
+        remaining = [name for name in benchmarks if name not in done | already_skipped]
+        if previous is not None:
+            logger.info('Resuming: %s completed, %s skipped, %s remaining', len(done), len(already_skipped), len(remaining))
+            for name in missing:
+                logger.warning('%s: completed output missing or empty; it will be rebuilt if selected', name)
+            if not remaining and not missing and previous.get('status') == 'complete':
+                logger.info('Nothing to resume; this run is already complete')
+                return
+        logger.info(
+            'Selected %s/%s benchmarks at %s: %s', len(benchmarks), len(discovered),
+            revision, ', '.join(selection['requested_categories']),
+        )
+        if catalog['excluded_benchmarks']:
+            logger.info('Excluded by policy: %s', ', '.join(catalog['excluded_benchmarks']))
+        logger.info('Run output: %s', run_dir.resolve())
+        logger.info('Output batch size: %s rows; DuckDB memory limit: %s; threads: %s',
+                    args.batch_size, args.memory_limit, args.threads)
+        api = HfApi()
+        asset_context = None
+        try:
+            checkpoint()
+            asset_context = AssetProcessingContext(
+                OUT / 'asset_descriptions.sqlite3', artifact_root=run_dir / 'assets',
+            )
+            for position, benchmark in enumerate(benchmarks, 1):
+                if benchmark in done or benchmark in already_skipped:
+                    continue
+                current_benchmark = benchmark
+                checkpoint()
+                logger.info('[%s/%s] %s', position, len(benchmarks), benchmark)
+                actual_categories = catalog['benchmarks'][benchmark]['categories']
+                try:
+                    result = process_benchmark(
+                        benchmark,
+                        api,
+                        revision,
+                        loaded_at_utc,
+                        output_dir=run_dir,
+                        asset_context=asset_context,
+                        batch_size=args.batch_size,
+                        logger=logger,
+                        memory_limit=args.memory_limit,
+                        threads=args.threads,
+                    )
+                except UnsupportedScaleError as error:
+                    skipped.append({
+                        'benchmark': benchmark, 'categories': actual_categories, 'reason': str(error),
+                    })
+                    logger.warning('%s: skipped: %s', benchmark, error)
+                else:
+                    result['categories'] = actual_categories
+                    outputs.append(result)
+                    logger.info(
+                        '%s: wrote %s rows to %s', benchmark,
+                        f"{result['rows']:,}", result['output_file'],
+                    )
+                checkpoint()
+        except BaseException as error:
+            status = 'interrupted' if isinstance(error, KeyboardInterrupt) else 'failed'
+            logger.exception('%s at %s: %s: %s', status.upper(), current_benchmark, type(error).__name__, error)
+            try:
+                checkpoint(
+                    status=status,
+                    error={'benchmark': current_benchmark, 'type': type(error).__name__, 'message': str(error)},
+                )
+            except Exception:
+                logger.exception('Could not save the failure manifest; original error is shown above')
+            raise
+        finally:
+            if asset_context is not None:
+                asset_context.close()
+
+        manifest = checkpoint(status='complete')
+        logger.info('Finished: %s written, %s skipped -> %s', len(outputs), len(skipped), manifest)
+        archive = run_dir.parent / f'{run_dir.parent.name}__{run_dir.name}.tar.gz'
+        logger.info(
+            'To compress this run: tar -czf %s -C %s %s',
+            quote(str(archive.resolve())), quote(str(run_dir.parent.resolve())), quote(run_dir.name),
+        )
+
+
+def main(argv=None) -> None:
+    args = parse_args(argv)
+    if args.refresh_categories:
+        build_catalog(args.category_file or CATEGORY_FILE)
+        return
+    if args.resume:
+        run_dir = args.resume.resolve()
+        if not run_dir.is_dir():
+            raise ValueError(f'Resume folder does not exist: {run_dir}')
+        with run_lock(run_dir):
+            catalog, previous, outputs, missing = load_resume_state(run_dir)
+            execute_run(args, run_dir, catalog, previous=previous, outputs=outputs, missing=missing)
+    else:
+        catalog = load_catalog(args.category_file or CATEGORY_FILE)
+        args.started_at = utc_now()
+        run_dir = create_run_directory(
+            args.output_root or OUT / 'measurement_db', list(args.categories or CATEGORIES), args.started_at,
+        )
+        with run_lock(run_dir):
+            execute_run(args, run_dir, catalog)
 
 
 if __name__ == "__main__":

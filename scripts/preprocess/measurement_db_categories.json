@@ -1,0 +1,2189 @@
+{
+  "schema_version": 1,
+  "source_repository": "aims-foundations/measurement-db",
+  "source_revision": "54074453da7b9911be0f48e4c560be547bc84d21",
+  "generated_at_utc": "2026-10-22T18:19:14.733573Z",
+  "classification": "MIME major types referenced in items.asset_manifest; any-match benchmark selection",
+  "benchmarks": {
+    "abstract_reason": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 9089
+    },
+    "adaptivestep": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4525
+    },
+    "advprompter": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 50
+    },
+    "aegis": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 11500
+    },
+    "afrieval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 35205
+    },
+    "afrimedqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 42494
+    },
+    "agc_bench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 8600
+    },
+    "agentdojo": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1081
+    },
+    "agentic_review_perturbation": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 105
+    },
+    "agi_elo": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 13953
+    },
+    "ai2d_test": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 3088
+    },
+    "aider": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 26
+    },
+    "algotune": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 154
+    },
+    "alignment_faking": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1464
+    },
+    "alpacaeval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 805
+    },
+    "alpha_sql": {
+      "categories": [
+        "asset-application",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/vnd.sqlite3",
+        "text/csv"
+      ],
+      "items": 1534
+    },
+    "annotating_errors_wcf": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 15344
+    },
+    "appworld": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 585
+    },
+    "arcagi": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 526
+    },
+    "atmossci_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2802
+    },
+    "auditing_sabotage_bench": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/octet-stream"
+      ],
+      "items": 68
+    },
+    "autoresearchbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 60
+    },
+    "averimatec": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 152
+    },
+    "babilong": {
+      "categories": [
+        "asset-text"
+      ],
+      "media_types": [
+        "text/plain"
+      ],
+      "items": 526202
+    },
+    "bbq": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 204201
+    },
+    "beavertails": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 420
+    },
+    "bedd_basalt": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 46266
+    },
+    "benger": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 760
+    },
+    "bertaqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 51760
+    },
+    "bigfinancebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 600
+    },
+    "biggen": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4589
+    },
+    "bird_sql": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 360
+    },
+    "brace": {
+      "categories": [
+        "asset-audio"
+      ],
+      "media_types": [
+        "audio/wav"
+      ],
+      "items": 12631
+    },
+    "braveguard": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 536
+    },
+    "bridging_gap": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 132418
+    },
+    "care_enzymes": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4136
+    },
+    "causal_axioms": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4500
+    },
+    "cellverse": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 748
+    },
+    "ceobench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 3
+    },
+    "ceval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 13951
+    },
+    "chartmuseum": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 162
+    },
+    "chatgpt_drift": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 11479
+    },
+    "chi_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 775
+    },
+    "chipbench": {
+      "categories": [
+        "asset-text"
+      ],
+      "media_types": [
+        "text/plain"
+      ],
+      "items": 230
+    },
+    "clasheval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 12495
+    },
+    "classroom_ai": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 734
+    },
+    "cmmlu": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 23160
+    },
+    "coffeebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1
+    },
+    "complexbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1150
+    },
+    "confagents": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 16
+    },
+    "corebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 270
+    },
+    "critic_discernment_game": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1819
+    },
+    "crow": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1984
+    },
+    "cruxeval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4000
+    },
+    "csedb": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2069
+    },
+    "cseo_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 242265
+    },
+    "das_med_hallucination": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 108
+    },
+    "data_juicer2": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 12
+    },
+    "dataclawbench": {
+      "categories": [
+        "asset-application",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/json",
+        "text/csv"
+      ],
+      "items": 492
+    },
+    "dave": {
+      "categories": [
+        "asset-audio",
+        "asset-video"
+      ],
+      "media_types": [
+        "audio/mpeg",
+        "video/mp4"
+      ],
+      "items": 3922
+    },
+    "dbpa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 59
+    },
+    "decodingtrust": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 437586
+    },
+    "decompile_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 72059
+    },
+    "devbench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 271
+    },
+    "disco": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 28000
+    },
+    "donotanswer": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1876
+    },
+    "doris_mae": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 165104
+    },
+    "dpai": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 306
+    },
+    "dqvis": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 356
+    },
+    "dtap_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 13392
+    },
+    "editbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 540
+    },
+    "edu_circuit_hw": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 513
+    },
+    "eduguardbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 7494
+    },
+    "edumath": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 76
+    },
+    "egoschema": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4500
+    },
+    "ehrflowbench": {
+      "categories": [
+        "asset-application",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/json",
+        "application/vnd.apache.parquet",
+        "text/markdown"
+      ],
+      "items": 20
+    },
+    "elicitation_game": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2960
+    },
+    "embodied_agent_interface": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 100
+    },
+    "emoji_attack": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 15153
+    },
+    "engdesign": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 101
+    },
+    "engibench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 9
+    },
+    "enginemt_qa": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/x-npy"
+      ],
+      "items": 676
+    },
+    "erbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 32163
+    },
+    "evouna": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5609
+    },
+    "exploitgym": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/octet-stream"
+      ],
+      "items": 1737
+    },
+    "faithcot": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 687
+    },
+    "felm": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4412
+    },
+    "fetv": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 20788
+    },
+    "fewshot_ttt_bbh": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1310
+    },
+    "fgbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 7146
+    },
+    "financebench": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/pdf"
+      ],
+      "items": 150
+    },
+    "find_interp": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 10397
+    },
+    "finegrain_t2i": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 760
+    },
+    "frontieror": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 180
+    },
+    "genai_learning": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/pdf"
+      ],
+      "items": 162
+    },
+    "ghosts_math": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 478
+    },
+    "goodai_ltm_benchmark": {
+      "categories": [
+        "asset-application",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/json",
+        "text/x-python"
+      ],
+      "items": 452
+    },
+    "haiid": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 152
+    },
+    "hallusionbench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 1205
+    },
+    "harmbench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 62160
+    },
+    "healthadminbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 540
+    },
+    "helm_afr": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 72223
+    },
+    "helm_airbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 7723
+    },
+    "helm_anthropic_redteam": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 995
+    },
+    "helm_bbq": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2000
+    },
+    "helm_bold": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2028
+    },
+    "helm_cleva": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 7536
+    },
+    "helm_harmbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 403
+    },
+    "helm_real_toxicity_prompts": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2006
+    },
+    "helm_simple_safety_tests": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 100
+    },
+    "helm_thaiexam": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 565
+    },
+    "helm_xstest": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 450
+    },
+    "hivmedqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2570
+    },
+    "hle": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/gif",
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "items": 2249
+    },
+    "icpc2_code_selector": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2175
+    },
+    "igakuqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2942
+    },
+    "igakuqa119": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 400
+    },
+    "ikp": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1400
+    },
+    "image2struct": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 30636
+    },
+    "imagenet_hard": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 7496
+    },
+    "imgedit": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 737
+    },
+    "indeterminacy": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4284
+    },
+    "ineqmath": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1000
+    },
+    "infibench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 369
+    },
+    "interchangeable_token_embeddings": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 199978
+    },
+    "intercode": {
+      "categories": [
+        "asset-application",
+        "asset-image",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/gzip",
+        "application/octet-stream",
+        "application/pdf",
+        "application/sql",
+        "application/zip",
+        "image/jpeg",
+        "image/png",
+        "text/plain",
+        "text/x-python",
+        "text/x-shellscript"
+      ],
+      "items": 2484
+    },
+    "jailbreakbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2001
+    },
+    "jetts": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5940
+    },
+    "judgetuning": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 3000
+    },
+    "katakomba": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 38
+    },
+    "kernelbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 250
+    },
+    "kmmlu": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 35015
+    },
+    "kormedmcqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 3009
+    },
+    "kris_bench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "items": 8941
+    },
+    "lambda_fp_course": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 152
+    },
+    "lawbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 233168
+    },
+    "legal_rag_bench": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/x-ndjson"
+      ],
+      "items": 300
+    },
+    "legalbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 9393
+    },
+    "lexeval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 39908
+    },
+    "lingoly": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 12463
+    },
+    "live_agent_risk": {
+      "categories": [
+        "asset-text"
+      ],
+      "media_types": [
+        "text/x-python"
+      ],
+      "items": 73
+    },
+    "liveaopsbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5323
+    },
+    "livebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1286
+    },
+    "llm4ir": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1804
+    },
+    "llm_bp_tag": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 152139
+    },
+    "llm_survey_simulation": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 797
+    },
+    "llm_uncertainty_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 149793
+    },
+    "llmail_inject": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/json"
+      ],
+      "items": 207291
+    },
+    "llms_lean_formalization": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 588
+    },
+    "lohi_drug_discovery": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 42080
+    },
+    "matharena": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 1755
+    },
+    "matharena_platform": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1414
+    },
+    "mathconstraint": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 504
+    },
+    "mathvista_mini": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "items": 1000
+    },
+    "medagentboard": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 2301
+    },
+    "medhelm_ehr_sql": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1000
+    },
+    "medhelm_head_qa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1000
+    },
+    "medhelm_med_mcqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1000
+    },
+    "medhelm_med_qa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1000
+    },
+    "medhelm_medbullets": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 298
+    },
+    "medhelm_medcalc_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 992
+    },
+    "medhelm_medec": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 597
+    },
+    "medhelm_medhallu": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2000
+    },
+    "medhelm_pubmed_qa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1500
+    },
+    "medhelm_race_based_med": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 167
+    },
+    "medwatermark_fws": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2376
+    },
+    "mergebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1813
+    },
+    "mind2web": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 17153
+    },
+    "mj_bench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "items": 26564
+    },
+    "mlip_arena": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 13706
+    },
+    "mlrbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5226
+    },
+    "mmbench_v11": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 12175
+    },
+    "mmdocrag": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2000
+    },
+    "mmedbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 300
+    },
+    "mmlu": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 14015
+    },
+    "mmlupro": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 14226
+    },
+    "mmmu_dev_val": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 1050
+    },
+    "mmoral_bench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 1069
+    },
+    "mochi": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 3717
+    },
+    "moe_cap": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 10065
+    },
+    "monkey_power_laws": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 525
+    },
+    "morphkv": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 537
+    },
+    "morqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5443
+    },
+    "mtbbench": {
+      "categories": [
+        "asset-application",
+        "asset-image",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/json",
+        "image/jpeg",
+        "image/png",
+        "text/csv",
+        "text/plain"
+      ],
+      "items": 573
+    },
+    "mtbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2716
+    },
+    "multi_moe": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5140
+    },
+    "multi_swebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2127
+    },
+    "multimodal_stem_ai": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 249
+    },
+    "mypcbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 118
+    },
+    "naep_llm_students": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/gif",
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 488
+    },
+    "nanobaselib": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 45970
+    },
+    "naturalreasoning": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1145824
+    },
+    "naturebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 181
+    },
+    "nester": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 356
+    },
+    "nis3d": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/tiff"
+      ],
+      "items": 30
+    },
+    "nyu_ctf_bench": {
+      "categories": [
+        "asset-application",
+        "asset-image",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/gzip",
+        "application/json",
+        "application/octet-stream",
+        "application/pdf",
+        "application/zip",
+        "image/jpeg",
+        "image/png",
+        "text/plain",
+        "text/x-python"
+      ],
+      "items": 400
+    },
+    "oasst": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1742
+    },
+    "ocrbench_v2": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 9868
+    },
+    "ood_prediction": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 142805
+    },
+    "openbiorq": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 657
+    },
+    "os_harm": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 512
+    },
+    "perfcodebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1854
+    },
+    "perumedqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 8259
+    },
+    "phyblock": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 1362
+    },
+    "pku_saferlhf": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 39994
+    },
+    "planbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 11076
+    },
+    "preference_dissection": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 5239
+    },
+    "prism": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 53926
+    },
+    "prm800k": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 973120
+    },
+    "programbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1317
+    },
+    "proofaug": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 244
+    },
+    "proteininvbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 7410
+    },
+    "prox": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 12052
+    },
+    "psychosis_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2688
+    },
+    "putnam_axiom": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2500
+    },
+    "pxplore": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 787
+    },
+    "qatch": {
+      "categories": [
+        "asset-application",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/vnd.sqlite3",
+        "text/plain"
+      ],
+      "items": 36458
+    },
+    "radar": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1
+    },
+    "rakuda": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 280
+    },
+    "rclicks": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/bmp",
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 29035
+    },
+    "real_pocqi": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 3100
+    },
+    "real_webagents": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 233
+    },
+    "realtimeqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 7954
+    },
+    "reasoning_gym": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 56181
+    },
+    "refgrader": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 3597
+    },
+    "reliancescope": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1200
+    },
+    "researchclawbench": {
+      "categories": [
+        "asset-application",
+        "asset-image",
+        "asset-text"
+      ],
+      "media_types": [
+        "application/json",
+        "application/octet-stream",
+        "application/pdf",
+        "image/png",
+        "text/csv",
+        "text/markdown",
+        "text/plain"
+      ],
+      "items": 40
+    },
+    "researchcodebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 212
+    },
+    "revolve": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 310
+    },
+    "rewardbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4045
+    },
+    "risebench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 1080
+    },
+    "robust_reasoning_benchmark": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 4895
+    },
+    "safeagentbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 665
+    },
+    "scale_mrt": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 34698
+    },
+    "scbench_long": {
+      "categories": [
+        "asset-application"
+      ],
+      "media_types": [
+        "application/json"
+      ],
+      "items": 4
+    },
+    "sciarena": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 8393
+    },
+    "scigym": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 959
+    },
+    "sgrades": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 40509
+    },
+    "sib200": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 83640
+    },
+    "sketchjudge": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 4053
+    },
+    "software_world_models": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 434
+    },
+    "stanford_orb": {
+      "categories": [
+        "asset-application",
+        "asset-image",
+        "asset-model"
+      ],
+      "media_types": [
+        "application/x-npy",
+        "image/png",
+        "image/x-exr",
+        "model/obj"
+      ],
+      "items": 630
+    },
+    "statqa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1183
+    },
+    "subjective_qa": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 10921
+    },
+    "sugarcrepe": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 15024
+    },
+    "summeval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 800
+    },
+    "sustainable_food": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 500
+    },
+    "svrpbench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 40
+    },
+    "swe_rebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 6306
+    },
+    "swe_smith": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 15616
+    },
+    "swe_together": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 109
+    },
+    "swebench_live": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2202
+    },
+    "swepolybench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 547
+    },
+    "synthpai": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 9220
+    },
+    "tabarena": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 346195
+    },
+    "tau2_bench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2388
+    },
+    "taubench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 201
+    },
+    "tengu": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 840
+    },
+    "tensortrust": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 570791
+    },
+    "theagentcompany": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 175
+    },
+    "threeeed": {
+      "categories": [
+        "asset-application",
+        "asset-image"
+      ],
+      "media_types": [
+        "application/octet-stream",
+        "image/jpeg"
+      ],
+      "items": 8616
+    },
+    "truthfulqa_mc": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 817
+    },
+    "tulu_human_eval": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 1028
+    },
+    "tumlu": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 133944
+    },
+    "txbench_pp": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 12
+    },
+    "ultrafeedback": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 255820
+    },
+    "vhelm": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 93127
+    },
+    "visit_bench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "items": 2391
+    },
+    "visual_memory": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 47500
+    },
+    "visual_riddles": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "items": 793
+    },
+    "visualwebarena": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 200
+    },
+    "vl_rewardbench": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/jpeg",
+        "image/png"
+      ],
+      "items": 1532
+    },
+    "weavebench": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 114
+    },
+    "wikihow_agent": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 14287
+    },
+    "wildvision": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 500
+    },
+    "wmt_mqm": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 207090
+    },
+    "wonderbread": {
+      "categories": [
+        "asset-image"
+      ],
+      "media_types": [
+        "image/png"
+      ],
+      "items": 9091
+    },
+    "workarena": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 385
+    },
+    "workbench_revisited": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 690
+    },
+    "worldcentralbanks": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 119925
+    },
+    "xstest": {
+      "categories": [
+        "no-assets"
+      ],
+      "media_types": [],
+      "items": 2250
+    }
+  },
+  "excluded_benchmarks": {
+    "alignment_faking": "Behavior-presence labels have no declared utility ordering.",
+    "annotating_errors_wcf": "Excluded as requested: mixed criteria include unordered directness labels."
+  }
+}

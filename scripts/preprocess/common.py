@@ -35,8 +35,6 @@ OBSERVATION_COLUMNS = [
     "response_id", "item_id", "benchmark", "subject_id", "trial", "test_condition", "interactors",
     # Target. score is normalized; raw_score is the released value.
     "score", "raw_score", "response_scale", "normalization_policy", "n_runs", "score_type",
-    # Released model output
-    "trace",
     # Item
     "question", "ground_truth", "eval_type", "domain", "modality", "multi_turn", "programming_language",
     "benchmark_release_date",
@@ -162,7 +160,10 @@ def write_observation_batches(batches, benchmark, provenance=None, output_dir=No
             output_rows += len(df)
     temporary_path.replace(path)
 
-    if provenance is not None:
+    # A JSONL regenerated without a sidecar must not retain an obsolete manifest.
+    if provenance is None:
+        (destination / f"{benchmark}.manifest.json").unlink(missing_ok=True)
+    else:
         manifest = {
             "benchmark": benchmark,
             **provenance,

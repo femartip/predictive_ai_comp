@@ -20,10 +20,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from huggingface_hub import HfApi, HfFileSystem
 
-from assets import AssetProcessingContext, SUPPORTED_MEDIA_TYPES, recipe_provenance
+from assets import AssetProcessingContext, SUPPORTED_MEDIA_TYPES
 from assets.pipeline import add_asset_descriptions, parse_manifest
-from common import OUT, huggingface_provenance, load_metadata, write_observations
-from measurement_db import NORMALIZATION_METADATA, REPOSITORY, UnsupportedScaleError, build_output, utc_now
+from common import OUT, load_metadata, write_observations
+from measurement_db import REPOSITORY, UnsupportedScaleError, build_output, utc_now
 
 
 TRIAL_OUT = OUT / "asset_trial"
@@ -380,26 +380,6 @@ def process_trial_benchmark(
     ).to_pandas()
     _require_rows(subjects, "subject_id", set(subject_ids), f"{benchmark} subjects")
 
-    traces = None
-    trace_name = f"{prefix}/traces.parquet"
-    source_tables = [
-        f"{benchmark}/metadata.yaml",
-        f"{prefix}/benchmarks.parquet",
-        f"{prefix}/items.parquet",
-        f"{prefix}/subjects.parquet",
-        f"{prefix}/responses.parquet",
-        f"{prefix}/assets.parquet",
-    ]
-    if api.file_exists(REPOSITORY, trace_name, repo_type="dataset", revision=revision):
-        response_ids = selected_responses.response_id.astype(str).tolist()
-        traces = remote_parquet(
-            revision,
-            trace_name,
-            ["response_id", "trace"],
-            [("response_id", "in", response_ids)],
-        ).to_pandas()
-        source_tables.append(trace_name)
-
     benchmark_table = remote_parquet(
         revision,
         f"{prefix}/benchmarks.parquet",
@@ -413,38 +393,13 @@ def process_trial_benchmark(
         items,
         subjects,
         selected_responses,
-        traces,
     )
     output["n_runs"] = output.response_id.map(source_n_runs).astype("int64")
     item_order = {item_id: position for position, item_id in enumerate(item_ids)}
     output["_trial_order"] = output.item_id.str.removeprefix(f"{benchmark}:").map(item_order)
     output = output.sort_values("_trial_order").drop(columns="_trial_order").reset_index(drop=True)
 
-    provenance = huggingface_provenance(
-        REPOSITORY,
-        source_tables,
-        revision=revision,
-        loaded_at_utc=loaded_at_utc,
-    )
-    provenance["normalization"] = NORMALIZATION_METADATA
-    provenance["asset_trial"] = {
-        "selection": "20 source items fixed in scripts/preprocess/measurement_db_asset_trial.py",
-        "one_response_per_item": "lowest (trial, subject_id, response_id)",
-        "source_manifests_filtered": True,
-        "selected_items": [
-            {"item_id": sample["item_id"], "assets": sample["assets"]}
-            for sample in samples
-        ],
-        "remote_parquet_row_filtering": True,
-    }
-    provenance["asset_processing"] = {
-        **asset_stats,
-        **asset_context.provenance(),
-        "recipes": recipe_provenance(asset_stats["media_types"], asset_context),
-        "descriptions_replace_assets": True,
-        "manifest_order": "ordinal",
-    }
-    path = write_observations(output, benchmark, provenance, output_dir=TRIAL_OUT)
+    path = write_observations(output, benchmark, output_dir=TRIAL_OUT)
     return {
         "benchmark": benchmark,
         "items": len(output),
@@ -508,7 +463,6 @@ def main() -> None:
         "source_repository": REPOSITORY,
         "source_revision": revision,
         "selection": "fixed 20-item asset trial",
-        "normalization": NORMALIZATION_METADATA,
         "selected_items": len(TRIAL_ITEMS),
         "selected_media_types": sorted(SUPPORTED_MEDIA_TYPES),
         "items": sum(result["items"] for result in outputs),

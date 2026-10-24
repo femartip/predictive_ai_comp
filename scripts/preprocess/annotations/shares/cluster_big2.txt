@@ -1,0 +1,23 @@
+# Second cluster batch (2026-10-23): the 20 largest benchmarks of cremaet_short.txt by estimated annotation time,
+# moved to the cluster while it is quiet (one A40 each, ~1-3.7 h per task). None has items over the 32k window.
+# Excluded beforehand: excluded.txt, and matharena_platform / swe_together (flagged, pending a decision).
+arcagi
+pxplore
+psychosis_bench
+egoschema
+decompile_bench
+clasheval
+tau2_bench
+editbench
+tabarena
+legalbench
+abstract_reason
+llms_lean_formalization
+programbench
+icpc2_code_selector
+mlrbench
+ineqmath
+judgetuning
+benger
+swebench_live
+synthpai

@@ -1,0 +1,15 @@
+# Split of the ADeLe v1 annotation of the no-assets bank run (2026-10-23), at 600 items per benchmark.
+# Estimated time per benchmark on cremaet (A5000, vLLM) from the EDA's item lengths (scripts/analysis/token_lengths.py)
+# and the speeds measured in the smoke test: ~30,000 prompt tokens/s for prompts up to 8k tokens, ~3,900 above.
+# Benchmarks with fewer than 80 items are left out (too small to be evaluated under the competition's rule).
+# cluster_long: the 9 benchmarks estimated at 3 h or more each (about 120 h of the 159 h); one A40 each.
+# Of these, 7 were cancelled after the team excluded them (excluded.txt): only sciarena and reliancescope ran.
+mind2web
+sciarena
+dqvis
+proteininvbench
+software_world_models
+robust_reasoning_benchmark
+reliancescope
+cseo_bench
+agentic_review_perturbation

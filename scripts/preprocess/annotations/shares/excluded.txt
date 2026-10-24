@@ -1,0 +1,11 @@
+# Benchmarks excluded from the ADeLe v1 annotation by the team (2026-10-23): too many items over the 32,767-token
+# window (share of items over it, from scripts/analysis/token_lengths.py; cseo_bench for its size).
+dqvis
+software_world_models
+agentic_review_perturbation
+mind2web
+robust_reasoning_benchmark
+proteininvbench
+cseo_bench
+# Flagged, not excluded yet (annotated in cluster_rest.txt; use decided later): matharena_platform (shares items with MathArena),
+# swe_together (withheld from the bank's public release).

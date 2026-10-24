@@ -285,6 +285,31 @@ multi-swe-bench (from `multi_swebench.ipynb`):
 models (dropped by its script). Every entry has the same fields; `provider` and `release_date` only fill
 blanks in the build, and `null` means unknown or not verified.
 
+### ADeLe prompt lengths of the bank (no-assets run)
+
+[`scripts/analysis/token_lengths.py`](scripts/analysis/token_lengths.py) measures how long each item's prompt to the
+ADeLe annotator would be: the item's tokens (Qwen2.5 tokenizer) plus the rubric's prompt overhead, which is
+634–1,973 tokens depending on the rubric (counted with the longest). Run on the 189 benchmarks of the no-assets
+conversion: 6.36M distinct items, a random sample of at most 5,000 per benchmark (468,616 measured). Results in
+[`scripts/analysis/token_lengths/`](scripts/analysis/token_lengths/): per-benchmark table and plot.
+
+| prompt longer than | share of all items (weighted by benchmark size) | about | benchmarks affected |
+|---|---|---|---|
+| 4,096 (the annotator's training length) | 6.4% | 404,000 items | 79 |
+| 8,192 | 4.4% | 281,000 | 39 |
+| 16,384 | 2.5% | 159,000 | 22 |
+| 32,767 (the annotation window) | 0.27% | 17,000 | 11 |
+
+- Items: median 186 tokens, 90th percentile 2,141, 99th 33,515, longest 2.2M (`mind2web`).
+- The 32k window cuts few items, concentrated in a few benchmarks: `dqvis` (88% of items; all about 119k tokens),
+  `software_world_models` (55%), `agentic_review_perturbation` (50%), `mind2web` (49%), `robust_reasoning_benchmark`
+  (33%), `proteininvbench` (11%), and `cseo_bench` (2.3%, but of 242,000 items: the most in absolute terms).
+- The annotator's training length is the bigger caveat: 6% of items are longer than any prompt it saw in training.
+- 13 benchmarks have fewer than 80 distinct items (two have a single one): too small to be evaluated under the
+  competition's rule.
+- `swe_together` (withheld from the bank's public release) and `matharena_platform` (shares items with MathArena)
+  are in this run.
+
 
 ## Preprocessing
 

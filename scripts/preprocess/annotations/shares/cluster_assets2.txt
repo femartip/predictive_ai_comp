@@ -1,0 +1,8 @@
+# Asset-image benchmarks, second batch (2026-10-25): the 5 written by the asset-image conversion since the first batch
+# (cluster_assets.txt), run 20261023T110411Z_26fccf60 at benchmark 27 of 48. All items carry image descriptions; none is
+# near the 32,767-token window (longest prompt ~2,400 tokens + rubric). Send with JSONL_DIR set to the asset-image run.
+mj_bench
+mmbench_v11
+mmmu_dev_val
+mmoral_bench
+mochi

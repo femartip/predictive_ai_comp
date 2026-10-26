@@ -7,5 +7,12 @@ mind2web
 robust_reasoning_benchmark
 proteininvbench
 cseo_bench
+# Asset-image run (2026-10-24, team decision). intercode: 82% of items over the window (median 189k tokens);
+# engdesign: 2% over the window, 18% over 4,096; haiid, disco, igakuqa119: excluded by the team.
+intercode
+engdesign
+haiid
+disco
+igakuqa119
 # Flagged, not excluded yet (annotated in cluster_rest.txt; use decided later): matharena_platform (shares items with MathArena),
 # swe_together (withheld from the bank's public release).

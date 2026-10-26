@@ -64,6 +64,18 @@ n=$(grep -cv '^\s*\(#\|$\)' my_share.txt); sbatch --array=0-$((n-1))%8 --export=
 **3. Collect.** Each finished benchmark has its own `adele_v1.parquet`, which needs no further step. Copy the cluster's
 finished folders back with `scp -r`.
 
+**Asset benchmarks** (the asset-image conversion run): the same pipeline, with `JSONL_DIR` pointing at that run.
+Images reach the annotator as their written descriptions (`<image_description>` tags in the item text). On vent, with
+the list `shares/cluster_assets.txt` (the team's exclusions are in `shares/excluded.txt`):
+
+```bash
+JSONL_DIR=/data/datasets/measurement_db/asset-image/20261023T110411Z_26fccf60 \
+  bash ~/adele_tools/code/vent/send_to_cluster.sh <upv-user> ~/adele_tools/code/shares/cluster_assets.txt 600
+# then the printed cluster commands; when the tasks finish, on vent:
+bash ~/adele_tools/code/vent/fetch_from_cluster.sh <upv-user> ~/adele_tools/code/shares/cluster_assets.txt 600
+bash ~/adele_tools/code/vent/publish.sh
+```
+
 **Code onto the machines** (from the laptop, repo root):
 
 ```bash

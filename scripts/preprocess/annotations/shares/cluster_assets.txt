@@ -1,0 +1,18 @@
+# Asset-image benchmarks for the VRAIN cluster (2026-10-24): the 18 written so far by the asset-image conversion
+# (/data/datasets/measurement_db/asset-image/20261023T110411Z_26fccf60, 22 of 48 processed), minus the team's
+# exclusions (excluded.txt). Images reach the annotator as their written descriptions (<image_description> tags).
+# Send with JSONL_DIR set to the asset-image run (README, "Asset benchmarks"). Append benchmarks as the conversion
+# writes more; already selected or finished ones are skipped.
+ai2d_test
+averimatec
+chartmuseum
+devbench
+edu_circuit_hw
+hallusionbench
+harmbench
+hle
+image2struct
+imagenet_hard
+imgedit
+kris_bench
+mathvista_mini

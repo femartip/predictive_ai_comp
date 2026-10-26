@@ -4463,6 +4463,7 @@ description = "A video decoder for PyTorch"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "sys_platform != \"win32\""
 files = [
     {file = "torchcodec-0.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:f71cb7918a56196dd04fb456e259c1db83516d52320387fed8b16df5e95bc36d"},
     {file = "torchcodec-0.5-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:f760e49803d7767e10577d3d20d1a9dd0ad5adebd1ecbf7ce941176e8c388f54"},
@@ -5144,4 +5145,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "5a04609b628499fbe05b8012c094d7d21e1034856e519b21e8a258c631fb8b36"
+content-hash = "5873011699426b7eec6e3583eef593a3c66becc7b0914e38638cf32de9aaca05"

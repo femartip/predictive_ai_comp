@@ -42,20 +42,23 @@ def cell_name(cell):
 
 def build_cell(d, R, cell, spec, n_eval, n_tune, cache_dir, n_jobs, device):
     """Draws of one cell and the arrays the simulator needs (prior logits per pair). Cached on disk."""
-    path = cache_dir / f"rep{R.rep}_{cell_name(cell)}_d{n_eval}_t{n_tune}.pkl"   # the draws depend on both counts
+    # the draws depend on both counts; v2 = bundles with per-pair starts (2026-10-25)
+    path = cache_dir / f"rep{R.rep}_{cell_name(cell)}_d{n_eval}_t{n_tune}_v2.pkl"
     if path.exists():
         with open(path, "rb") as fh:
             return pickle.load(fh)
     draws = R.draws(cell, n_eval, C.EVAL_SEED)
     tdraws = R.draws(cell, n_tune, C.TUNE_SEED)
     groups = sorted({g for x in draws + tdraws for g in x})
-    bundle = {"cell": cell, "draws": draws, "tune_draws": tdraws, "pairs": {}, "start": None, "importance": None}
+    bundle = {"cell": cell, "draws": draws, "tune_draws": tdraws, "pairs": {}, "importance": None}
     if groups:
         info = [R.pair(b, s) for b, s in groups]
         test_rows = np.concatenate([np.concatenate([p["acq_rows"], p["eval_rows"]]) for p in info])
         pr = fit_prior(d, R, cell, spec, test_rows, n_jobs=n_jobs, device=device, seed=R.rep)
         z = pd.Series(pr["z"], index=test_rows)
         z = z[~z.index.duplicated()]
+        start = pd.Series(pr["start"], index=test_rows)
+        start = start[~start.index.duplicated()]
         P = d.P
         for (b, s), p in zip(groups, info):
             a, e = p["acq_rows"], p["eval_rows"]
@@ -64,8 +67,9 @@ def build_cell(d, R, cell, spec, n_eval, n_tune, cache_dir, n_jobs, device):
                 "acq_inst": P["inst"].to_numpy()[a], "revealed": p["revealed"], "acq_z": z.loc[a].to_numpy(),
                 "eval_inst": P["inst"].to_numpy()[e], "eval_z": z.loc[e].to_numpy(),
                 "n": P["n"].to_numpy()[e].astype(float), "s": P["s"].to_numpy()[e].astype(float),
-                "q": P["q"].to_numpy()[e].astype(float)}
-        bundle["start"], bundle["importance"] = pr["start"], pr["importance"]
+                "q": P["q"].to_numpy()[e].astype(float),
+                "start": float(start.loc[e].mean()), "r1": pr["r1"]}      # the start is constant per benchmark
+        bundle["importance"] = pr["importance"]
         log(f"  cell {cell_name(cell)}: {len(draws)} draws, {len(groups)} pairs, prior on {pr['train_rows']:,} "
             f"training rows")
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -78,8 +82,7 @@ def build_cell(d, R, cell, spec, n_eval, n_tune, cache_dir, n_jobs, device):
 def score_cells(bundles, key, predictors, tau1, tau2, n_jobs):
     """Run the simulator on every cell's draws (key = 'draws' or 'tune_draws'), in parallel over cells."""
     jobs = [b for b in bundles if b[key]]
-    outs = Parallel(n_jobs=n_jobs)(delayed(run_draws)(b[key], b["pairs"], b["start"], predictors, tau1, tau2)
-                                   for b in jobs)
+    outs = Parallel(n_jobs=n_jobs)(delayed(run_draws)(b[key], b["pairs"], predictors, tau1, tau2) for b in jobs)
     for b, o in zip(jobs, outs):
         o["cell"] = cell_name(b["cell"])
     return pd.concat(outs, ignore_index=True) if outs else pd.DataFrame()

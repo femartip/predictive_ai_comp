@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Run a step of the v3 pipeline with the resource settings of each server.
+# Run a step of the v3 pipeline with the resource settings of each server, in the repository's own Poetry environment
+# (<repo>/.venv: poetry.toml sets in-project = true; the dependencies are in pyproject.toml). Run from a clone of the
+# repository after `poetry install` at its root.
 #   bash scripts/assessors_v3/run.sh <vent|cremaet> build    [build_data.py args]
 #   bash scripts/assessors_v3/run.sh <vent|cremaet> evaluate [evaluate.py args]
 #   bash scripts/assessors_v3/run.sh <vent|cremaet> report   NAME [report.py args]
@@ -10,14 +12,15 @@
 # cremaet (A5000 24 GB, 14 GB RAM): LightGBM on the GPU when it works there (else CPU), 8 threads, thresholds 6 / 2 GB.
 #   cremaet has no copy of the bank: build on vent, then copy ~/assessors_v3_work/data to cremaet.
 # Environment overrides (config.py): ASSESSOR_WORK, ASSESSOR_JSONL_DIR, ASSESSOR_ADELE_DIR, ASSESSOR_MODELS_CSV,
-# ASSESSOR_TRAIN_PAIRS, ASSESSOR_START_RAM_GB, ASSESSOR_MIN_FREE_RAM_GB; VENV (default ~/assessors_v3/.venv).
+# ASSESSOR_TRAIN_PAIRS, ASSESSOR_START_RAM_GB, ASSESSOR_MIN_FREE_RAM_GB.
 set -euo pipefail
 SERVER=${1:?usage: run.sh <vent|cremaet> <build|evaluate|report> [args]}
 STEP=${2:?usage: run.sh <vent|cremaet> <build|evaluate|report> [args]}
 shift 2
 HERE=$(cd "$(dirname "$0")" && pwd)
-PY=${VENV:-$HOME/assessors_v3/.venv}/bin/python
-[ -x "$PY" ] || { echo "no environment at $PY: run bash $HERE/setup_env.sh first"; exit 1; }
+ROOT=$(cd "$HERE/../.." && pwd)                     # the repository
+PY="$ROOT/.venv/bin/python"
+[ -x "$PY" ] || { echo "no Poetry environment at $ROOT/.venv: run 'poetry install' in $ROOT first"; exit 1; }
 case "$SERVER" in
   vent)
     export ASSESSOR_START_RAM_GB=${ASSESSOR_START_RAM_GB:-10} ASSESSOR_MIN_FREE_RAM_GB=${ASSESSOR_MIN_FREE_RAM_GB:-5}

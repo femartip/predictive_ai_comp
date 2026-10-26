@@ -1,8 +1,0 @@
-numpy
-pandas>=2.2
-pyarrow
-scipy
-lightgbm>=4.0
-orjson
-joblib
-matplotlib

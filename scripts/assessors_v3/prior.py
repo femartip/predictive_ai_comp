@@ -22,17 +22,17 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import log, logit  # noqa: E402
-from components import CATEGORICAL, FEATURES, parse  # noqa: E402
+from components import CATEGORICAL, FEATURES, parse, routed_start  # noqa: E402
 from config import LGBM_PARAMS, R2_PAIRS_PER_BENCHMARK, TRAIN_PAIRS_PER_BENCHMARK  # noqa: E402
 
 
 class Context:
     """What the feature components may use: the data, a seed, the sibling groups (R2's inner folds), a cache for
-    per-subject tables, and R2's own row sample."""
+    per-subject tables, R2's own row sample, and the training benchmarks' base rates (G1)."""
 
     def __init__(self, d, seed, siblings):
         self.d, self.seed, self.siblings = d, seed, siblings
-        self.cache, self.rasch_rows = {}, None
+        self.cache, self.rasch_rows, self.rate = {}, None, None
 
 
 def sample_rows(P, mask, per_bench, rng):
@@ -69,20 +69,29 @@ def lgb_device(requested, n_jobs):
 
 
 def fit_prior(d, rep, cell, spec, test_rows, n_jobs=4, device="cpu", seed=0):
-    """Train the prior for one cell; return its logits on test_rows (indices into d.P), the start (R1 on a hidden
-    benchmark, logit) and the feature importances (gain)."""
+    """Train the prior for one cell. Returns its logits on test_rows (indices into d.P); `start`, the start of each
+    test row (logit; per benchmark: R1's global start, or K1's routed start); `r1`, R1's global start (baseline B3);
+    and the feature importances (gain)."""
     P = d.P
-    use_r1, comps = parse(spec)
+    start_mode, comps = parse(spec)
+    use_r1 = start_mode is not None                            # training rows start from their own base rate
     rng = np.random.default_rng([seed, rep.rep, cell[0], 99 if cell[1] is None else cell[1]])
     mask = rep.train_mask(cell)
     rate = d.bench_mean(mask)                                  # base rate of every training benchmark
-    start = float(logit(rate.mean()))
+    r1 = float(logit(rate.mean()))
+    test_bench = P["bench"].to_numpy()[test_rows]
+    if start_mode == "K1":                                     # routed by task: nearest training benchmarks
+        routed = routed_start(d, rate, test_bench)
+        start = np.array([routed[b] for b in test_bench])
+    else:
+        start = np.full(len(test_rows), r1)
     if not comps:
-        z = np.full(len(test_rows), start if use_r1 else float(logit(P["s"][mask].sum() / P["n"][mask].sum())))
-        return {"z": z, "start": start, "importance": pd.Series(dtype=float), "train_rows": int(mask.sum())}
+        z = start if use_r1 else np.full(len(test_rows), float(logit(P["s"][mask].sum() / P["n"][mask].sum())))
+        return {"z": z, "start": start, "r1": r1, "importance": pd.Series(dtype=float), "train_rows": int(mask.sum())}
 
     tr = sample_rows(P, mask, TRAIN_PAIRS_PER_BENCHMARK, rng)
     ctx = Context(d, seed, rep.siblings)
+    ctx.rate = rate
     if "R2" in comps:
         ctx.rasch_rows = sample_rows(P, mask, R2_PAIRS_PER_BENCHMARK, rng)
     parts_tr, parts_te = [], []
@@ -110,4 +119,4 @@ def fit_prior(d, rep, cell, spec, test_rows, n_jobs=4, device="cpu", seed=0):
     booster = lgb.train(params, data, num_boost_round=LGBM_PARAMS["n_estimators"])
     z = booster.predict(X_te, raw_score=True) + (start if use_r1 else 0.0)
     imp = pd.Series(booster.feature_importance(importance_type="gain"), index=booster.feature_name())
-    return {"z": z, "start": start, "importance": imp, "train_rows": len(tr)}
+    return {"z": z, "start": start, "r1": r1, "importance": imp, "train_rows": len(tr)}

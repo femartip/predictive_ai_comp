@@ -40,7 +40,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import LowMemory, check_start_ram, guard_memory, log, write_json, write_parquet  # noqa: E402
-from config import ADELE_CODES, ADELE_DIR, DATA, JSONL_DIR  # noqa: E402
+from config import ADELE_CODES, ADELE_DIR, DATA, JSONL_DIRS  # noqa: E402
 
 SUBJECT_FIELDS = ["model_name", "normalized_name", "reasoning_effort", "thinking", "harness", "harness_version",
                   "access_date"]
@@ -209,10 +209,25 @@ def merge(out):
     subj = pd.concat([pd.read_parquet(out / "subjects" / f"{b}.parquet") for b in benches], ignore_index=True)
     write_parquet(subj.drop_duplicates("subject_id"), out / "subjects.parquet")
     cols = ["item_id"] + [f"{c}_exp" for c in ADELE_CODES]
-    adele = pd.concat([pd.read_parquet(ADELE_DIR / f"{b}.parquet", columns=cols) for b in benches], ignore_index=True)
+    tables = adele_tables()
+    adele = pd.concat([pd.read_parquet(tables[b], columns=cols) for b in benches], ignore_index=True)
     write_parquet(adele.drop_duplicates("item_id"), out / "adele.parquet")
     log(f"merged {len(benches)} benchmarks: {int(t['pairs'].sum()):,} pairs, {int(t['items'].sum()):,} items, "
         f"{subj['subject_id'].nunique():,} subjects -> {out}")
+
+
+def adele_tables():
+    """benchmark -> its ADeLe table: ADELE_DIR/<run>/<benchmark>.parquet (or a flat ADELE_DIR/<benchmark>.parquet)."""
+    return {p.stem: p for p in sorted(ADELE_DIR.glob("*.parquet")) + sorted(ADELE_DIR.glob("*/*.parquet"))}
+
+
+def jsonl_files():
+    """benchmark -> its JSONL, from the first of JSONL_DIRS that has it."""
+    out = {}
+    for d in JSONL_DIRS:
+        for p in sorted(d.glob("*.jsonl")):
+            out.setdefault(p.stem, p)
+    return out
 
 
 def main():
@@ -222,17 +237,18 @@ def main():
     ap.add_argument("--overwrite", action="store_true", help="rebuild benchmarks already built")
     a = ap.parse_args()
     check_start_ram()
-    annotated = {p.stem for p in ADELE_DIR.glob("*.parquet")}
-    available = {p.stem for p in JSONL_DIR.glob("*.jsonl")}
+    tables, files = adele_tables(), jsonl_files()
+    annotated, available = set(tables), set(files)
     benches = sorted((set(a.benchmarks) if a.benchmarks else annotated) & annotated & available)
     missing = sorted(annotated - available)
     if missing:
-        log(f"{len(missing)} annotated benchmarks have no JSONL in {JSONL_DIR}: {', '.join(missing[:10])}")
+        log(f"{len(missing)} annotated benchmarks have no JSONL in {':'.join(map(str, JSONL_DIRS))}: "
+            f"{', '.join(missing[:10])}")
     todo = [b for b in benches if a.overwrite or not (DATA / "bench" / f"{b}.json").exists()]
     log(f"{len(benches)} benchmarks, {len(todo)} to build, {a.workers} workers -> {DATA}")
     # largest files first, so the longest jobs do not end up alone at the end
-    todo.sort(key=lambda b: -(JSONL_DIR / f"{b}.jsonl").stat().st_size)
-    jobs = [(b, str(JSONL_DIR / f"{b}.jsonl"), str(ADELE_DIR / f"{b}.parquet"), str(DATA)) for b in todo]
+    todo.sort(key=lambda b: -files[b].stat().st_size)
+    jobs = [(b, str(files[b]), str(tables[b]), str(DATA)) for b in todo]
     try:
         with Pool(a.workers, maxtasksperchild=1) as pool:
             for k, info in enumerate(pool.imap_unordered(process, jobs)):

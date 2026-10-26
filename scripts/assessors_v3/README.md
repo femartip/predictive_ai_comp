@@ -19,7 +19,7 @@ as in [approaches.md](../../approaches.md).
 | File | What it does |
 |---|---|
 | `config.py` | Paths (overridable by environment variables), competition and protocol constants, model settings |
-| `build_data.py` | Converter JSONL + ADeLe tables → compact training tables (one row per subject × instance) |
+| `build_data.py` | Converter JSONL + ADeLe tables → compact training tables (one row per subject × item), from both conversion runs (no-assets, asset-image) |
 | `data.py` | Loads those tables into integer-coded arrays (`Data`); marks evaluable benchmarks |
 | `protocol.py` | Protocol v3: sibling groups, benchmark and model folds, fixed subsets, splits, draws, draw checks |
 | `components.py` | The prior's input components R2, S1, I0, I2 (R1 is the start, in `prior.py`) |
@@ -29,7 +29,9 @@ as in [approaches.md](../../approaches.md).
 | `evaluate.py` | Runs everything per repetition, regime and cell; resumable; caches the priors |
 | `report.py` | Summary tables, per-budget plots, paired comparisons (also between two runs) |
 | `export_adele.py` | Copies the published ADeLe tables into the repo, slimmed to the expected levels |
-| `setup_env.sh`, `run.sh`, `requirements.txt` | Environment and per-server launcher (vent: CPU; cremaet: GPU) |
+| `run.sh` | Per-server launcher (vent: CPU; cremaet: GPU), in the repository's Poetry environment |
+| `compare_runs.py`, `compare_plot.py` | Tables and a figure comparing several runs on their common draws |
+| `COMPONENTS.md` | What every prior and test-time component is, how it is computed and why it is there |
 
 ## Data decisions (build_data.py)
 
@@ -43,11 +45,15 @@ as in [approaches.md](../../approaches.md).
 
 ## Running
 
-Install once per server (creates `~/assessors_v3/.venv`):
+The pipeline uses the repository's own Poetry environment (`.venv` at the repository root, since `poetry.toml` sets
+`in-project = true`); its dependencies (LightGBM, SciPy, orjson, joblib, pandas, pyarrow, matplotlib) are in
+`pyproject.toml`. From a clone of the repository, once per machine:
 
 ```bash
-bash scripts/assessors_v3/setup_env.sh
+poetry install
 ```
+
+Any script also runs directly, e.g. `poetry run python scripts/assessors_v3/evaluate.py --quick`.
 
 On **vent** (the bank is in `/data`). Use `tmux new -s assessors`, since the full protocol takes hours:
 

@@ -8,13 +8,16 @@ the draw (all pairs) and the evaluation instances are scored.
 Predictors (name: prior | test-time, approaches.md):
     B1      0.5 always
     B2      the running mean of the pair's revealed labels (0.5 before the first label): the official baseline
-    B3      R1 | T1 (start level + test-time corrections; no trained prior)
+    B3      R1 | T1 (R1's global start + test-time corrections; no trained prior)
+    S1T1    start | T1: the prior's own start (= B3 with R1; the routed start with K1) + T1, no trees: routing alone
     oracle  each pair's true mean score on its evaluation instances: a floor for any level-only method
     T0      prior | T0 (the prior alone)
     T1      prior | T1
     T2      prior | T2
 Scores per (draw, pair, budget, predictor): Brier over every response run of the evaluation instances,
-sum(n p^2 - 2 p s + q) / sum(n), and ECE (ECE_BINS equal-width bins, weighted by runs, within the pair).
+sum(n p^2 - 2 p s + q) / sum(n), and ECE (ECE_BINS equal-width bins, weighted by runs, within the pair); plus the
+pair's mean prediction and mean outcome (p_mean, y_mean, weighted by runs), so report.py can split the Brier into a
+level part, (p_mean - y_mean)^2, and the rest (ranking and spread within the pair).
 """
 
 import sys
@@ -27,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import testtime as TT  # noqa: E402
 from config import ALC_WEIGHTS, BUDGETS, ECE_BINS  # noqa: E402
 
-PREDICTORS = ("B1", "B2", "B3", "oracle", "T0", "T1", "T2")
+PREDICTORS = ("B1", "B2", "B3", "S1T1", "oracle", "T0", "T1", "T2")
 
 
 def _sigmoid(z):
@@ -42,12 +45,15 @@ def pair_scores(p, n, s, q, bins=ECE_BINS):
     return brier, float(gap / np.sum(n))
 
 
-def run_draw(draw, pairs, start, predictors, tau1, tau2, budgets=BUDGETS):
+def run_draw(draw, pairs, predictors, tau1, tau2, budgets=BUDGETS):
     """Score one draw. draw: list of (bench, subj); pairs: (bench, subj) -> dict with acq_inst, revealed, acq_z
-    (prior logits), eval_inst, eval_z, n, s, q. Returns a list of records (bench, subj, budget, predictor, brier, ece,
-    labels)."""
+    (prior logits), eval_inst, eval_z, n, s, q, start (the prior's start for this pair's benchmark, logit) and r1
+    (R1's global start). Returns a list of records (bench, subj, budget, predictor, brier, ece, labels, p_mean,
+    y_mean)."""
     P = [pairs[g] for g in draw]
     ev_z = np.concatenate([p["eval_z"] for p in P])
+    ev_st = np.concatenate([np.full(len(p["eval_inst"]), p["start"]) for p in P])
+    ev_r1 = np.concatenate([np.full(len(p["eval_inst"]), p["r1"]) for p in P])
     ev_g = TT.keys(np.concatenate([np.full(len(p["eval_inst"]), p["bench"]) for p in P]),
                    np.concatenate([np.full(len(p["eval_inst"]), p["subj"]) for p in P]),
                    np.concatenate([p["eval_inst"] for p in P]))
@@ -57,6 +63,8 @@ def run_draw(draw, pairs, start, predictors, tau1, tau2, budgets=BUDGETS):
         m = [min(k, len(p["acq_inst"])) for p in P]
         y = np.concatenate([p["revealed"][:mm] for p, mm in zip(P, m)])
         z = np.concatenate([p["acq_z"][:mm] for p, mm in zip(P, m)])
+        st = np.concatenate([np.full(mm, p["start"]) for p, mm in zip(P, m)])
+        r1 = np.concatenate([np.full(mm, p["r1"]) for p, mm in zip(P, m)])
         g = TT.keys(np.concatenate([np.full(mm, p["bench"]) for p, mm in zip(P, m)]),
                     np.concatenate([np.full(mm, p["subj"]) for p, mm in zip(P, m)]),
                     np.concatenate([p["acq_inst"][:mm] for p, mm in zip(P, m)]))
@@ -72,30 +80,31 @@ def run_draw(draw, pairs, start, predictors, tau1, tau2, budgets=BUDGETS):
             elif name == "T0":
                 preds[name] = _sigmoid(ev_z)
             elif name == "B3":
-                st = np.full(len(y), start)
-                preds[name] = TT.predict(TT.fit(y, st, None, g, tau1, False), np.full(len(ev_z), start), None, ev_g)
+                preds[name] = TT.predict(TT.fit(y, r1, None, g, tau1, False), ev_r1, None, ev_g)
+            elif name == "S1T1":
+                preds[name] = TT.predict(TT.fit(y, st, None, g, tau1, False), ev_st, None, ev_g)
             elif name == "T1":
                 preds[name] = TT.predict(TT.fit(y, z, None, g, tau1, False), ev_z, None, ev_g)
             elif name == "T2":
-                st = np.full(len(y), start)
-                preds[name] = TT.predict(TT.fit(y, st, z - start, g, tau2, True), np.full(len(ev_z), start),
-                                         ev_z - start, ev_g)
+                preds[name] = TT.predict(TT.fit(y, st, z - st, g, tau2, True), ev_st, ev_z - ev_st, ev_g)
         for i, p in enumerate(P):
             sl = slice(cut[i], cut[i + 1])
+            y_mean = float(p["s"].sum() / p["n"].sum())
             for name, pr in preds.items():
                 b, e = pair_scores(pr[sl], p["n"], p["s"], p["q"])
-                out.append((p["bench"], p["subj"], k, name, b, e, m[i]))
+                out.append((p["bench"], p["subj"], k, name, b, e, m[i], float(np.average(pr[sl], weights=p["n"])),
+                            y_mean))
     return out
 
 
-def run_draws(draws, pairs, start, predictors, tau1, tau2, first_index=0):
+def run_draws(draws, pairs, predictors, tau1, tau2, first_index=0):
     """Score several draws; a DataFrame with one row per (draw, pair, budget, predictor)."""
     rows = []
     for t, draw in enumerate(draws):
-        for r in run_draw(draw, pairs, start, predictors, tau1, tau2):
+        for r in run_draw(draw, pairs, predictors, tau1, tau2):
             rows.append((first_index + t, len({b for b, _ in draw}), *r))
     return pd.DataFrame(rows, columns=["draw", "draw_benchmarks", "bench", "subj", "budget", "predictor", "brier",
-                                       "ece", "labels"])
+                                       "ece", "labels", "p_mean", "y_mean"])
 
 
 # ----------------------------------------------------------------------------- scores

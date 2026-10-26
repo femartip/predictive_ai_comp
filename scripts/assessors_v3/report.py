@@ -7,6 +7,8 @@ Writes RESULTS/NAME/report/:
     per_budget.csv     per regime, predictor and budget: Brier and ECE (mean over draws of the mean over pairs), s.e.
     paired.csv         per regime: each predictor minus --ref on the same draws, 95% cluster-bootstrap interval over
                        cells (D6); a difference counts when its interval excludes zero
+    budget0.csv        per regime and predictor, at budget 0: Brier = level + rest, level = mean over pairs of
+                       (mean prediction - mean outcome)^2, rest = ranking and spread within the pair
     by_benchmark.csv   Brier ALC per benchmark (its pairs' ALC, averaged) and predictor
     by_draw_size.csv   Brier ALC by number of benchmarks in the draw
     by_route.csv       Brier ALC for agentic and non-agentic benchmarks
@@ -28,9 +30,9 @@ from simulate import draw_scores  # noqa: E402
 
 # Fixed colour per predictor (categorical palette order; a colour follows its predictor in every plot)
 COLOURS = {"T2": "#2a78d6", "T1": "#eb6834", "T0": "#1baf7a", "B3": "#eda100", "B2": "#e87ba4", "oracle": "#008300",
-           "B1": "#6250d6"}
+           "B1": "#6250d6", "S1T1": "#e34948"}
 LABELS = {"T2": "prior | T2", "T1": "prior | T1", "T0": "prior alone (T0)", "B3": "B3: R1 | T1",
-          "B2": "B2: running mean", "oracle": "oracle level", "B1": "B1: 0.5"}
+          "B2": "B2: running mean", "oracle": "oracle level", "B1": "B1: 0.5", "S1T1": "start | T1 (no trees)"}
 
 
 def load(name):
@@ -142,6 +144,14 @@ def main():
         rows += paired(scores, pred, a.ref)
     pd.DataFrame(rows).to_csv(out / "paired.csv", index=False)
 
+    b0 = None
+    if "p_mean" in rec:                                        # records written since 2026-10-25
+        r0 = rec[rec["budget"] == 0].assign(level=lambda t: (t["p_mean"] - t["y_mean"]) ** 2)
+        b0 = r0.groupby(["regime", "predictor"])[["brier", "level"]].mean()
+        b0["rest"] = b0["brier"] - b0["level"]
+        b0 = b0.reset_index().sort_values(["regime", "brier"])
+        b0.to_csv(out / "budget0.csv", index=False)
+
     pa = pair_alc(rec)
     pa.groupby(["regime", "benchmark", "predictor"])["brier_alc"].mean().unstack("predictor") \
         .to_csv(out / "by_benchmark.csv")
@@ -173,6 +183,9 @@ def main():
     pd.set_option("display.width", 160)
     print(summ.round(4).to_string(index=False))
     print(pd.DataFrame(rows).round(4).to_string(index=False))
+    if b0 is not None:
+        print("\nbudget 0: Brier = level + rest")
+        print(b0.round(4).to_string(index=False))
     print(f"wrote {out}")
 
 

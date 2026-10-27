@@ -17,6 +17,10 @@ mmbench_v11,asset-image,600,600,0
 mmmu_dev_val,asset-image,600,600,0
 mmoral_bench,asset-image,491,491,0
 mochi,asset-image,600,595,0
+multimodal_stem_ai,asset-image,249,249,0
+naep_llm_students,asset-image,488,488,0
+ocrbench_v2,asset-image,600,600,0
+phyblock,asset-image,600,564,0
 abstract_reason,no-assets,600,600,0
 adaptivestep,no-assets,600,600,0
 aegis,no-assets,600,600,0

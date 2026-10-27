@@ -1,0 +1,11 @@
+# Asset-image benchmarks, third batch (2026-10-26): the 5 written by the asset-image conversion since the second batch
+# (cluster_assets2.txt), run 20261023T110411Z_26fccf60 at benchmark 34 of 48. None reaches the 32,767-token window.
+# Send with JSONL_DIR set to the asset-image run (README, "Asset benchmarks").
+multimodal_stem_ai
+naep_llm_students
+ocrbench_v2
+phyblock
+# mtbbench: off until the team decides. Median prompt 14,668 tokens, 97% of items over the annotator's 4,096-token
+# training length (none over the window), up to 23 image descriptions per item, 11.8 GPU-hours. Remove the "# " below
+# to include it (its items are already selected on vent).
+# mtbbench

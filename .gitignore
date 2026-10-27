@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+results/
+
 # Distribution / packaging
 .Python
 build/
@@ -219,3 +221,6 @@ __marimo__/
 
 # Dataset (downloaded from Hugging Face, ~12 GB)
 data/
+
+# Fitted assessors cached by scripts/assessors_router (large, rebuilt on demand)
+results/assessors_router/*/cache/

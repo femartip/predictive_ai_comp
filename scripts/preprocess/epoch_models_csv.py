@@ -96,7 +96,6 @@ def clean():
             print(f"  {c}: {before - df[c].notna().sum()} non-numeric values set to empty")
     df["Publication date"] = pd.to_datetime(df["Publication date"], errors="coerce")
     assert df.Model.is_unique, "duplicate model names"
-    PROCESSED.mkdir(parents=True, exist_ok=True)
     out = df.drop(columns=DROP_COLUMNS).assign(**{"Publication date": df["Publication date"].dt.date})
     out.to_csv(RAW, index=False)
     print(f"{len(out):,} models × {out.shape[1]} columns → {RAW.relative_to(ROOT)}")
@@ -261,7 +260,7 @@ def fill_sizes(df):
     notes = pd.DataFrame([size_from_notes(n) for n in df.parameters_notes], index=df.index)
     df["parameters_source"] = df.parameters.notna().map({True: "epoch", False: None})
     fill = df.parameters.isna() & f.total.notna()
-    df.loc[fill, "parameters"] = f.total[fill]
+    df.loc[fill, "parameters"] = f.total[fill].astype(float)   # f.total is all None (object) when no name has a size
     df.loc[fill, "parameters_source"] = "name"
     df["active_parameters"] = f.active.fillna(notes.active)
     df["active_parameters_source"] = f.active.notna().map({True: "name", False: None}).where(
@@ -680,8 +679,9 @@ def hf_record(repo):
     return rec
 
 
-def fill_hf(df, offline):
-    """Fill from the Hugging Face Hub, anonymously, for models that are open-weight or of unknown openness."""
+def fill_hf(df, offline, refresh=True):
+    """Fill from the Hugging Face Hub, anonymously, for models that are open-weight or of unknown openness. With
+    refresh=False, models already in the cache are not queried again."""
     providers = sorted(set(df.provider.dropna()), key=len, reverse=True)
     cache = json.loads(HF_CACHE.read_text(encoding="utf-8")) if HF_CACHE.exists() else {}
     todo = df[(df.kind == "model") & df.open_weights.ne(False)]
@@ -689,6 +689,8 @@ def fill_hf(df, offline):
     provider_owners = {p: {key(x) for x in g.dropna()} for p, g in df.groupby("provider").hf_developer}
     if not offline:
         for r in todo.itertuples():
+            if not refresh and r.normalized_name in cache:
+                continue
             try:
                 repo = hf_repo(r, providers, provider_owners)
                 cache[r.normalized_name] = hf_record(repo) if repo else None
@@ -715,25 +717,36 @@ def fill_hf(df, offline):
     return df
 
 
-def main(offline=False):
+def model_table(models, offline=False, hf_refresh=True):
+    """The model attributes table for `models` (one row per normalized_name, the columns of benchmark_models()):
+    Epoch, then the names and runs, models.dev, ReleasedModels and the Hugging Face Hub. Also used by
+    assessor_data.py, which collects the models from the converter's JSONL instead of data/processed/.
+    hf_refresh=False queries the Hugging Face Hub only for models not in its cache."""
     if not offline:
         download()
     epoch = clean()
-    models = fill_hf(fill_external(fill_capabilities(fill_sizes(match(benchmark_models(), epoch))), offline), offline)
+    models = fill_hf(fill_external(fill_capabilities(fill_sizes(match(models, epoch))), offline), offline,
+                     hf_refresh)
     order = ["normalized_name", "kind", "benchmarks", "display_names", "n_subjects", "provider",
              "release_date", "release_date_source", "epoch_model", "models_dev_id", "releasedmodels_slug", "hf_repo", "n_candidates",
              "open_weights", "open_weights_source", *FIELDS.values(), "parameters_source",
              "active_parameters", "active_parameters_source", "architecture", "architecture_source", "moe", "moe_source",
              "n_experts", "n_experts_source", "multimodal_input", "multimodal_input_source", "context_window", "context_window_source",
              "knowledge_cutoff", "knowledge_cutoff_source", "thinking", "thinking_source"]
-    # thinking here is whether the model has a thinking mode; the benchmark files' `thinking` is whether a run
-    # thought. Renamed so the two do not collide when joining on normalized_name.
-    models[order].rename(columns={"thinking": "thinking_mode", "thinking_source": "thinking_mode_source"}).to_csv(
-        MODELS, index=False)
     m = models[models.kind == "model"]
     group = m.open_weights.map({True: "open", False: "closed"}).fillna("unknown")
     print(f"matched {m.epoch_model.notna().sum()} of {len(m)} models: {m.match_stage.value_counts().to_dict()} · "
-          f"{group.value_counts().to_dict()} → {MODELS.relative_to(ROOT)}")
+          f"{group.value_counts().to_dict()}")
+    # thinking here is whether the model has a thinking mode; the benchmark files' `thinking` is whether a run
+    # thought. Renamed so the two do not collide when joining on normalized_name.
+    return models[order].rename(columns={"thinking": "thinking_mode", "thinking_source": "thinking_mode_source"})
+
+
+def main(offline=False):
+    table = model_table(benchmark_models(), offline)
+    PROCESSED.mkdir(parents=True, exist_ok=True)
+    table.to_csv(MODELS, index=False)
+    print(f"→ {MODELS.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

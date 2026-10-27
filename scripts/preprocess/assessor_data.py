@@ -1,7 +1,7 @@
 """Build the assessor dataset: one Parquet file per benchmark with everything needed to train an assessor, on every row.
 
-    .venv/bin/python scripts/preprocess/assessor_data.py [--workers 4] [--benchmarks a b ...] [--offline]
-    .venv/bin/python scripts/preprocess/assessor_data.py --resume data/datasets/assessor_data/RUN_ID
+    poetry run python scripts/preprocess/assessor_data.py [--workers 4] [--benchmarks a b ...] [--offline]
+    poetry run python scripts/preprocess/assessor_data.py --resume data/datasets/assessor_data/RUN_ID
 
 Inputs (data/datasets, the shared folder on vent):
   annotations/adele_v1/<run>/<benchmark>.parquet   ADeLe v1 levels of the annotated items (at most 600 per benchmark,
@@ -15,7 +15,7 @@ Inputs (data/datasets, the shared folder on vent):
   the bank on Hugging Face (gated, at the conversion's pinned revision): each benchmark's subjects table, for every
   subject's provider, release_date and subject_features_extra, and its items table, for every item's item_features.
   The converter does not copy them into the JSONL, and CodaBench gives all four to predict(). Needs
-  `.venv/bin/hf auth login`.
+  `poetry run hf auth login`.
   Epoch AI, models.dev, ReleasedModels and the Hugging Face Hub: model attributes (epoch_models_csv.model_table)
 
 Output, one folder per build: data/datasets/assessor_data/<UTC-timestamp>_<id>/
@@ -499,7 +499,7 @@ def main():
     try:
         HfApi().whoami()
     except Exception:  # noqa: BLE001 - any failure means no usable token
-        sys.exit("no Hugging Face login: run `.venv/bin/hf auth login` (provider and release_date are on the bank)")
+        sys.exit("no Hugging Face login: run `poetry run hf auth login` (provider and release_date are on the bank)")
     log(f"building -> {out}")
     parts = out / "parts"
     parts.mkdir(exist_ok=True)

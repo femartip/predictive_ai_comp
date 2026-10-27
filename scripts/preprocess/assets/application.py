@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import base64
+import ast
 import gzip
 import hashlib
 import json
 import math
+import pickle
+import pickletools
 import re
 import sqlite3
 import stat
@@ -17,10 +20,11 @@ import zipfile
 from datetime import date, datetime, time
 from decimal import Decimal
 from io import BytesIO
+from itertools import islice
 from pathlib import Path, PurePosixPath
+from time import monotonic
 
 import numpy as np
-from PIL import Image
 
 from .base import (
     AssetProcessingContext,
@@ -88,7 +92,8 @@ def _json_compatible(value):
     if isinstance(value, np.generic):
         return _json_compatible(value.item())
     if isinstance(value, np.ndarray):
-        return [_json_compatible(item) for item in value.tolist()]
+        # A scalar object array can contain a dictionary, rather than a list.
+        return _json_compatible(value.tolist())
     if isinstance(value, dict):
         return {str(key): _json_compatible(item) for key, item in value.items()}
     if isinstance(value, (list, tuple)):
@@ -212,42 +217,75 @@ def process_sql(asset_id: str, data: bytes, context: AssetProcessingContext, **_
     return _with_marker(embedded_result(text, "application/sql", "sql_asset"), marker)
 
 
+def _preserve_pdf(data: bytes, context: AssetProcessingContext, status: str,
+                  *, document_metadata=None, error: str | None = None) -> ProcessedAsset:
+    """Retain PDF bytes when there is no page content the processor can render."""
+    relative_path = context.write_binary_artifact(data)
+    metadata = {
+        'status': status,
+        'page_count': 0 if status == 'no_pages' else None,
+        'relative_path': relative_path,
+        'byte_size': len(data),
+        'sha256': hashlib.sha256(data).hexdigest(),
+        'document_metadata': document_metadata,
+        'printable_strings': [match.group().decode('ascii') for match in
+                              islice(re.finditer(rb'[\x20-\x7e]{4,}', data), context.limits.max_printable_strings)],
+    }
+    if error is not None:
+        metadata['read_error'] = error
+    result = embedded_result(_json_dump(metadata, indent=2), 'application/pdf', 'pdf_asset')
+    return ProcessedAsset(result.question_fragment, relative_path, result.media_type)
+
+
 def process_pdf(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
     try:
-        import fitz
+        import pymupdf as fitz
     except ImportError as error:
         raise RuntimeError("PDF processing requires PyMuPDF. Run `poetry install`.") from error
-    document = fitz.open(stream=data, filetype="pdf")
+    try:
+        document = fitz.open(stream=data, filetype="pdf")
+    except (fitz.FileDataError, fitz.EmptyFileError) as error:
+        return _preserve_pdf(data, context, 'unreadable', error=str(error))
     try:
         total = len(document)
         if total == 0:
-            raise ValueError("PDF has no pages")
+            return _preserve_pdf(data, context, 'no_pages', document_metadata=document.metadata)
         maximum = context.limits.max_pdf_pages
         indices = list(range(total)) if maximum is None else evenly_spaced_indices(total, maximum)
         sections = []
-        for index in indices:
+        empty_pages = 0
+        started = last_progress = monotonic()
+        logger = context.logger
+        if logger is not None:
+            logger.info('PDF %s: extracting text from %s/%s pages',
+                        asset_id[:12], len(indices), total)
+        for position, index in enumerate(indices, 1):
             page = document[index]
             extracted_text = page.get_text("text", sort=False)
-            pixmap = page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5), alpha=False)
-            image = Image.frombytes("RGB", (pixmap.width, pixmap.height), pixmap.samples)
-            prompt = (
-                f"Describe page {index + 1} of {total} objectively and exhaustively, focusing on layout, "
-                "figures, diagrams, handwriting, tables, and visible text that a PDF text layer may miss. "
-                "Do not infer or answer the benchmark question."
-            )
-            visual = context.describe_images([image], prompt)
+            has_text = bool(extracted_text.strip())
+            empty_pages += not has_text
             sections.append(
-                f'<pdf_page number="{index + 1}" total="{total}">\n'
+                f'<pdf_page number="{index + 1}" total="{total}" '
+                f'status="{"text_extracted" if has_text else "no_extractable_text"}">\n'
                 f"<extracted_text>\n{extracted_text}\n</extracted_text>\n"
-                f"<visual_description>\n{visual}\n</visual_description>\n"
                 "</pdf_page>"
             )
+            now = monotonic()
+            if logger is not None and now - last_progress >= 5:
+                logger.info('PDF %s: extracted text from %s/%s pages',
+                            asset_id[:12], position, len(indices))
+                last_progress = now
         omitted = total - len(indices)
         if omitted:
             sections.append(
                 f'<asset_truncation kind="pdf" omitted_pages="{omitted}" '
                 f'included_pages="{",".join(str(index + 1) for index in indices)}" />'
             )
+        sections.insert(0, '<pdf_processing policy="text-only" '
+                        f'included_pages="{len(indices)}" pages_without_text="{empty_pages}" />')
+        if logger is not None:
+            logger.info('PDF %s: extracted %s pages (%s without text) in %.1fs',
+                        asset_id[:12], len(indices), empty_pages, monotonic() - started)
         return embedded_result("\n".join(sections), "application/pdf", "pdf_asset")
     finally:
         document.close()
@@ -287,6 +325,17 @@ def _quote_sqlite_identifier(name: str) -> str:
     return '"' + name.replace('"', '""') + '"'
 
 
+def _decode_sqlite_text(data: bytes) -> str | dict:
+    """Keep malformed TEXT distinguishable from BLOBs and preserve its exact bytes."""
+    try:
+        return data.decode('utf-8')
+    except UnicodeDecodeError:
+        return {'__sqlite_invalid_utf8_text__': {
+            'display': data.decode('utf-8', errors='replace'),
+            'base64': base64.b64encode(data).decode('ascii'),
+        }}
+
+
 def process_sqlite(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
     temporary_name = None
     connection = None
@@ -296,6 +345,7 @@ def process_sqlite(asset_id: str, data: bytes, context: AssetProcessingContext, 
             temporary_name = temporary.name
         uri = Path(temporary_name).as_uri() + "?mode=ro&immutable=1"
         connection = sqlite3.connect(uri, uri=True)
+        connection.text_factory = _decode_sqlite_text
         connection.enable_load_extension(False)
         connection.execute("PRAGMA query_only=ON")
         connection.execute("PRAGMA trusted_schema=OFF")
@@ -352,8 +402,52 @@ def process_sqlite(asset_id: str, data: bytes, context: AssetProcessingContext, 
             Path(temporary_name).unlink(missing_ok=True)
 
 
+class _NumpyDataUnpickler(pickle.Unpickler):
+    """Allow only NumPy's data constructors, never arbitrary payload globals."""
+
+    def find_class(self, module, name):
+        if module == 'numpy' and name in {'ndarray', 'dtype'}:
+            return getattr(np, name)
+        if module in {'numpy.core.multiarray', 'numpy._core.multiarray'}:
+            if name == '_reconstruct':
+                return np._core.multiarray._reconstruct
+            if name == 'scalar':
+                return np._core.multiarray.scalar
+        raise pickle.UnpicklingError(f'Unsupported global in NumPy object data: {module}.{name}')
+
+    def persistent_load(self, pid):
+        raise pickle.UnpicklingError('Persistent references are not supported in NumPy object data')
+
+
+def _load_npy_data(data: bytes) -> np.ndarray:
+    try:
+        return np.load(BytesIO(data), allow_pickle=False)
+    except ValueError as error:
+        if str(error) != 'Object arrays cannot be loaded when allow_pickle=False':
+            raise
+    # NumPy has already validated the header. Locate its pickle payload without
+    # enabling unrestricted allow_pickle=True, including UTF-8 NPY v3 headers.
+    stream = BytesIO(data)
+    version = np.lib.format.read_magic(stream)
+    width = 2 if version == (1, 0) else 4
+    header_size = int.from_bytes(stream.read(width), 'little')
+    encoding = 'utf-8' if version == (3, 0) else 'latin-1'
+    header = ast.literal_eval(stream.read(header_size).decode(encoding))
+    payload = stream.read()
+    # Extension references can reuse process-global cached callables without
+    # invoking find_class. Reject them before entering the restricted unpickler.
+    for opcode, _, _ in pickletools.genops(payload):
+        if opcode.name in {'EXT1', 'EXT2', 'EXT4', 'PERSID', 'BINPERSID'}:
+            raise pickle.UnpicklingError(f'Unsupported reference in NumPy object data: {opcode.name}')
+    array = _NumpyDataUnpickler(BytesIO(payload)).load()
+    if (not isinstance(array, np.ndarray) or array.shape != header['shape']
+            or array.dtype != np.dtype(header['descr'])):
+        raise ValueError('NumPy object payload does not match its array header')
+    return array
+
+
 def process_npy(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
-    array = np.load(BytesIO(data), allow_pickle=False)
+    array = _load_npy_data(data)
     if not isinstance(array, np.ndarray):
         raise ValueError("application/x-npy payload is not a NumPy array")
     order = "F" if array.flags.f_contiguous and not array.flags.c_contiguous else "C"
@@ -389,6 +483,36 @@ def _safe_member_path(name: str) -> str:
     return path.as_posix()
 
 
+def _has_mpeg_audio_frames(data: bytes) -> bool:
+    """A sync-looking binary prefix is insufficient: confirm actual audio frames."""
+    if len(data) < 4 or data[0] != 0xFF or data[1] & 0xE0 != 0xE0:
+        return False
+    version = (data[1] >> 3) & 3
+    layer = (data[1] >> 1) & 3
+    bitrate = data[2] >> 4
+    sample_rate = (data[2] >> 2) & 3
+    if version == 1 or layer == 0 or bitrate in {0, 15} or sample_rate == 3:
+        return False
+    try:
+        import av
+    except ImportError:
+        # Unknown binary remains preservable without optional audio decoding.
+        return False
+    try:
+        with av.open(BytesIO(data)) as container:
+            if not container.streams.audio:
+                return False
+            codec = container.streams.audio[0].codec_context.name
+            if codec not in {'mp1', 'mp2', 'mp2float', 'mp3', 'mp3float'}:
+                return False
+            frames = iter(container.decode(audio=0))
+            next(frames)
+            next(frames)
+            return True
+    except (av.error.FFmpegError, StopIteration, ValueError):
+        return False
+
+
 def detect_media_type(data: bytes, filename: str | None = None) -> str | None:
     if data.startswith(b"%PDF-"):
         return "application/pdf"
@@ -412,7 +536,7 @@ def detect_media_type(data: bytes, filename: str | None = None) -> str | None:
         return "image/webp"
     if data.startswith(b"RIFF") and data[8:12] == b"WAVE":
         return "audio/wav"
-    if data.startswith(b"ID3") or (len(data) > 1 and data[0] == 0xFF and data[1] & 0xE0 == 0xE0):
+    if data.startswith(b"ID3") or _has_mpeg_audio_frames(data):
         return "audio/mpeg"
     if len(data) >= 12 and data[4:8] == b"ftyp":
         return "video/mp4"
@@ -567,6 +691,7 @@ def _decompress_gzip(data: bytes, maximum: int | None) -> bytes:
 
 def _process_tar(data: bytes, context: AssetProcessingContext, archive_depth: int) -> tuple[str, int]:
     members = []
+    links = []
     with tarfile.open(fileobj=BytesIO(data), mode="r:") as archive:
         processed = 0
         used_bytes = 0
@@ -575,7 +700,14 @@ def _process_tar(data: bytes, context: AssetProcessingContext, archive_depth: in
             if info.isdir():
                 continue
             if info.issym() or info.islnk():
-                raise ValueError(f"TAR link is not supported: {path}")
+                # Preserve the archive relationship without following or extracting
+                # a target, which may be external, missing, or another link.
+                links.append({
+                    "path": path,
+                    "member_type": "symlink" if info.issym() else "hardlink",
+                    "link_target": info.linkname,
+                })
+                continue
             if not info.isfile():
                 raise ValueError(f"unsupported TAR member type: {path}")
             include = _include_archive_member(context, processed, used_bytes, info.size)
@@ -596,6 +728,7 @@ def _process_tar(data: bytes, context: AssetProcessingContext, archive_depth: in
             checksum = f"sha256:{digest}"
             members.append((path, info.size, info.size, checksum, payload))
     manifest, fragments, omitted = _process_members(members, context, archive_depth)
+    manifest = sorted([*manifest, *links], key=lambda member: member["path"])
     content = "tar_manifest=" + _json_dump(manifest) + "\n" + "\n".join(fragments)
     return content, omitted
 
@@ -611,17 +744,35 @@ def process_gzip(
 ) -> ProcessedAsset:
     if archive_depth >= context.limits.max_archive_depth:
         raise ValueError(f"archive nesting exceeds max_archive_depth={context.limits.max_archive_depth}")
-    metadata = _gzip_header(data)
-    payload = _decompress_gzip(data, context.limits.max_gzip_uncompressed_bytes)
+    is_gzip = data.startswith(b"\x1f\x8b")
+    maximum = context.limits.max_gzip_uncompressed_bytes
+    if is_gzip:
+        metadata = _gzip_header(data)
+        payload = _decompress_gzip(data, maximum)
+        header = "gzip_header=" + _json_dump(metadata)
+    else:
+        # Some released .tar.gz files are uncompressed TAR archives. Verify that
+        # format below and retain the source MIME mismatch in the exported text.
+        payload = data
+        if maximum is not None and len(payload) > maximum:
+            raise ValueError(f"Uncompressed TAR payload exceeds max_gzip_uncompressed_bytes={maximum}")
+        metadata = {
+            "declared_media_type": "application/gzip",
+            "detected_media_type": "application/x-tar",
+            "compression": "none",
+        }
+        header = "format_mismatch=" + _json_dump(metadata)
     stream = BytesIO(payload)
     try:
         with tarfile.open(fileobj=stream, mode="r:"):
             is_tar = True
-    except tarfile.TarError:
+    except tarfile.TarError as error:
+        if not is_gzip:
+            raise ValueError("invalid GZIP header; payload is not an uncompressed TAR archive") from error
         is_tar = False
     if is_tar:
         nested, omitted = _process_tar(payload, context, archive_depth + 1)
-        content = "gzip_header=" + _json_dump(metadata) + "\n" + nested
+        content = header + "\n" + nested
         if omitted:
             content += f'\n<asset_truncation kind="tar" omitted_members="{omitted}" />'
     else:
@@ -639,7 +790,7 @@ def process_gzip(
             archive_depth=archive_depth + 1,
         )
         content = (
-            "gzip_header=" + _json_dump(metadata) + "\n"
+            header + "\n"
             + _nested_result(original_name or "<gzip-payload>", "compressed payload", detected, result)
         )
     return embedded_result(content, "application/gzip", "gzip_asset")

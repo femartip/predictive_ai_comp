@@ -74,8 +74,8 @@ def load_catalog(path: Path = CATEGORY_FILE):
     return catalog
 
 
-def select_benchmarks(catalog, categories=None):
-    """Select whole benchmarks when any requested category matches."""
+def select_benchmarks(catalog, categories=None, *, exclusive=False):
+    """Match requested categories, optionally excluding every unrequested asset category."""
     requested = set(categories or CATEGORIES)
     if requested - set(CATEGORIES):
         raise ValueError(f'Unknown benchmark categories: {sorted(requested - set(CATEGORIES))}')
@@ -83,6 +83,7 @@ def select_benchmarks(catalog, categories=None):
     return sorted(
         name for name, entry in catalog['benchmarks'].items()
         if name not in excluded and requested.intersection(entry['categories'])
+        and (not exclusive or set(entry['categories']).issubset(requested))
     )
 
 

@@ -45,21 +45,24 @@ class Handler:
     cacheable: bool = True
 
 
+PDF_PROCESSING_POLICY = {'mode': 'text-only', 'recipe_version': 'pdf-text-only-v2'}
+
+
 HANDLERS = {
-    "application/gzip": Handler(process_gzip, "application", "gzip-recursive-v1", False),
+    "application/gzip": Handler(process_gzip, "application", "gzip-recursive-v3", False),
     "application/json": Handler(process_json, "application", "json-verbatim-valid-v1"),
     "application/octet-stream": Handler(
-        process_octet_stream, "application", "octet-detect-or-preserve-v1", False
+        process_octet_stream, "application", "octet-verified-media-or-preserve-v2", False
     ),
-    "application/pdf": Handler(process_pdf, "image", "pdf-text-and-rendered-pages-v1"),
+    "application/pdf": Handler(process_pdf, "application", PDF_PROCESSING_POLICY['recipe_version']),
     "application/sql": Handler(process_sql, "application", "sql-verbatim-v1"),
     "application/vnd.apache.parquet": Handler(
         process_parquet, "application", "parquet-schema-rows-v1"
     ),
-    "application/vnd.sqlite3": Handler(process_sqlite, "application", "sqlite-readonly-v1"),
+    "application/vnd.sqlite3": Handler(process_sqlite, "application", "sqlite-readonly-utf8-preserved-v2"),
     "application/x-ndjson": Handler(process_ndjson, "application", "ndjson-valid-lines-v1"),
-    "application/x-npy": Handler(process_npy, "application", "npy-safe-array-v1"),
-    "application/zip": Handler(process_zip, "application", "zip-recursive-v1", False),
+    "application/x-npy": Handler(process_npy, "application", "npy-restricted-object-data-v2"),
+    "application/zip": Handler(process_zip, "application", "zip-verified-members-v2", False),
     "audio/mpeg": Handler(process_mpeg, "audio", "audio-timestamped-description-v1"),
     "audio/wav": Handler(process_wav, "audio", "audio-timestamped-description-v1"),
     "image/bmp": Handler(process_bmp, "image", "bmp-lossless-png-description-v1"),
@@ -70,12 +73,12 @@ HANDLERS = {
     "image/webp": Handler(process_webp, "image", "webp-eight-frame-description-v1"),
     "image/x-exr": Handler(process_exr, "image", "exr-tonemap-all-channels-description-v1"),
     "model/obj": Handler(process_obj, "image", "obj-six-view-render-description-v1"),
-    "text/csv": Handler(process_csv, "text", "csv-verbatim-complete-record-limit-v1"),
-    "text/markdown": Handler(process_markdown, "text", "markdown-verbatim-line-limit-v1"),
-    "text/plain": Handler(process_plain, "text", "plain-verbatim-line-limit-v1"),
-    "text/x-python": Handler(process_python, "text", "python-verbatim-never-execute-v1"),
+    "text/csv": Handler(process_csv, "text", "csv-head-tail-record-limit-v2"),
+    "text/markdown": Handler(process_markdown, "text", "markdown-head-tail-line-limit-v2"),
+    "text/plain": Handler(process_plain, "text", "plain-head-tail-line-limit-v2"),
+    "text/x-python": Handler(process_python, "text", "python-head-tail-never-execute-v2"),
     "text/x-shellscript": Handler(
-        process_shellscript, "text", "shell-verbatim-never-execute-v1"
+        process_shellscript, "text", "shell-head-tail-never-execute-v2"
     ),
     "video/mp4": Handler(process_mp4, "video", "mp4-sixteen-frame-audio-description-v1"),
 }
@@ -101,7 +104,10 @@ def cached_asset(
     if not handler.cacheable:
         return None
     version = context.recipe_version(handler.prompt_version)
-    return context.cached(asset_id, media_type, handler.family, version)
+    result = context.cached(asset_id, media_type, handler.family, version)
+    # Artifact paths belong to a particular output folder and must be regenerated
+    # there rather than reused from a previous run's cache entry.
+    return result if result is not None and result.relative_path is None else None
 
 
 def process_asset(
@@ -118,7 +124,7 @@ def process_asset(
     version = context.recipe_version(handler.prompt_version)
     if handler.cacheable:
         cached = context.cached(asset_id, media_type, handler.family, version)
-        if cached is not None:
+        if cached is not None and cached.relative_path is None:
             return cached
     result = handler.function(
         asset_id,
@@ -129,7 +135,7 @@ def process_asset(
     )
     if result.media_type != media_type:
         raise ValueError(f"{media_type} processor returned {result.media_type}")
-    if handler.cacheable:
+    if handler.cacheable and result.relative_path is None:
         context.store(asset_id, handler.family, version, result)
     return result
 
@@ -154,6 +160,7 @@ __all__ = [
     "AssetLimits",
     "AssetProcessingContext",
     "ProcessedAsset",
+    "PDF_PROCESSING_POLICY",
     "SUPPORTED_MEDIA_TYPES",
     "UnsupportedAssetTypeError",
     "cached_asset",

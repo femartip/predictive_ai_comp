@@ -6,6 +6,8 @@ response, so repeated trials remain distinct. Model traces are not downloaded or
 
 import argparse
 import fcntl
+import hashlib
+import heapq
 import json
 import logging
 import math
@@ -16,6 +18,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from shlex import quote
+import shutil
 from uuid import uuid4
 
 import duckdb
@@ -24,13 +27,18 @@ import pyarrow.parquet as pq
 import yaml
 from huggingface_hub import HfApi, hf_hub_download
 
-from assets import AssetProcessingContext, handler_for
+from assets import AssetProcessingContext, PDF_PROCESSING_POLICY, handler_for
 from assets.pipeline import add_asset_descriptions, manifest_references
+from assets.question_budget import (
+    DEFAULT_QUESTION_TOKENS, DEFAULT_QUESTION_TOKENIZER, QUESTION_BUDGET_CATEGORIES, QuestionBudget,
+)
 from common import OUT, benchmark_columns, subject_columns, write_observation_batches
 from measurement_db_categories import CATEGORY_FILE, CATEGORIES, REPOSITORY, build_catalog, load_catalog, select_benchmarks
 
 
 TABLES = ("benchmarks", "items", "subjects", "responses")
+DEFAULT_MAX_ITEMS = 1000
+DEFAULT_SAMPLING_SEED = 42
 NORMALIZATION_METADATA = {
     "per_item_field": "normalization_policy",
     "description": "Each observation records only the name of its applied normalization policy.",
@@ -263,6 +271,21 @@ def download_files(filenames: list[str], revision: str) -> dict[str, Path]:
     }
 
 
+def sample_item_ids(item_ids, benchmark: str, max_items: int = DEFAULT_MAX_ITEMS,
+                    sampling_seed: int = DEFAULT_SAMPLING_SEED) -> list[str]:
+    """Select whole questions reproducibly, independent of Parquet row order."""
+    if max_items < 0:
+        raise ValueError('max_items must be nonnegative; zero means all questions')
+    item_ids = list(item_ids)
+    if len(set(item_ids)) != len(item_ids):
+        raise ValueError(f'{benchmark}: duplicate item_id values')
+    if not max_items or len(item_ids) <= max_items:
+        return sorted(item_ids)
+    prefix = f'{sampling_seed}\0{benchmark}\0'.encode('utf-8')
+    return sorted(heapq.nsmallest(max_items, item_ids,
+                                 key=lambda name: hashlib.sha256(prefix + name.encode('utf-8')).digest()))
+
+
 def process_benchmark(
     benchmark: str,
     api: HfApi,
@@ -274,6 +297,9 @@ def process_benchmark(
     logger: logging.Logger | None = None,
     memory_limit: str = '4GB',
     threads: int = 4,
+    question_budget: QuestionBudget | None = None,
+    max_items: int = DEFAULT_MAX_ITEMS,
+    sampling_seed: int = DEFAULT_SAMPLING_SEED,
 ) -> dict:
     if batch_size < 1 or threads < 1:
         raise ValueError("batch_size and threads must be positive")
@@ -292,12 +318,20 @@ def process_benchmark(
     if len(benchmark_table) != 1 or benchmark_table.iloc[0].benchmark_id != benchmark:
         raise ValueError(f"{benchmark}: invalid benchmarks table")
     items_path = paths[f"{prefix}items.parquet"]
+    item_ids = pq.read_table(items_path, columns=['item_id']).column('item_id').to_pylist()
+    selected_ids = sample_item_ids(item_ids, benchmark, max_items, sampling_seed)
+    sampling = {'max_items': max_items, 'seed': sampling_seed, 'method': 'sha256-item-id-v1',
+                'items_available': len(item_ids), 'items_selected': len(selected_ids),
+                'selection_digest': hashlib.sha256('\n'.join(selected_ids).encode('utf-8')).hexdigest()}
+    logger.info('%s: selected %s/%s questions (seed %s)', benchmark, len(selected_ids), len(item_ids), sampling_seed)
+    item_filters = [('item_id', 'in', selected_ids)] if len(selected_ids) < len(item_ids) else None
     metadata_columns = ['item_id', 'grading_criterion', 'verifier']
     if 'asset_manifest' in pq.read_schema(items_path).names:
         metadata_columns.append('asset_manifest')
     # Large question columns stay in Parquet unless asset expansion needs them.
-    items = pd.read_parquet(items_path, columns=metadata_columns)
+    items = pd.read_parquet(items_path, columns=metadata_columns, filters=item_filters)
     owned_asset_context = None
+    asset_stats = {}
     references = manifest_references(items)
     stream_questions = references.empty
     if stream_questions:
@@ -305,7 +339,7 @@ def process_benchmark(
         items['content'] = None
         logger.info("%s: question text will stream directly from Parquet", benchmark)
     else:
-        content = pd.read_parquet(items_path, columns=['item_id', 'content'])
+        content = pd.read_parquet(items_path, columns=['item_id', 'content'], filters=item_filters)
         items = items.merge(content, on='item_id', validate='one_to_one')
         if asset_name not in filenames:
             raise ValueError(f"{benchmark}: item manifests reference assets but assets.parquet is missing")
@@ -315,10 +349,15 @@ def process_benchmark(
         if asset_context is None:
             owned_asset_context = AssetProcessingContext(
                 OUT / "asset_descriptions.sqlite3", artifact_root=(output_dir or OUT) / "assets",
+                logger=logger,
             )
             asset_context = owned_asset_context
         try:
-            items, _ = add_asset_descriptions(items, paths[asset_name], asset_context)
+            items, asset_stats = add_asset_descriptions(
+                items, paths[asset_name], asset_context, question_budget=question_budget, logger=logger,
+            )
+            if 'question_budget' in asset_stats:
+                logger.info('%s: question budget: %s', benchmark, asset_stats['question_budget'])
         finally:
             if owned_asset_context is not None:
                 owned_asset_context.close()
@@ -343,7 +382,13 @@ def process_benchmark(
     else:
         question_select = 'i.question'
         item_source = 'item_data i'
-    connection.from_parquet(str(paths[f"{prefix}responses.parquet"])).create_view("responses")
+    connection.from_parquet(str(paths[f"{prefix}responses.parquet"])).create_view("all_responses")
+    # Filter before counting repeated trials; keep every response for sampled IDs.
+    connection.execute('''
+        CREATE TEMP VIEW responses AS
+        SELECT * FROM all_responses
+        WHERE item_id IN (SELECT source_item_id FROM item_data)
+    ''')
     query = f"""
         WITH response_runs AS MATERIALIZED (
             SELECT *, count(*) OVER (
@@ -385,6 +430,10 @@ def process_benchmark(
         last_progress = 0.0
         for batch in reader:
             output = batch.to_pandas()
+            if stream_questions and question_budget is not None:
+                output['question'] = output.question.fillna('').map(
+                    lambda text: question_budget.assemble(text, [])[0],
+                )
             output["score"] = normalize_scores(output.raw_score, output.response_scale)
             policies = {
                 encoded: applied_normalization_policy(json.loads(encoded))
@@ -414,6 +463,8 @@ def process_benchmark(
         "benchmark": benchmark,
         **stats,
         "output_file": path.name,
+        "sampling": sampling,
+        **({"question_budget": asset_stats['question_budget']} if 'question_budget' in asset_stats else {}),
     }
 
 
@@ -446,13 +497,13 @@ def write_collection_manifest(
         "source_revision": revision,
         "selection": {
             key: value for key, value in (selection or {}).items()
-            if key in {'requested_categories', 'match', 'benchmarks_selected', 'benchmarks_excluded', 'catalog_snapshot', 'excluded_benchmarks'}
+            if key in {'requested_categories', 'match', 'benchmarks_selected', 'benchmarks_excluded', 'catalog_snapshot', 'excluded_benchmarks', 'question_budget', 'item_sampling', 'mixed_benchmarks_excluded', 'archived_outputs', 'pdf_processing'}
         },
         "benchmarks_discovered": len(discovered),
         "benchmarks_written": len(outputs),
         "benchmarks_skipped": len(skipped),
         "outputs": [
-            {key: entry[key] for key in ('benchmark', 'output_file', 'rows', 'categories') if key in entry}
+            {key: entry[key] for key in ('benchmark', 'output_file', 'rows', 'categories', 'question_budget', 'sampling') if key in entry}
             for entry in outputs
         ],
         "skipped": skipped,
@@ -549,17 +600,31 @@ def parse_args(argv=None):
                         help='Local benchmark category catalog (also pins the dataset revision).')
     parser.add_argument('--output-root', type=Path,
                         help='Parent for category/run folders (default: data/processed/measurement_db).')
+    parser.add_argument('--exclusive-categories', action=argparse.BooleanOptionalAction, default=None,
+                        help='Exclude benchmarks with unrequested asset categories (default: enabled for application-only selection; saved on resume).')
     parser.add_argument('--batch-size', type=int, default=256,
                         help='Maximum response rows per output batch (default: 256); reduce for large questions.')
     parser.add_argument('--memory-limit', default='4GB',
                         help='DuckDB working-memory budget, leaving room for Python/Arrow (default: 4GB).')
     parser.add_argument('--threads', type=int, default=4,
                         help='DuckDB worker threads (default: 4).')
+    parser.add_argument('--question-token-budget', type=int,
+                        help='Total tokens per question in text/application benchmarks (default: 24576; saved on resume).')
+    parser.add_argument('--question-tokenizer',
+                        help='Tokenizer for the question budget (default: Qwen/Qwen2.5-7B-Instruct; saved on resume).')
+    parser.add_argument('--max-items', type=int,
+                        help='Maximum distinct questions per benchmark (default: 1000; zero means all; saved on resume).')
+    parser.add_argument('--sampling-seed', type=int,
+                        help='Seed for reproducible question sampling (default: 42; saved on resume).')
     parser.add_argument('--refresh-categories', action='store_true',
                         help='Rebuild the category catalog from the latest dataset revision and exit.')
     args = parser.parse_args(argv)
     if args.batch_size < 1 or args.threads < 1:
         parser.error('--batch-size and --threads must be positive')
+    if args.question_token_budget is not None and args.question_token_budget < 256:
+        parser.error('--question-token-budget must be at least 256')
+    if args.max_items is not None and args.max_items < 0:
+        parser.error('--max-items must be nonnegative; zero means all questions')
     if args.refresh_categories and args.categories:
         parser.error('--refresh-categories cannot be combined with category selection flags')
     if args.resume and (args.categories or args.output_root or args.category_file or args.refresh_categories):
@@ -573,14 +638,38 @@ def execute_run(args, run_dir: Path, catalog: dict, *, previous=None, outputs=No
     loaded_at_utc = previous['loaded_at_utc'] if previous is not None else args.started_at
     requested = previous['selection']['requested_categories'] if previous is not None else args.categories
     discovered = sorted(catalog['benchmarks'])
-    benchmarks = select_benchmarks(catalog, requested)
+    if args.exclusive_categories is not None:
+        exclusive = args.exclusive_categories
+    elif previous is not None:
+        exclusive = previous.get('selection', {}).get('match', 'any') == 'exclusive'
+    else:
+        exclusive = set(requested or CATEGORIES) == {'asset-application'}
+    benchmarks = select_benchmarks(catalog, requested, exclusive=exclusive)
+    mixed_excluded = sorted(set(select_benchmarks(catalog, requested)) - set(benchmarks))
+    saved_budget = previous.get('selection', {}).get('question_budget', {}) if previous else {}
+    question_budget = QuestionBudget(
+        max_tokens=args.question_token_budget if args.question_token_budget is not None
+        else saved_budget.get('max_tokens', DEFAULT_QUESTION_TOKENS),
+        tokenizer_name=args.question_tokenizer or saved_budget.get('tokenizer_name', DEFAULT_QUESTION_TOKENIZER),
+    )
+    saved_sampling = previous.get('selection', {}).get('item_sampling', {}) if previous else {}
+    sampling = {'max_items': args.max_items if args.max_items is not None
+                else saved_sampling.get('max_items', DEFAULT_MAX_ITEMS),
+                'seed': args.sampling_seed if args.sampling_seed is not None
+                else saved_sampling.get('seed', DEFAULT_SAMPLING_SEED),
+                'method': 'sha256-item-id-v1'}
     selection = {
         'requested_categories': sorted(set(requested or CATEGORIES)),
-        'match': 'any',
+        'match': 'exclusive' if exclusive else 'any',
         'benchmarks_selected': len(benchmarks),
         'benchmarks_excluded': len(discovered) - len(benchmarks),
         'excluded_benchmarks': catalog['excluded_benchmarks'],
         'catalog_snapshot': previous['selection'].get('catalog_snapshot', 'measurement_db_categories.json') if previous else 'measurement_db_categories.json',
+        'question_budget': question_budget.settings,
+        'pdf_processing': PDF_PROCESSING_POLICY,
+        'item_sampling': sampling,
+        'mixed_benchmarks_excluded': mixed_excluded,
+        'archived_outputs': list(previous.get('selection', {}).get('archived_outputs', [])) if previous else [],
     }
     if previous is None:
         (run_dir / 'measurement_db_categories.json').write_text(
@@ -593,10 +682,17 @@ def execute_run(args, run_dir: Path, catalog: dict, *, previous=None, outputs=No
             f'Selected categories: {", ".join(selection["requested_categories"])}\n'
             f'Dataset revision: {revision}\n'
             f'Excluded benchmarks: {", ".join(catalog["excluded_benchmarks"]) or "none"}\n\n'
-            'A benchmark is selected when ANY requested category matches. Each selected\n'
-            'benchmark includes all of its items and assets, even if it has other categories.\n'
+            f'Category matching: {selection["match"]}. Exclusive matching excludes unrequested asset types.\n'
+            'Each selected\n'
+            'benchmark samples whole question IDs before processing their referenced assets.\n'
+            f'Question cap per benchmark: {sampling["max_items"] or "all"}; seed: {sampling["seed"]}.\n'
+            'Every released response for a sampled question is retained.\n'
             'The run manifest records actual categories per benchmark, output files, and run status.\n'
             'Each benchmark has its own JSONL; one compact manifest describes this entire run.\n'
+            'For text/application benchmarks, questions keep file beginnings and endings within the\n'
+            f'saved token budget ({question_budget.max_tokens}; {question_budget.tokenizer_name}).\n'
+            'The manifest records the policy and counts of truncated questions and omitted assets.\n'
+            'PDFs use text extraction only; pages without extractable text are marked explicitly.\n'
             'Model traces are not downloaded or included in the JSONLs.\n'
             'The catalog snapshot records category\n'
             'membership at this dataset revision. Exported binary artifacts are under assets/.\n'
@@ -623,6 +719,47 @@ def execute_run(args, run_dir: Path, catalog: dict, *, previous=None, outputs=No
         )
 
     with run_logging(run_dir) as logger:
+        out_of_scope = [entry for entry in outputs if entry['benchmark'] not in benchmarks]
+        if out_of_scope:
+            archive = run_dir / 'previous_outputs' / ('category_selection_' + datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '_' + uuid4().hex[:8])
+            archive.mkdir(parents=True)
+            (archive / 'measurement_db.manifest.json').write_text(
+                json.dumps(previous, indent=2, ensure_ascii=False) + '\n', encoding='utf-8',
+            )
+            snapshot_destination = archive / selection['catalog_snapshot']
+            snapshot_destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(run_dir / selection['catalog_snapshot'], snapshot_destination)
+            for entry in out_of_scope:
+                path = run_dir / entry['output_file']
+                if path.exists():
+                    target = archive / path.name
+                    path.replace(target)
+                    selection['archived_outputs'].append({
+                        'benchmark': entry['benchmark'], 'output_file': str(target.relative_to(run_dir)),
+                        'reason': 'outside the current category selection',
+                    })
+            outputs = [entry for entry in outputs if entry['benchmark'] in benchmarks]
+            logger.info('Preserved %s completed benchmarks outside the new category selection in %s',
+                        len(out_of_scope), archive)
+            checkpoint()
+        if previous is not None and sampling != saved_sampling and outputs:
+            # A policy change must not leave completed full-size exports mixed
+            # with capped ones. Preserve those exports before rebuilding them.
+            archive = run_dir / 'previous_outputs' / (datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '_' + uuid4().hex[:8])
+            archive.mkdir(parents=True)
+            (archive / 'measurement_db.manifest.json').write_text(
+                json.dumps(previous, indent=2, ensure_ascii=False) + '\n', encoding='utf-8',
+            )
+            snapshot_destination = archive / selection['catalog_snapshot']
+            snapshot_destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(run_dir / selection['catalog_snapshot'], snapshot_destination)
+            for entry in outputs:
+                path = run_dir / entry['output_file']
+                if path.exists():
+                    path.replace(archive / path.name)
+            logger.info('Sampling policy changed; preserved %s completed outputs in %s before rebuilding', len(outputs), archive)
+            outputs.clear()
+            checkpoint()
         done = {entry['benchmark'] for entry in outputs}
         already_skipped = {entry['benchmark'] for entry in skipped}
         remaining = [name for name in benchmarks if name not in done | already_skipped]
@@ -631,23 +768,33 @@ def execute_run(args, run_dir: Path, catalog: dict, *, previous=None, outputs=No
             for name in missing:
                 logger.warning('%s: completed output missing or empty; it will be rebuilt if selected', name)
             if not remaining and not missing and previous.get('status') == 'complete':
+                if selection != previous.get('selection'):
+                    checkpoint(status='complete')
                 logger.info('Nothing to resume; this run is already complete')
                 return
         logger.info(
             'Selected %s/%s benchmarks at %s: %s', len(benchmarks), len(discovered),
             revision, ', '.join(selection['requested_categories']),
         )
+        logger.info('Category matching: %s', selection['match'])
+        if mixed_excluded:
+            logger.info('Excluded %s mixed-category benchmarks: %s', len(mixed_excluded), ', '.join(mixed_excluded))
         if catalog['excluded_benchmarks']:
             logger.info('Excluded by policy: %s', ', '.join(catalog['excluded_benchmarks']))
         logger.info('Run output: %s', run_dir.resolve())
         logger.info('Output batch size: %s rows; DuckDB memory limit: %s; threads: %s',
                     args.batch_size, args.memory_limit, args.threads)
+        logger.info('Question sampling: %s', sampling)
+        logger.info('PDF processing: %s', PDF_PROCESSING_POLICY)
+        if any(QUESTION_BUDGET_CATEGORIES.intersection(catalog['benchmarks'][name]['categories']) for name in benchmarks):
+            logger.info('Question budget for text/application benchmarks: %s', question_budget.settings)
         api = HfApi()
         asset_context = None
         try:
             checkpoint()
             asset_context = AssetProcessingContext(
                 OUT / 'asset_descriptions.sqlite3', artifact_root=run_dir / 'assets',
+                logger=logger,
             )
             for position, benchmark in enumerate(benchmarks, 1):
                 if benchmark in done or benchmark in already_skipped:
@@ -668,6 +815,8 @@ def execute_run(args, run_dir: Path, catalog: dict, *, previous=None, outputs=No
                         logger=logger,
                         memory_limit=args.memory_limit,
                         threads=args.threads,
+                        question_budget=question_budget if QUESTION_BUDGET_CATEGORIES.intersection(actual_categories) else None,
+                        max_items=sampling['max_items'], sampling_seed=sampling['seed'],
                     )
                 except UnsupportedScaleError as error:
                     skipped.append({

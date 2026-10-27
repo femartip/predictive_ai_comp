@@ -5,6 +5,7 @@ from __future__ import annotations
 import gc
 import hashlib
 import json
+import logging
 import os
 import sqlite3
 import tempfile
@@ -14,7 +15,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Literal, Sequence
 
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, snapshot_download
 
 
 AssetFamily = Literal["image", "audio", "video", "text", "application"]
@@ -89,6 +90,13 @@ class ProcessedAsset:
     question_fragment: str
     relative_path: str | None
     media_type: str
+
+
+def asset_recipe_version(version: str, limits: AssetLimits) -> str:
+    """Identify a processing recipe without opening a cache or loading a model."""
+    encoded = json.dumps(asdict(limits), sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()[:16]
+    return f"{version};limits={digest}"
 
 
 class AssetDescriptionCache:
@@ -188,10 +196,14 @@ class AssetProcessingContext:
         image_model_revision: str | None = None,
         audio_model_revision: str | None = None,
         video_model_revision: str | None = None,
+        logger: logging.Logger | None = None,
+        local_files_only: bool = False,
     ):
         self.cache = AssetDescriptionCache(cache_path)
         self.artifact_root = artifact_root or cache_path.parent / "assets"
         self.limits = limits or AssetLimits()
+        self.logger = logger
+        self.local_files_only = local_files_only
         self.model_ids: dict[AssetFamily, str] = {
             "image": image_model_id or os.getenv("AIMS_IMAGE_MODEL", DEFAULT_IMAGE_MODEL),
             "audio": audio_model_id or os.getenv("AIMS_AUDIO_MODEL", DEFAULT_AUDIO_MODEL),
@@ -216,6 +228,11 @@ class AssetProcessingContext:
             requested = self.requested_revisions[family]
             if family in {"text", "application"}:
                 self.resolved_revisions[family] = requested or LOCAL_PROCESSOR_REVISION
+            elif self.local_files_only:
+                # Competition models are pre-downloaded; resolve their commit
+                # from the local snapshot instead of calling the Hub API.
+                snapshot = snapshot_download(self.model_ids[family], revision=requested, local_files_only=True)
+                self.resolved_revisions[family] = Path(snapshot).name
             else:
                 info = HfApi().model_info(self.model_ids[family], revision=requested)
                 if not info.sha:
@@ -225,9 +242,7 @@ class AssetProcessingContext:
 
     def recipe_version(self, version: str) -> str:
         """Include all configured limits in cache identity."""
-        encoded = json.dumps(asdict(self.limits), sort_keys=True, separators=(",", ":"))
-        digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()[:16]
-        return f"{version};limits={digest}"
+        return asset_recipe_version(version, self.limits)
 
     def cached(
         self,
@@ -300,12 +315,15 @@ class AssetProcessingContext:
                 ) from error
             revision = self.model_revision("image")
             model_id = self.model_ids["image"]
-            self._processors["image"] = AutoProcessor.from_pretrained(model_id, revision=revision)
+            self._processors["image"] = AutoProcessor.from_pretrained(
+                model_id, revision=revision, local_files_only=self.local_files_only,
+            )
             self._models["image"] = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                 model_id,
                 revision=revision,
                 torch_dtype="auto",
                 device_map="auto",
+                local_files_only=self.local_files_only,
             ).eval()
         return self._processors["image"], self._models["image"]
 
@@ -321,12 +339,15 @@ class AssetProcessingContext:
                 ) from error
             revision = self.model_revision("audio")
             model_id = self.model_ids["audio"]
-            self._processors["audio"] = AutoProcessor.from_pretrained(model_id, revision=revision)
+            self._processors["audio"] = AutoProcessor.from_pretrained(
+                model_id, revision=revision, local_files_only=self.local_files_only,
+            )
             self._models["audio"] = Qwen2AudioForConditionalGeneration.from_pretrained(
                 model_id,
                 revision=revision,
                 torch_dtype="auto",
                 device_map="auto",
+                local_files_only=self.local_files_only,
             ).eval()
         return self._processors["audio"], self._models["audio"]
 
@@ -342,12 +363,15 @@ class AssetProcessingContext:
                 ) from error
             revision = self.model_revision("video")
             model_id = self.model_ids["video"]
-            self._processors["video"] = Qwen2_5OmniProcessor.from_pretrained(model_id, revision=revision)
+            self._processors["video"] = Qwen2_5OmniProcessor.from_pretrained(
+                model_id, revision=revision, local_files_only=self.local_files_only,
+            )
             self._models["video"] = Qwen2_5OmniThinkerForConditionalGeneration.from_pretrained(
                 model_id,
                 revision=revision,
                 torch_dtype="auto",
                 device_map="auto",
+                local_files_only=self.local_files_only,
             ).eval()
         return self._processors["video"], self._models["video"]
 

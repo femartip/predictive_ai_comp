@@ -1,0 +1,13 @@
+accelerate>=1.2
+av>=14,<17
+charset-normalizer>=3.4
+matplotlib>=3.9
+numpy
+openexr>=3.3
+pandas>=2.2
+pillow>=11
+pyarrow>=18
+pymupdf>=1.25
+sqlparse>=0.5
+torchvision
+trimesh>=4.6

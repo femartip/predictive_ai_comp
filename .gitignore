@@ -9,6 +9,7 @@ __pycache__/
 results/
 
 # Distribution / packaging
+*.zip
 .Python
 build/
 develop-eggs/

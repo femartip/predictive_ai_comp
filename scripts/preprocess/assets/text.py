@@ -27,26 +27,42 @@ def decode_text(data: bytes) -> str:
 
 def _truncation_marker(kind: str, original_bytes: int, omitted: int, unit: str) -> str:
     return (
-        f'<asset_truncation kind="{kind}" original_bytes="{original_bytes}" '
+        f'<asset_truncation kind="{kind}" mode="head_tail" original_bytes="{original_bytes}" '
         f'omitted_{unit}="{omitted}" />'
     )
 
 
-def _truncate_complete_lines(text: str, limit: int | None, kind: str) -> tuple[str, str | None]:
+def _truncate_chunks(text: str, chunks: list[str], limit: int, kind: str, unit: str) -> str:
+    """Keep complete lines/CSV records at both ends when they fit the byte limit."""
+    sizes = [len(chunk.encode("utf-8")) for chunk in chunks]
+    first, last, used = 0, len(chunks), 0
+    while first < last and used + sizes[first] <= limit // 2:
+        used += sizes[first]
+        first += 1
+    while last > first and used + sizes[last - 1] <= limit:
+        last -= 1
+        used += sizes[last]
+    original = len(text.encode("utf-8"))
+    if first and last < len(chunks):
+        head, tail = "".join(chunks[:first]), "".join(chunks[last:])
+        marker = _truncation_marker(kind, original, last - first, unit)
+    else:
+        # A single enormous line/record must still expose its beginning and end.
+        encoded = text.encode("utf-8")
+        head_bytes = (limit + 1) // 2
+        tail_bytes = limit - head_bytes
+        head = encoded[:head_bytes].decode("utf-8", errors="ignore")
+        tail = encoded[-tail_bytes:].decode("utf-8", errors="ignore") if tail_bytes else ""
+        omitted = original - len(head.encode("utf-8")) - len(tail.encode("utf-8"))
+        marker = _truncation_marker(kind, original, omitted, "bytes")
+    return head + "\n" + marker + "\n" + tail
+
+
+def _truncate_complete_lines(text: str, limit: int | None, kind: str) -> str:
     encoded_size = len(text.encode("utf-8"))
     if limit is None or encoded_size <= limit:
-        return text, None
-    lines = text.splitlines(keepends=True)
-    kept = []
-    used = 0
-    for line in lines:
-        size = len(line.encode("utf-8"))
-        if used + size > limit:
-            break
-        kept.append(line)
-        used += size
-    marker = _truncation_marker(kind, encoded_size, len(lines) - len(kept), "lines")
-    return "".join(kept), marker
+        return text
+    return _truncate_chunks(text, text.splitlines(keepends=True), limit, kind, "lines")
 
 
 def _csv_record_chunks(text: str) -> list[str]:
@@ -69,62 +85,41 @@ def _csv_record_chunks(text: str) -> list[str]:
     return chunks
 
 
-def _truncate_csv(text: str, limit: int | None) -> tuple[str, str | None]:
+def _truncate_csv(text: str, limit: int | None) -> str:
     encoded_size = len(text.encode("utf-8"))
     if limit is None or encoded_size <= limit:
-        return text, None
-    chunks = _csv_record_chunks(text)
-    kept = []
-    used = 0
-    for chunk in chunks:
-        size = len(chunk.encode("utf-8"))
-        if used + size > limit:
-            break
-        kept.append(chunk)
-        used += size
-    marker = _truncation_marker("csv", encoded_size, len(chunks) - len(kept), "records")
-    return "".join(kept), marker
-
-
-def _result(content: str, marker: str | None, media_type: str, tag: str) -> ProcessedAsset:
-    result = embedded_result(content, media_type, tag)
-    if marker is None:
-        return result
-    return ProcessedAsset(
-        question_fragment=result.question_fragment + "\n" + marker,
-        relative_path=None,
-        media_type=media_type,
-    )
+        return text
+    return _truncate_chunks(text, _csv_record_chunks(text), limit, "csv", "records")
 
 
 def process_csv(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
-    content, marker = _truncate_csv(decode_text(data), context.limits.max_csv_bytes)
-    return _result(content, marker, "text/csv", "csv_asset")
+    content = _truncate_csv(decode_text(data), context.limits.max_csv_bytes)
+    return embedded_result(content, "text/csv", "csv_asset")
 
 
 def process_markdown(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
-    content, marker = _truncate_complete_lines(
+    content = _truncate_complete_lines(
         decode_text(data), context.limits.max_markdown_bytes, "markdown"
     )
-    return _result(content, marker, "text/markdown", "markdown_asset")
+    return embedded_result(content, "text/markdown", "markdown_asset")
 
 
 def process_plain(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
-    content, marker = _truncate_complete_lines(
+    content = _truncate_complete_lines(
         decode_text(data), context.limits.max_plain_text_bytes, "plain_text"
     )
-    return _result(content, marker, "text/plain", "text_asset")
+    return embedded_result(content, "text/plain", "text_asset")
 
 
 def process_python(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
-    content, marker = _truncate_complete_lines(
+    content = _truncate_complete_lines(
         decode_text(data), context.limits.max_python_bytes, "python"
     )
-    return _result(content, marker, "text/x-python", "python_asset")
+    return embedded_result(content, "text/x-python", "python_asset")
 
 
 def process_shellscript(asset_id: str, data: bytes, context: AssetProcessingContext, **_) -> ProcessedAsset:
-    content, marker = _truncate_complete_lines(
+    content = _truncate_complete_lines(
         decode_text(data), context.limits.max_shellscript_bytes, "shellscript"
     )
-    return _result(content, marker, "text/x-shellscript", "shellscript_asset")
+    return embedded_result(content, "text/x-shellscript", "shellscript_asset")

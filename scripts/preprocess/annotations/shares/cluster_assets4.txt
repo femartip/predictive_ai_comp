@@ -1,0 +1,8 @@
+# Asset benchmarks, fourth batch (2026-10-27), mixing two conversion runs: rclicks from the asset-image run
+# (20261023T110411Z_26fccf60, stopped at benchmark 35 of 48 by an error in researchclawbench) and brace from the
+# asset-audio run (20261026T125726Z_995632fe, the first of its 2 benchmarks). Audio clips reach the annotator as written
+# descriptions (<audio_description> tags), like images. None is near the 32,767-token window.
+# Each benchmark is selected beforehand from its own run folder; the list is then sent with either JSONL_DIR
+# (select_items.py skips benchmarks already selected).
+rclicks
+brace

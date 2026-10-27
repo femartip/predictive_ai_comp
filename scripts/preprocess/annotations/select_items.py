@@ -162,7 +162,10 @@ def main():
         names = [x.strip() for x in Path(a.benchmark_file).read_text().splitlines() if x.strip() and not x.startswith("#")]
     else:
         names = list(a.benchmarks)
-    missing = [b for b in names if not (src / f"{b}.jsonl").exists()]
+    # a benchmark already selected needs no JSONL here: one list can mix benchmarks of several conversion runs
+    # (e.g. asset-image and asset-audio), each selected beforehand from its own run folder
+    missing = [b for b in names if not (src / f"{b}.jsonl").exists()
+               and ((root / b / "items.jsonl").exists() is False or a.overwrite)]
     if missing:
         raise SystemExit(f"not in {src}: {missing}")
     wanted = {}

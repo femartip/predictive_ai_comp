@@ -19,12 +19,13 @@ from pathlib import Path
 ROOT = next((p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists()),
             Path(__file__).resolve().parents[2])      # the repository (or two levels up outside a clone)
 
-# Converter runs to read, ':'-separated: by default the no-assets and the asset-image runs on vent (a benchmark is
-# taken from the first folder that has its JSONL)
+# Converter runs to read, ':'-separated: by default the no-assets, asset-image and asset-audio runs on vent (a benchmark
+# is taken from the first folder that has its JSONL)
 JSONL_DIRS = [Path(p) for p in os.environ.get(
     "ASSESSOR_JSONL_DIR",
     "/data/datasets/measurement_db/no-assets/20261022T205359Z_b5a02e2a:"
-    "/data/datasets/measurement_db/asset-image/20261023T110411Z_26fccf60").split(":") if p]
+    "/data/datasets/measurement_db/asset-image/20261023T110411Z_26fccf60:"
+    "/data/datasets/measurement_db/asset-audio/20261026T125726Z_995632fe").split(":") if p]
 _REPO_ADELE = ROOT / "annotations" / "adele_v1"
 ADELE_DIR = Path(os.environ.get("ASSESSOR_ADELE_DIR",
                                 _REPO_ADELE if _REPO_ADELE.exists() else "/data/datasets/annotations/adele_v1"))

@@ -225,3 +225,6 @@ data/
 
 # Fitted assessors cached by scripts/assessors_router (large, rebuilt on demand)
 results/assessors_router/*/cache/
+
+# The competition submission (built into submission.zip by scripts/preprocess/build_submission.py)
+submission/

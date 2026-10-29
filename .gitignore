@@ -226,5 +226,7 @@ data/
 # Fitted assessors cached by scripts/assessors_router (large, rebuilt on demand)
 results/assessors_router/*/cache/
 
-# The competition submission (built into submission.zip by scripts/preprocess/build_submission.py)
-submission/
+# The competition submission is tracked in full, its data folders and zips too (ignored elsewhere in the repository)
+!submission/**/data/
+!submission/**/*.zip
+!submission/**/*.log

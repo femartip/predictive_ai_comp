@@ -1,0 +1,3288 @@
+{
+ "nan": null,
+ "01.AI Yi 34B": {
+  "repo": "01-ai/Yi-34B-Chat",
+  "gated": false,
+  "parameters": 34388917248,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "01.AI Yi 6B": {
+  "repo": "01-ai/Yi-6B-Chat",
+  "gated": false,
+  "parameters": 6061035520,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "01.AI Yi-VL 34B": {
+  "repo": "01-ai/Yi-VL-34B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "01.AI Yi-VL 6B": {
+  "repo": "01-ai/Yi-VL-6B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "AI Singapore SEA-LION 2 8B": null,
+ "AI21 Jamba 1.5 Large": null,
+ "AI21 Jamba Large": null,
+ "AI21 Jurassic-1 Grande": null,
+ "AI21 Jurassic-1 Large": null,
+ "AI21 Jurassic-2 Grande": null,
+ "AI21 Jurassic-2 Large": null,
+ "AIDC-AI Ovis1.5 Gemma2 9B": null,
+ "AIDC-AI Ovis1.5 Llama3 8B": null,
+ "AIDC-AI Ovis1.6 Gemma2 27B": null,
+ "AIDC-AI Ovis1.6 Gemma2 9B": null,
+ "AIDC-AI Ovis1.6 Llama3.2 3B": null,
+ "AIDC-AI Ovis2 16B": null,
+ "AIDC-AI Ovis2 1B": null,
+ "AIDC-AI Ovis2 2B": null,
+ "AIDC-AI Ovis2 34B": null,
+ "AIDC-AI Ovis2 4B": null,
+ "AIDC-AI Ovis2 8B": null,
+ "AKI": null,
+ "Alibaba QwQ 32B": {
+  "repo": "Qwen/QwQ-32B",
+  "gated": false,
+  "parameters": 32763876352,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "Alibaba Qwen 14B": {
+  "repo": "Qwen/Qwen-14B-Chat",
+  "gated": false,
+  "parameters": 14167290880,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "Alibaba Qwen 7B": {
+  "repo": "Qwen/Qwen-7B",
+  "gated": false,
+  "parameters": 7721324544,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen1.5 110B": {
+  "repo": "Qwen/Qwen1.5-110B-Chat",
+  "gated": false,
+  "parameters": 111209914368,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen1.5 14B": {
+  "repo": "Qwen/Qwen1.5-14B-Chat",
+  "gated": false,
+  "parameters": 14167290880,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen1.5 72B": {
+  "repo": "Qwen/Qwen1.5-72B",
+  "gated": false,
+  "parameters": 72287920128,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen1.5 7B": {
+  "repo": "Qwen/Qwen1.5-7B",
+  "gated": false,
+  "parameters": 7721324544,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2 72B": {
+  "repo": "Qwen/Qwen2-72B-Instruct",
+  "gated": false,
+  "parameters": 72706203648,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2-VL 2B": {
+  "repo": "Qwen/Qwen2-VL-2B-Instruct",
+  "gated": false,
+  "parameters": 2208985600,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2-VL 72B": {
+  "repo": "Qwen/Qwen2-VL-72B-Instruct",
+  "gated": false,
+  "parameters": 73405560320,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2-VL 7B": {
+  "repo": "Qwen/Qwen2-VL-7B-Instruct",
+  "gated": false,
+  "parameters": 8291375616,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5 0.5B": {
+  "repo": "Qwen/Qwen2.5-0.5B-Instruct",
+  "gated": false,
+  "parameters": 494032768,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5 32B": {
+  "repo": "Qwen/Qwen2.5-32B-Instruct",
+  "gated": false,
+  "parameters": 32763876352,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5 3B": {
+  "repo": "Qwen/Qwen2.5-3B-Instruct",
+  "gated": false,
+  "parameters": 3085938688,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5 72B": {
+  "repo": "Qwen/Qwen2.5-72B-Instruct",
+  "gated": false,
+  "parameters": 72706203648,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5 7B": {
+  "repo": "Qwen/Qwen2.5-7B-Instruct",
+  "gated": false,
+  "parameters": 7615616512,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5-Coder 32B": {
+  "repo": "Qwen/Qwen2.5-Coder-14B-Instruct",
+  "gated": false,
+  "parameters": 14770033664,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Alibaba Qwen2.5-Math 1.5B": {
+  "repo": "Qwen/Qwen2.5-Math-1.5B",
+  "gated": false,
+  "parameters": 1543714304,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Alibaba Qwen2.5-Math 72B": {
+  "repo": "Qwen/Qwen2.5-Math-72B-Instruct",
+  "gated": false,
+  "parameters": 72706203648,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Alibaba Qwen2.5-Math 7B": {
+  "repo": "Qwen/Qwen2.5-Math-7B-Instruct",
+  "gated": false,
+  "parameters": 7615616512,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Alibaba Qwen2.5-VL 32B": {
+  "repo": "Qwen/Qwen2.5-VL-32B-Instruct",
+  "gated": false,
+  "parameters": 33452718336,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 128000
+ },
+ "Alibaba Qwen2.5-VL 3B": {
+  "repo": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "gated": false,
+  "parameters": 3754622976,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 128000
+ },
+ "Alibaba Qwen2.5-VL 72B": {
+  "repo": "Qwen/Qwen2.5-VL-72B-Instruct",
+  "gated": false,
+  "parameters": 73410777344,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 128000
+ },
+ "Alibaba Qwen2.5-VL 7B": {
+  "repo": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "gated": false,
+  "parameters": 8292166656,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 128000
+ },
+ "Alibaba Qwen3 0.6B": {
+  "repo": "Qwen/Qwen3-0.6B",
+  "gated": false,
+  "parameters": 751632384,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "Alibaba Qwen3 14B": {
+  "repo": "Qwen/Qwen3-14B",
+  "gated": false,
+  "parameters": 14768307200,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "Alibaba Qwen3 235B": {
+  "repo": "Qwen/Qwen3-235B-A22B",
+  "gated": false,
+  "parameters": 235093634560,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 40960
+ },
+ "Alibaba Qwen3 235B A22B": {
+  "repo": "Qwen/Qwen3-235B-A22B",
+  "gated": false,
+  "parameters": 235093634560,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 40960
+ },
+ "Alibaba Qwen3 235B A22B Thinking": {
+  "repo": "Qwen/Qwen3-235B-A22B-Thinking-2507",
+  "gated": false,
+  "parameters": 235093634560,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3 30B A3B": {
+  "repo": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "gated": false,
+  "parameters": 30532122624,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3 32B": {
+  "repo": "Qwen/Qwen3-32B",
+  "gated": false,
+  "parameters": 32762123264,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "Alibaba Qwen3 8B": {
+  "repo": "Qwen/Qwen3-8B",
+  "gated": false,
+  "parameters": 8190735360,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "Alibaba Qwen3-Coder": {
+  "repo": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+  "gated": false,
+  "parameters": 30532122624,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3-Coder 480B": {
+  "repo": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+  "gated": false,
+  "parameters": 480154875392,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3-Next 80B A3B": {
+  "repo": "Qwen/Qwen3-Next-80B-A3B-Instruct",
+  "gated": false,
+  "parameters": 81324862720,
+  "n_experts": 512,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3-VL": {
+  "repo": "Qwen/Qwen3-VL-8B-Instruct",
+  "gated": false,
+  "parameters": 8767123696,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3-VL 8B": {
+  "repo": "Qwen/Qwen3-VL-8B-Instruct",
+  "gated": false,
+  "parameters": 8767123696,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5": {
+  "repo": "Qwen/Qwen3.5-4B",
+  "gated": false,
+  "parameters": 4659865088,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5 0.8B": {
+  "repo": "Qwen/Qwen3.5-0.8B",
+  "gated": false,
+  "parameters": 873438784,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5 122B A10B": {
+  "repo": "Qwen/Qwen3.5-122B-A10B",
+  "gated": false,
+  "parameters": 125086497008,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5 27B": {
+  "repo": "Qwen/Qwen3.5-27B",
+  "gated": false,
+  "parameters": 27781427952,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5 35B A3B": {
+  "repo": "Qwen/Qwen3.5-35B-A3B",
+  "gated": false,
+  "parameters": 35951822704,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5 397B A17B": {
+  "repo": "Qwen/Qwen3.5-397B-A17B",
+  "gated": false,
+  "parameters": 403397928944,
+  "n_experts": 512,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.5 9B": {
+  "repo": "Qwen/Qwen3.5-9B",
+  "gated": false,
+  "parameters": 9653104368,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.6": {
+  "repo": "Qwen/Qwen3.6-35B-A3B",
+  "gated": false,
+  "parameters": 35951822704,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba Qwen3.6 35B A3B": {
+  "repo": "Qwen/Qwen3.6-35B-A3B",
+  "gated": false,
+  "parameters": 35951822704,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Alibaba mPLUG-Owl2": null,
+ "Alibaba mPLUG-Owl3": null,
+ "AllenAI Molmo 72B": {
+  "repo": "allenai/Molmo-72B-0924",
+  "gated": false,
+  "parameters": 73308285952,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "AllenAI Molmo 7B-D": {
+  "repo": "allenai/Molmo-7B-D-0924",
+  "gated": false,
+  "parameters": 8021025280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "AllenAI Molmo 7B-O": {
+  "repo": "allenai/Molmo-7B-O-0924",
+  "gated": false,
+  "parameters": 7665032192,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "AllenAI MolmoE 1B": {
+  "repo": "allenai/MolmoE-1B-0924",
+  "gated": false,
+  "parameters": null,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 32768
+ },
+ "AllenAI OLMo 1B": {
+  "repo": "allenai/OLMo-1B-hf",
+  "gated": false,
+  "parameters": 1176764416,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "AllenAI OLMo 2 13B": null,
+ "AllenAI OLMo 2 32B": null,
+ "AllenAI OLMo 2 7B": null,
+ "AllenAI OLMo 3.1 32B": {
+  "repo": "allenai/Olmo-3.1-32B-Instruct",
+  "gated": false,
+  "parameters": 32233522176,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 65536
+ },
+ "AllenAI OLMoE 1B-7B": {
+  "repo": "allenai/OLMoE-1B-7B-0924",
+  "gated": false,
+  "parameters": 6919161856,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 4096
+ },
+ "AllenAI Tulu 2 70B": {
+  "repo": "allenai/tulu-2-dpo-70b",
+  "gated": false,
+  "parameters": 68976648192,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "AllenAI Tulu 65B": {
+  "repo": "allenai/tulu-65b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "AllenAI Tulu 7B": {
+  "repo": "allenai/tulu-7b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Ant Bailing-MM": null,
+ "Ant Bailing-MM Lite": null,
+ "Ant Bailing-MM Pro": null,
+ "Anthropic Claude Opus": null,
+ "Arx 3": null,
+ "BAAI Aquila-VL 2B": null,
+ "BAAI Emu2": {
+  "repo": "BAAI/Emu2-Chat",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "BAAI Emu3": {
+  "repo": "BAAI/Emu3-Chat-hf",
+  "gated": false,
+  "parameters": 8762751871,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 131072
+ },
+ "Baidu ERNIE 4.5 300B A47B": null,
+ "Baize 13B": null,
+ "BigScience BLOOM": {
+  "repo": "bigscience/bloom-560m",
+  "gated": false,
+  "parameters": 559214592,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "BigScience T0pp": {
+  "repo": "bigscience/T0pp",
+  "gated": false,
+  "parameters": 11135332352,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "BioMistral 7B": {
+  "repo": "BioMistral/BioMistral-7B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Black Forest Labs FLUX": null,
+ "Bunny Llama 3 8B": null,
+ "ByteDance BAGEL": null,
+ "ByteDance Doubao 1.5 Thinking": null,
+ "ByteDance Doubao VL": null,
+ "ByteDance Valley-Eagle": {
+  "repo": "bytedance-research/Valley-Eagle-7B",
+  "gated": false,
+  "parameters": 8880402624,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "CLIP ViT-L/14": null,
+ "Cambrian 13B": null,
+ "Cambrian 34B": null,
+ "Cambrian 8B": null,
+ "Chinese-LLaMA-Alpaca-2 7B": null,
+ "Chinese-LLaMA-Alpaca-3 8B": null,
+ "ClimateGPT 70B": null,
+ "ClimateGPT 7B": null,
+ "Cohere Command A": null,
+ "Cohere Command Medium": null,
+ "Cohere Command R": {
+  "repo": "CohereLabs/c4ai-command-r-v01",
+  "gated": "auto",
+  "parameters": 34980831232
+ },
+ "Cohere Command R+": null,
+ "Cohere Command R7B": null,
+ "Cohere Xlarge": null,
+ "Databricks DBRX": null,
+ "DeepSeek": null,
+ "DeepSeek Coder 33B": {
+  "repo": "deepseek-ai/deepseek-coder-33b-instruct",
+  "gated": false,
+  "parameters": 33342991360,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "DeepSeek Coder 6.7B": {
+  "repo": "deepseek-ai/deepseek-coder-6.7b-instruct",
+  "gated": false,
+  "parameters": 6740512768,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "DeepSeek Coder V2": {
+  "repo": "deepseek-ai/DeepSeek-Coder-V2-Instruct",
+  "gated": false,
+  "parameters": 235741434880,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek Janus 1.3B": {
+  "repo": "deepseek-ai/Janus-1.3B",
+  "gated": false,
+  "parameters": 2089297547,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "DeepSeek Janus-Pro 7B": {
+  "repo": "deepseek-ai/Janus-Pro-7B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "DeepSeek LLM 67B": {
+  "repo": "deepseek-ai/deepseek-llm-67b-chat",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "DeepSeek Math 7B": {
+  "repo": "deepseek-ai/deepseek-math-7b-instruct",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "DeepSeek R1": {
+  "repo": "deepseek-ai/DeepSeek-R1",
+  "gated": false,
+  "parameters": 684489845504,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek R1 Distill Llama 70B": {
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+  "gated": false,
+  "parameters": 70553706496,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "DeepSeek R1 Distill Qwen 1.5B": {
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+  "gated": false,
+  "parameters": 1777088000,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "DeepSeek R1 Distill Qwen 32B": {
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+  "gated": false,
+  "parameters": 32763876352,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "DeepSeek R1 Distill Qwen 7B": {
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+  "gated": false,
+  "parameters": 7615616512,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "DeepSeek V2.5": {
+  "repo": "deepseek-ai/DeepSeek-V2.5",
+  "gated": false,
+  "parameters": 235741434880,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek V3": {
+  "repo": "deepseek-ai/DeepSeek-V3",
+  "gated": false,
+  "parameters": 684489845504,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek V3.1": {
+  "repo": "deepseek-ai/DeepSeek-V3.1",
+  "gated": false,
+  "parameters": 684531386000,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek V3.2": {
+  "repo": "deepseek-ai/DeepSeek-V3.2",
+  "gated": false,
+  "parameters": 685355329792,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek V4": null,
+ "DeepSeek V4 Flash": {
+  "repo": "deepseek-ai/DeepSeek-V4-Flash-0731",
+  "gated": false,
+  "parameters": 304180418494,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "DeepSeek V4 Pro": {
+  "repo": "deepseek-ai/DeepSeek-V4-Pro",
+  "gated": false,
+  "parameters": 1598839674782,
+  "n_experts": 384,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "DeepSeek VL 1.3B": {
+  "repo": "deepseek-community/deepseek-vl-1.3b-chat",
+  "gated": false,
+  "parameters": 1962640384,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "DeepSeek VL 7B": {
+  "repo": "deepseek-community/deepseek-vl-7b-chat",
+  "gated": false,
+  "parameters": 7331390721,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "DeepSeek VL2": {
+  "repo": "deepseek-ai/deepseek-vl2",
+  "gated": false,
+  "parameters": 27480134248,
+  "n_experts": 72,
+  "architecture": "moe",
+  "context_window": 4096
+ },
+ "DeepSeek VL2 Small": {
+  "repo": "deepseek-ai/deepseek-vl2-small",
+  "gated": false,
+  "parameters": 16148349504,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 4096
+ },
+ "DeepSeek VL2 Tiny": {
+  "repo": "deepseek-ai/deepseek-vl2-tiny",
+  "gated": false,
+  "parameters": 3370501440,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 4096
+ },
+ "Defog SQLCoder 70B": null,
+ "Defog SQLCoder 7B": {
+  "repo": "defog/sqlcoder-7b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Dolphin Mistral 7B": null,
+ "EPFL Meditron 3 70B": {
+  "repo": "EPFLiGHT/Meditron3-70B",
+  "gated": "auto",
+  "parameters": 70553706496
+ },
+ "EduChat-R1": null,
+ "EleutherAI GPT-J 6B": {
+  "repo": "EleutherAI/gpt-j-6b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "EleutherAI GPT-NeoX 20B": {
+  "repo": "EleutherAI/gpt-neox-20b",
+  "gated": false,
+  "parameters": 20739117584,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 1.4B": {
+  "repo": "EleutherAI/pythia-1.4b",
+  "gated": false,
+  "parameters": 1515311488,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 12B": {
+  "repo": "EleutherAI/pythia-12b",
+  "gated": false,
+  "parameters": 11997067840,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 160M": {
+  "repo": "EleutherAI/pythia-160m",
+  "gated": false,
+  "parameters": 212654688,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 1B": {
+  "repo": "EleutherAI/pythia-1b",
+  "gated": false,
+  "parameters": 1078891008,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 2.8B": {
+  "repo": "EleutherAI/pythia-2.8b",
+  "gated": false,
+  "parameters": 2909427008,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 410M": {
+  "repo": "EleutherAI/pythia-410m",
+  "gated": false,
+  "parameters": 505997504,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 6.9B": {
+  "repo": "EleutherAI/pythia-6.9b",
+  "gated": false,
+  "parameters": 6991520256,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "EleutherAI Pythia 70M": {
+  "repo": "EleutherAI/pythia-70m",
+  "gated": false,
+  "parameters": 95592496,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Fusion-in-Decoder": null,
+ "Google Bard": null,
+ "Google Gemini Flash": null,
+ "Google Gemini Pro": null,
+ "Google Gemini Pro Vision": null,
+ "Google Gemini Ultra": null,
+ "Google Gemma 2 27B": {
+  "repo": "google/gemma-2-27b-it",
+  "gated": "manual",
+  "parameters": 27227128320
+ },
+ "Google Gemma 2 2B": {
+  "repo": "google/gemma-2-2b-it",
+  "gated": "manual",
+  "parameters": 2614341888
+ },
+ "Google Gemma 2 9B": {
+  "repo": "google/gemma-2-9b-it",
+  "gated": "manual",
+  "parameters": 9241705984
+ },
+ "Google Gemma 2B": {
+  "repo": "google/gemma-2b",
+  "gated": "manual",
+  "parameters": 2506172416
+ },
+ "Google Gemma 3 12B": {
+  "repo": "google/gemma-3-12b-it",
+  "gated": "manual",
+  "parameters": 12187325040
+ },
+ "Google Gemma 3 1B": {
+  "repo": "google/gemma-3-1b-it",
+  "gated": "manual",
+  "parameters": 999885952
+ },
+ "Google Gemma 3 270M": {
+  "repo": "google/gemma-3-270m-it",
+  "gated": "manual",
+  "parameters": 268098176
+ },
+ "Google Gemma 3 27B": {
+  "repo": "google/gemma-3-27b-it",
+  "gated": "manual",
+  "parameters": 27432406640
+ },
+ "Google Gemma 3 4B": {
+  "repo": "google/gemma-3-4b-it",
+  "gated": "manual",
+  "parameters": 4300079472
+ },
+ "Google Gemma 3n E4B": {
+  "repo": "google/gemma-3n-E4B-it",
+  "gated": "manual",
+  "parameters": 7849978192
+ },
+ "Google Gemma 4 26B": {
+  "repo": "google/gemma-4-26B-A4B-it",
+  "gated": false,
+  "parameters": 25805936206,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Google Gemma 4 31B": {
+  "repo": "google/gemma-4-31B-it",
+  "gated": false,
+  "parameters": 31273088876,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Google Gemma 7B": {
+  "repo": "google/gemma-7b",
+  "gated": "manual",
+  "parameters": 8537680896
+ },
+ "Google MedGemma 27B": {
+  "repo": "google/medgemma-27b-it",
+  "gated": "auto",
+  "parameters": 27432406640
+ },
+ "Google PaliGemma 3B": {
+  "repo": "google/paligemma-3b-mix-448",
+  "gated": "manual",
+  "parameters": 2924351216
+ },
+ "Google T5 11B": {
+  "repo": "google-t5/t5-11b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "Google UL2": {
+  "repo": "google/ul2",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "Guanaco 33B": null,
+ "Guanaco 65B": null,
+ "H2O.ai H2OVL Mississippi 1B": null,
+ "H2O.ai H2OVL Mississippi 2B": {
+  "repo": "h2oai/h2ovl-mississippi-2b",
+  "gated": false,
+  "parameters": 2152317440,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "Hugging Face IDEFICS 80B": {
+  "repo": "HuggingFaceM4/idefics-80b-instruct",
+  "gated": false,
+  "parameters": 79967866665,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "Hugging Face IDEFICS 9B": {
+  "repo": "HuggingFaceM4/idefics-9b",
+  "gated": false,
+  "parameters": 8929682192,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Hugging Face IDEFICS2 8B": {
+  "repo": "HuggingFaceM4/idefics2-8b",
+  "gated": false,
+  "parameters": 8402768112,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 32768
+ },
+ "Hugging Face IDEFICS3 8B": {
+  "repo": "HuggingFaceM4/Idefics3-8B-Llama3",
+  "gated": false,
+  "parameters": 8462086384,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Hugging Face StarChat": {
+  "repo": "HuggingFaceH4/starchat2-15b-v0.1",
+  "gated": false,
+  "parameters": 15957913600,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "HuggingFace SmolLM2 1.7B": {
+  "repo": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+  "gated": false,
+  "parameters": 1711376384,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolLM2 135M": {
+  "repo": "HuggingFaceTB/SmolLM2-135M",
+  "gated": false,
+  "parameters": 134515008,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolLM2 360M": {
+  "repo": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "gated": false,
+  "parameters": 361821120,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolVLM": {
+  "repo": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "gated": false,
+  "parameters": 256484928,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolVLM 256M": {
+  "repo": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "gated": false,
+  "parameters": 256484928,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolVLM 500M": {
+  "repo": "HuggingFaceTB/SmolVLM-500M-Instruct",
+  "gated": false,
+  "parameters": 507482304,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolVLM2": {
+  "repo": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "gated": false,
+  "parameters": 256484928,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "HuggingFace SmolVLM2 256M": null,
+ "HuggingFace SmolVLM2 500M": null,
+ "HuggingFace Zephyr 7B": {
+  "repo": "HuggingFaceH4/zephyr-7b-beta",
+  "gated": false,
+  "parameters": 7241732096,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "IBM Granite 3.3 2B": {
+  "repo": "ibm-granite/granite-3.3-2b-instruct",
+  "gated": false,
+  "parameters": 2533539840,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "IBM Granite 3.3 8B": {
+  "repo": "ibm-granite/granite-3.3-8b-instruct",
+  "gated": false,
+  "parameters": 8170864640,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "IBM Granite 4.0 H-Small": {
+  "repo": "ibm-granite/granite-4.0-h-small",
+  "gated": false,
+  "parameters": 32207337984,
+  "n_experts": 72,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "InternLM-XComposer": null,
+ "InternLM-XComposer2": null,
+ "InternLM-XComposer2 1.8B": null,
+ "InternLM-XComposer2.5": null,
+ "JT-VL": null,
+ "LLaVA InternLM 7B": {
+  "repo": "internlm/internlm-7b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "LLaVA InternLM2 20B": {
+  "repo": "internlm/internlm2-20b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "LLaVA InternLM2 7B": {
+  "repo": "internlm/internlm2-7b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "LLaVA Llama 3 8B": null,
+ "LLaVA Vicuna 7B": null,
+ "LLaVA-1.5 Vicuna 13B": null,
+ "LLaVA-1.5 Vicuna 7B": null,
+ "LLaVA-CoT 11B": null,
+ "LLaVA-NeXT Llama 3 8B": null,
+ "LLaVA-NeXT Mistral 7B": null,
+ "LLaVA-NeXT Qwen 32B": null,
+ "LLaVA-NeXT Vicuna 13B": null,
+ "LLaVA-NeXT Vicuna 7B": null,
+ "LLaVA-NeXT Yi 34B": null,
+ "LLaVA-NeXT-Interleave Qwen 7B": null,
+ "LLaVA-OneVision Qwen2 0.5B": {
+  "repo": "llava-hf/llava-onevision-qwen2-0.5b-ov-hf",
+  "gated": false,
+  "parameters": 893675552,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "LLaVA-OneVision Qwen2 72B": {
+  "repo": "llava-hf/llava-onevision-qwen2-72b-ov-hf",
+  "gated": false,
+  "parameters": 73181570592,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "LLaVA-OneVision Qwen2 7B": {
+  "repo": "llava-hf/llava-onevision-qwen2-7b-ov-hf",
+  "gated": false,
+  "parameters": 8030807584,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "LMSYS Vicuna 13B": {
+  "repo": "lmsys/vicuna-13b-v1.5",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "LMSYS Vicuna 33B": {
+  "repo": "lmsys/vicuna-33b-v1.3",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "LMSYS Vicuna 7B": {
+  "repo": "lmsys/vicuna-7b-v1.5",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Llama-3-8B-Instruct axiomatic dsep (LoRA)": null,
+ "Llama-3.1-8B-Instruct + Shared E2E direct I/O (10-shot)": null,
+ "Llama-3.1-8B-Instruct-CDG": null,
+ "M42 Med42 70B": {
+  "repo": "m42-health/med42-70b",
+  "gated": "auto",
+  "parameters": null
+ },
+ "MMAlaya": {
+  "repo": "DataCanvas/MMAlaya",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "MMAlaya2": {
+  "repo": "DataCanvas/MMAlaya2",
+  "gated": false,
+  "parameters": 25514186112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "MUG-U 7B": null,
+ "Maritaca Sabiazinho-3": null,
+ "Maritaca Sabi\u00e1-3": null,
+ "Meta Chameleon 30B": null,
+ "Meta Chameleon 7B": null,
+ "Meta Code Llama 13B": {
+  "repo": "meta-llama/CodeLlama-13b-Instruct-hf",
+  "gated": "manual",
+  "parameters": 13016028160
+ },
+ "Meta Code Llama 34B": {
+  "repo": "meta-llama/CodeLlama-34b-hf",
+  "gated": "manual",
+  "parameters": 33743970304
+ },
+ "Meta Code Llama 70B": {
+  "repo": "meta-llama/CodeLlama-70b-Instruct-hf",
+  "gated": "manual",
+  "parameters": 68976910336
+ },
+ "Meta LLaMA": {
+  "repo": "meta-llama/Llama-3.1-8B-Instruct",
+  "gated": "manual",
+  "parameters": 8030261248
+ },
+ "Meta LLaMA 65B": null,
+ "Meta Llama 2 13B": {
+  "repo": "meta-llama/Llama-2-13b-chat-hf",
+  "gated": "manual",
+  "parameters": 13015866880
+ },
+ "Meta Llama 2 70B": {
+  "repo": "meta-llama/Llama-2-70b-hf",
+  "gated": "manual",
+  "parameters": 68976653312
+ },
+ "Meta Llama 2 7B": {
+  "repo": "meta-llama/Llama-2-7b-hf",
+  "gated": "manual",
+  "parameters": 6738417664
+ },
+ "Meta Llama 3 70B": {
+  "repo": "meta-llama/Meta-Llama-3-70B",
+  "gated": "manual",
+  "parameters": 70553706496
+ },
+ "Meta Llama 3 8B": {
+  "repo": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "gated": "manual",
+  "parameters": 8030261248
+ },
+ "Meta Llama 3.1 405B": {
+  "repo": "meta-llama/Llama-3.1-405B",
+  "gated": "manual",
+  "parameters": 405853388800
+ },
+ "Meta Llama 3.1 70B": {
+  "repo": "meta-llama/Llama-3.1-70B-Instruct",
+  "gated": "manual",
+  "parameters": 70553706496
+ },
+ "Meta Llama 3.1 8B": {
+  "repo": "meta-llama/Llama-3.1-8B-Instruct",
+  "gated": "manual",
+  "parameters": 8030261248
+ },
+ "Meta Llama 3.2 11B": {
+  "repo": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+  "gated": "manual",
+  "parameters": 10670220835
+ },
+ "Meta Llama 3.2 1B": {
+  "repo": "meta-llama/Llama-3.2-1B-Instruct",
+  "gated": "manual",
+  "parameters": 1235814400
+ },
+ "Meta Llama 3.2 3B": {
+  "repo": "meta-llama/Llama-3.2-3B-Instruct",
+  "gated": "manual",
+  "parameters": 3212749824
+ },
+ "Meta Llama 3.2 90B": {
+  "repo": "meta-llama/Llama-3.2-90B-Vision-Instruct",
+  "gated": "manual",
+  "parameters": 88593355323
+ },
+ "Meta Llama 3.3 70B": {
+  "repo": "meta-llama/Llama-3.3-70B-Instruct",
+  "gated": "manual",
+  "parameters": 70553706496
+ },
+ "Meta Llama 4 Maverick": {
+  "repo": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+  "gated": "manual",
+  "parameters": 401583781376
+ },
+ "Meta Llama 4 Scout": {
+  "repo": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+  "gated": "manual",
+  "parameters": 108641793536
+ },
+ "Meta OPT 175B": null,
+ "Meta OPT 66B": null,
+ "Meta SecAlign 70B": null,
+ "Microsoft Bing Chat": null,
+ "Microsoft Kosmos-2": null,
+ "Microsoft Phi-3 Medium": {
+  "repo": "microsoft/Phi-3-medium-128k-instruct",
+  "gated": false,
+  "parameters": 13960238080,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Microsoft Phi-3 Mini": {
+  "repo": "microsoft/Phi-3-mini-4k-instruct",
+  "gated": false,
+  "parameters": 3821079552,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Microsoft Phi-3 Vision": null,
+ "Microsoft Phi-3.5 Vision": {
+  "repo": "microsoft/Phi-3.5-vision-instruct",
+  "gated": false,
+  "parameters": 4146621440,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Microsoft Phi-4": {
+  "repo": "microsoft/phi-4",
+  "gated": false,
+  "parameters": 14659507200,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "Microsoft Phi-4 Vision": null,
+ "Microsoft Turing-NLG 530B": null,
+ "Microsoft Turing-NLG 7B": null,
+ "Microsoft WizardCoder 33B": null,
+ "Microsoft WizardLM 13B": null,
+ "Microsoft WizardLM 70B": null,
+ "Microsoft WizardLM 7B": null,
+ "Mini-Monkey": null,
+ "MiniGPT-4 13B": null,
+ "MiniGPT-4 7B": null,
+ "MiniGPT-v2": null,
+ "MiniMax M2": {
+  "repo": "MiniMaxAI/MiniMax-M2",
+  "gated": false,
+  "parameters": 228689764864,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 196608
+ },
+ "MiniMax M2.5": {
+  "repo": "MiniMaxAI/MiniMax-M2.5",
+  "gated": false,
+  "parameters": 228689764864,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 196608
+ },
+ "MiniMax M2.7": {
+  "repo": "MiniMaxAI/MiniMax-M2.7",
+  "gated": false,
+  "parameters": 228689764864,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 204800
+ },
+ "MiniMax M3": {
+  "repo": "MiniMaxAI/MiniMax-M3",
+  "gated": false,
+  "parameters": 427040140160,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "MiniMax abab6.5s": null,
+ "Mistral 7B": {
+  "repo": "mistralai/Mistral-7B-Instruct-v0.2",
+  "gated": false,
+  "parameters": 7241732096,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Mistral Codestral": {
+  "repo": "mistralai/Codestral-22B-v0.1",
+  "gated": false,
+  "parameters": 22247282688,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Mistral Devstral Small": {
+  "repo": "mistralai/Devstral-Small-2-24B-Instruct-2512",
+  "gated": false,
+  "parameters": 24011361840,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 393216
+ },
+ "Mistral Large 2": {
+  "repo": "mistralai/Mistral-Large-Instruct-2411",
+  "gated": false,
+  "parameters": 122610069504,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Mistral Magistral Medium": null,
+ "Mistral Mathstral 7B": {
+  "repo": "mistralai/Mathstral-7B-v0.1",
+  "gated": false,
+  "parameters": 7248023552,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Mistral Ministral 8B": {
+  "repo": "mistralai/Ministral-8B-Instruct-2410",
+  "gated": false,
+  "parameters": 8019808256,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Mistral Mixtral 8x22B": {
+  "repo": "mistralai/Mixtral-8x22B-Instruct-v0.1",
+  "gated": false,
+  "parameters": 140630071296,
+  "n_experts": 8,
+  "architecture": "moe",
+  "context_window": 65536
+ },
+ "Mistral Mixtral 8x7B": {
+  "repo": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  "gated": false,
+  "parameters": 46702792704,
+  "n_experts": 8,
+  "architecture": "moe",
+  "context_window": 32768
+ },
+ "Mistral NeMo 12B": null,
+ "Mistral Pixtral 12B": {
+  "repo": "mistral-experimental/pixtral-12b",
+  "gated": false,
+  "parameters": 12682739712,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 1024000
+ },
+ "Mistral Small": {
+  "repo": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+  "gated": false,
+  "parameters": 24011361280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Mistral Small 24B": {
+  "repo": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+  "gated": false,
+  "parameters": 24011361280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Mistral Small 3": {
+  "repo": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+  "gated": false,
+  "parameters": 24011361280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Mistral Small 3.1 24B": {
+  "repo": "mistralai/Mistral-Small-3.1-24B-Instruct-2503",
+  "gated": false,
+  "parameters": 24011361280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Mistral Small 3.2 24B": {
+  "repo": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+  "gated": false,
+  "parameters": 24011361280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Mistral Small 4": {
+  "repo": "mistralai/Mistral-Small-4-119B-2603",
+  "gated": false,
+  "parameters": 119401317376,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "Monkey": null,
+ "Moondream 1": null,
+ "Moondream 2": null,
+ "Moonshot Kimi K2": {
+  "repo": "moonshotai/Kimi-K2-Instruct",
+  "gated": false,
+  "parameters": 1026408235864,
+  "n_experts": 384,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "Moonshot Kimi K2.5": {
+  "repo": "moonshotai/Kimi-K2.5",
+  "gated": false,
+  "parameters": 1026879376368,
+  "n_experts": 384,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Moonshot Kimi K2.6": {
+  "repo": "moonshotai/Kimi-K2.6",
+  "gated": false,
+  "parameters": 1026879376368,
+  "n_experts": 384,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Moonshot Kimi K2.7": {
+  "repo": "moonshotai/Kimi-K2.7-Code",
+  "gated": false,
+  "parameters": 1026879376368,
+  "n_experts": 384,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Moonshot Kimi K3": {
+  "repo": "moonshotai/Kimi-K3",
+  "gated": false,
+  "parameters": 2779931837184,
+  "n_experts": 896,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "Moonshot Kimi-Dev 72B": {
+  "repo": "moonshotai/Kimi-Dev-72B",
+  "gated": false,
+  "parameters": 72706203648,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "MosaicML MPT 30B": null,
+ "MosaicML MPT 7B": null,
+ "NCSOFT VARCO-VISION": {
+  "repo": "NCSOFT/VARCO-VISION-2.0-1.7B",
+  "gated": false,
+  "parameters": 2124391328,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "NVIDIA Eagle X5 13B": null,
+ "NVIDIA Eagle X5 34B": null,
+ "NVIDIA Eagle X5 7B": null,
+ "NVIDIA NVLM": null,
+ "NVIDIA Nemotron 3 Nano 30B": null,
+ "NVIDIA Nemotron 3 Super 120B": null,
+ "NVIDIA Nemotron 3 Ultra": null,
+ "NVIDIA Nemotron 70B": null,
+ "NVIDIA Nemotron Nano 9B V2": {
+  "repo": "nvidia/NVIDIA-Nemotron-Nano-9B-v2",
+  "gated": false,
+  "parameters": 8888227328,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "NVIDIA Nemotron Orchestrator 8B": {
+  "repo": "nvidia/Nemotron-Orchestrator-8B",
+  "gated": false,
+  "parameters": 8190735360,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 40960
+ },
+ "NVIDIA Nemotron Super 49B": null,
+ "NVIDIA VILA 1.5 13B": {
+  "repo": "Efficient-Large-Model/VILA1.5-13b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "NVIDIA VILA 1.5 3B": {
+  "repo": "Efficient-Large-Model/VILA1.5-3b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "NVIDIA VILA 1.5 40B": {
+  "repo": "Efficient-Large-Model/VILA1.5-40b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "NVIDIA VILA 1.5 8B": {
+  "repo": "Efficient-Large-Model/Llama-3-VILA1.5-8B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "Nex N1": {
+  "repo": "nex-agi/DeepSeek-V3.1-Nex-N1",
+  "gated": false,
+  "parameters": 671026419200,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 204800
+ },
+ "Nous Research Hermes 3 405B": null,
+ "Nous Research Hermes 4 405B": {
+  "repo": "NousResearch/Hermes-4-405B",
+  "gated": false,
+  "parameters": 405853388800,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Nous Research Nous-Hermes 13B": {
+  "repo": "NousResearch/Nous-Hermes-13b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Ola": null,
+ "OmChat": null,
+ "OpenAI Ada": null,
+ "OpenAI Babbage": null,
+ "OpenAI GPT-2": {
+  "repo": "openai-community/gpt2",
+  "gated": false,
+  "parameters": 137022720,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "OpenAI GPT-3 Ada": null,
+ "OpenAI GPT-3 Babbage": null,
+ "OpenAI GPT-3 Curie": null,
+ "OpenAI GPT-3 Davinci": null,
+ "OpenAI GPT-5.3": null,
+ "OpenAI GPT-OSS 120B": {
+  "repo": "openai/gpt-oss-120b",
+  "gated": false,
+  "parameters": 116829156672,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "OpenAI GPT-OSS 20B": {
+  "repo": "openai/gpt-oss-20b",
+  "gated": false,
+  "parameters": 20914757184,
+  "n_experts": 32,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "OpenBMB MiniCPM-V": {
+  "repo": "openbmb/MiniCPM-V-4.7-35B-A3B",
+  "gated": false,
+  "parameters": 35212875824,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "OpenBMB MiniCPM-V 2": {
+  "repo": "openbmb/MiniCPM-V-2",
+  "gated": false,
+  "parameters": 3434965792,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "OpenBMB MiniCPM-V 2.5": {
+  "repo": "openbmb/MiniCPM-Llama3-V-2_5",
+  "gated": false,
+  "parameters": 8537092336,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "OpenBMB MiniCPM-V 2.6": {
+  "repo": "openbmb/MiniCPM-V-2_6",
+  "gated": "auto",
+  "parameters": 8099175152
+ },
+ "OpenBMB MiniCPM-o 2.6": {
+  "repo": "openbmb/MiniCPM-o-2_6",
+  "gated": false,
+  "parameters": 8674997028,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenBMB OmniLMM 12B": {
+  "repo": "openbmb/OmniLMM-12B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenBMB UltraLM 13B": {
+  "repo": "openbmb/UltraLM-13b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "OpenBMB UltraLM 65B": {
+  "repo": "openbmb/UltraLM-65b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "OpenChat 3.5": {
+  "repo": "openchat/openchat-3.5-1210",
+  "gated": false,
+  "parameters": 7241748480,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "OpenGVLab InternVL 1.1": {
+  "repo": "OpenGVLab/InternVL-Chat-V1-1",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "OpenGVLab InternVL 1.2": {
+  "repo": "OpenGVLab/InternVL-Chat-V1-2",
+  "gated": false,
+  "parameters": 40068684160,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "OpenGVLab InternVL 1.5": {
+  "repo": "OpenGVLab/InternVL-Chat-V1-5",
+  "gated": false,
+  "parameters": 25514186112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2 1B": {
+  "repo": "OpenGVLab/InternVL2-1B",
+  "gated": false,
+  "parameters": 938158976,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2 26B": {
+  "repo": "OpenGVLab/InternVL2-26B",
+  "gated": false,
+  "parameters": 25514186112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2 2B": {
+  "repo": "OpenGVLab/InternVL2-2B",
+  "gated": false,
+  "parameters": 2205754368,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2 40B": {
+  "repo": "OpenGVLab/InternVL2-40B",
+  "gated": false,
+  "parameters": 40068684160,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "OpenGVLab InternVL2 4B": {
+  "repo": "OpenGVLab/InternVL2-4B",
+  "gated": false,
+  "parameters": 4146855936,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "OpenGVLab InternVL2 76B": null,
+ "OpenGVLab InternVL2 8B": {
+  "repo": "OpenGVLab/InternVL2-8B",
+  "gated": false,
+  "parameters": 8075365376,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 1B": {
+  "repo": "OpenGVLab/InternVL2_5-1B",
+  "gated": false,
+  "parameters": 938193024,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 26B": {
+  "repo": "OpenGVLab/InternVL2_5-26B",
+  "gated": false,
+  "parameters": 25514186112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 2B": {
+  "repo": "OpenGVLab/InternVL2_5-2B",
+  "gated": false,
+  "parameters": 2205754368,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 38B": {
+  "repo": "OpenGVLab/InternVL2_5-38B",
+  "gated": false,
+  "parameters": 38388164992,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 4B": {
+  "repo": "OpenGVLab/InternVL2_5-4B-MPO",
+  "gated": false,
+  "parameters": 3712637952,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 78B": {
+  "repo": "OpenGVLab/InternVL2_5-78B",
+  "gated": false,
+  "parameters": 78408318336,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab InternVL2.5 8B": {
+  "repo": "OpenGVLab/InternVL2_5-8B",
+  "gated": false,
+  "parameters": 8075365376,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab Mini-InternVL 2B v1.5": {
+  "repo": "OpenGVLab/Mini-InternVL-Chat-2B-V1-5",
+  "gated": false,
+  "parameters": 2205754368,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "OpenGVLab Mini-InternVL 4B v1.5": {
+  "repo": "OpenGVLab/Mini-InternVL-Chat-4B-V1-5",
+  "gated": false,
+  "parameters": 4146855936,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "OpenThaiGPT 1.0.0 13B": {
+  "repo": "openthaigpt/openthaigpt-1.0.0-13b-chat",
+  "gated": false,
+  "parameters": 13108925440,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "OpenThaiGPT 1.0.0 7B": {
+  "repo": "openthaigpt/openthaigpt-1.0.0-7b-chat",
+  "gated": false,
+  "parameters": 6812864512,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "PandaGPT 13B": null,
+ "Parrot": null,
+ "Prime Intellect INTELLECT-3": {
+  "repo": "PrimeIntellect/INTELLECT-3",
+  "gated": false,
+  "parameters": 106852251264,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "Qihoo 360VL 70B": {
+  "repo": "qihoo360/360VL-70B",
+  "gated": false,
+  "parameters": 71041080320,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "RBDash 72B": null,
+ "Rhymes AI Aria": {
+  "repo": "rhymes-ai/Aria",
+  "gated": false,
+  "parameters": 25307311216,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 65536
+ },
+ "Ristretto 3B": null,
+ "Ross-Qwen2 7B": null,
+ "SAIL-VL 2B": null,
+ "SCB10X Typhoon 1.5 72B": null,
+ "SCB10X Typhoon 1.5 8B": null,
+ "SCB10X Typhoon 1.5X 70B": null,
+ "SCB10X Typhoon 1.5X 8B": null,
+ "SCB10X Typhoon 7B": null,
+ "SEA-LION 7B": null,
+ "SLIME 13B": null,
+ "SLIME 7B": null,
+ "SLIME 8B": null,
+ "Saama OpenBioLLM 70B": null,
+ "Saama OpenBioLLM 8B": null,
+ "Sailor 14B": {
+  "repo": "sail/Sailor-14B-Chat",
+  "gated": false,
+  "parameters": 14165980160,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Sailor 7B": {
+  "repo": "sail/Sailor-7B-Chat",
+  "gated": false,
+  "parameters": 7721324544,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Salesforce InstructBLIP": null,
+ "Salesforce InstructBLIP 13B": null,
+ "Salesforce InstructBLIP 7B": null,
+ "Salesforce xGen-MM": null,
+ "SambaNova SambaLingo Thai 70B": null,
+ "SambaNova SambaLingo Thai 7B": null,
+ "SeaLLM 7B v2": {
+  "repo": "SeaLLMs/SeaLLM-7B-v2",
+  "gated": false,
+  "parameters": 7375949824,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "SeaLLM 7B v2.5": {
+  "repo": "SeaLLMs/SeaLLM-7B-v2.5",
+  "gated": false,
+  "parameters": 8537680896,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "SenseTime SenseChat Vision": null,
+ "ShareCaptioner": null,
+ "ShareGPT4V 13B": null,
+ "ShareGPT4V 7B": null,
+ "Stability AI Stable Diffusion 3 Large": null,
+ "Stability AI Stable Diffusion 3 Medium": {
+  "repo": "stabilityai/stable-diffusion-3-medium",
+  "gated": "auto",
+  "parameters": null
+ },
+ "Stability AI Stable Diffusion 3.5 Large": {
+  "repo": "stabilityai/stable-diffusion-3.5-large",
+  "gated": "auto",
+  "parameters": 8146280768
+ },
+ "Stability AI Stable Diffusion 3.5 Medium": {
+  "repo": "stabilityai/stable-diffusion-3.5-medium",
+  "gated": "auto",
+  "parameters": 2469663936
+ },
+ "Stanford Alpaca 13B": null,
+ "Stanford Alpaca 7B": null,
+ "Stanford Marin 8B": {
+  "repo": "marin-community/marin-8b-instruct",
+  "gated": false,
+  "parameters": 8030261248,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "StepFun Step 3.5 Flash": {
+  "repo": "stepfun-ai/Step-3.5-Flash",
+  "gated": false,
+  "parameters": 199384301376,
+  "n_experts": 288,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "StepFun Step 3.7 Flash": {
+  "repo": "stepfun-ai/Step-3.7-Flash",
+  "gated": false,
+  "parameters": 201365316160,
+  "n_experts": 288,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "StepFun Step-1.5V Mini": null,
+ "StepFun Step-1V": null,
+ "StepFun Step-1o": null,
+ "Sup-AI-Ensemble": null,
+ "TIGER-Lab Mantis 8B CLIP-LLaMA3": {
+  "repo": "TIGER-Lab/Mantis-8B-clip-llama3",
+  "gated": false,
+  "parameters": 8354764800,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 8192
+ },
+ "TIGER-Lab Mantis 8B Fuyu": {
+  "repo": "TIGER-Lab/Mantis-8B-Fuyu",
+  "gated": false,
+  "parameters": 9408254976,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 16384
+ },
+ "TIGER-Lab Mantis 8B Idefics2": {
+  "repo": "TIGER-Lab/Mantis-8B-Idefics2",
+  "gated": false,
+  "parameters": 8402768112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "TIGER-Lab Mantis 8B SigLIP-LLaMA3": {
+  "repo": "TIGER-Lab/Mantis-8B-siglip-llama3",
+  "gated": false,
+  "parameters": 8480007232,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 8192
+ },
+ "TII Falcon 2 VLM 11B": null,
+ "TII Falcon 40B": {
+  "repo": "tiiuae/falcon-40b",
+  "gated": false,
+  "parameters": 41835970560,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "TII Falcon 7B": {
+  "repo": "tiiuae/falcon-7b",
+  "gated": false,
+  "parameters": 7217189760,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "TeleMM": null,
+ "Tencent Hunyuan 3": {
+  "repo": "tencent/Hy3-preview",
+  "gated": false,
+  "parameters": 298786155776,
+  "n_experts": 192,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Tencent Hunyuan A13B": {
+  "repo": "tencent/Hunyuan-A13B-Instruct",
+  "gated": false,
+  "parameters": 80393183232,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 32768
+ },
+ "Tencent Hunyuan Standard Vision": null,
+ "Tencent Hunyuan Vision": null,
+ "Tencent POINTS Qwen2.5 7B": null,
+ "Tencent POINTS Yi 1.5 9B": null,
+ "Tencent POINTS1.5 Qwen2.5 7B": null,
+ "Thinking Machines Inkling": {
+  "repo": "thinkingmachines/Inkling",
+  "gated": false,
+  "parameters": 952377623626,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": null
+ },
+ "TinyLlama 1.1B CPT OpenWebMath": null,
+ "Together RedPajama-INCITE 7B": {
+  "repo": "togethercomputer/RedPajama-INCITE-7B-Chat",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "TransCore-M": null,
+ "VITA": null,
+ "VXVERSE": null,
+ "Vintern 1B": null,
+ "Vintern 3B": null,
+ "WeMM": null,
+ "Writer Palmyra Instruct 30": null,
+ "Writer Palmyra Med": {
+  "repo": "Writer/palmyra-med-20b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "Writer Palmyra X": {
+  "repo": "Writer/Palmyra-X-4.3-73B",
+  "gated": "manual",
+  "parameters": 72706203648
+ },
+ "Writer Palmyra X V2": null,
+ "Writer Palmyra X V3": null,
+ "Xiaomi MiMo V2 Flash": {
+  "repo": "XiaomiMiMo/MiMo-V2-Flash",
+  "gated": false,
+  "parameters": 309766601088,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Xiaomi MiMo V2.5": {
+  "repo": "XiaomiMiMo/MiMo-V2.5",
+  "gated": false,
+  "parameters": 310756322688,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "Xiaomi MiMo V2.5 Pro": {
+  "repo": "XiaomiMiMo/MiMo-V2.5-Pro",
+  "gated": false,
+  "parameters": 1023182841600,
+  "n_experts": 384,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "Xinyuan-VL 2B": null,
+ "Yandex YaLM 100B": {
+  "repo": "yandex/yalm-100b",
+  "gated": false,
+  "parameters": null
+ },
+ "Zhipu CogVLM": {
+  "repo": "zai-org/cogvlm-chat-hf",
+  "gated": false,
+  "parameters": 17639687424,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Zhipu CogVLM2": {
+  "repo": "zai-org/cogvlm2-llama3-chat-19B",
+  "gated": false,
+  "parameters": 19503107328,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "Zhipu GLM": null,
+ "Zhipu GLM-4 32B": {
+  "repo": "zai-org/GLM-4-32B-0414",
+  "gated": false,
+  "parameters": 32566081536,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Zhipu GLM-4.5": {
+  "repo": "zai-org/GLM-4.5",
+  "gated": false,
+  "parameters": 358337791296,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "Zhipu GLM-4.5 Air": {
+  "repo": "zai-org/GLM-4.5-Air",
+  "gated": false,
+  "parameters": 110468824832,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 131072
+ },
+ "Zhipu GLM-4.6": {
+  "repo": "zai-org/GLM-4.6",
+  "gated": false,
+  "parameters": 356785898816,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 202752
+ },
+ "Zhipu GLM-4.7": {
+  "repo": "zai-org/GLM-4.7",
+  "gated": false,
+  "parameters": 358337791296,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 202752
+ },
+ "Zhipu GLM-4.7 Flash": {
+  "repo": "zai-org/GLM-4.7-Flash",
+  "gated": false,
+  "parameters": 31221488576,
+  "n_experts": 64,
+  "architecture": "moe",
+  "context_window": 202752
+ },
+ "Zhipu GLM-4V": {
+  "repo": "zai-org/glm-4v-9b",
+  "gated": false,
+  "parameters": 13906320928,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "Zhipu GLM-4V 9B": {
+  "repo": "zai-org/glm-4v-9b",
+  "gated": false,
+  "parameters": 13906320928,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "Zhipu GLM-4V Plus": null,
+ "Zhipu GLM-5": {
+  "repo": "zai-org/GLM-5",
+  "gated": false,
+  "parameters": 753864139008,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 202752
+ },
+ "Zhipu GLM-5.1": {
+  "repo": "zai-org/GLM-5.1",
+  "gated": false,
+  "parameters": 753864139008,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 202752
+ },
+ "Zhipu GLM-5.2": {
+  "repo": "zai-org/GLM-5.2",
+  "gated": false,
+  "parameters": 753329940480,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "Zhipu GLM-Z1 9B": {
+  "repo": "zai-org/GLM-Z1-9B-0414",
+  "gated": false,
+  "parameters": 9400279040,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Zhipu VisualGLM 6B": {
+  "repo": "zai-org/visualglm-6b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "anthropic/stanford-online-all-v4-s3": null,
+ "iAsk Pro": null,
+ "llama-3.2-1B-instruct-grpo": null,
+ "llama-3.2-1B-instruct-grpo-001": null,
+ "llama-3.2-1B-instruct-grpo-002": null,
+ "llama-3.2-1B-instruct-grpo-003": null,
+ "llama-3.2-1B-instruct-grpo-004-step-0050": null,
+ "llama-3.2-1B-instruct-grpo-005-step-1000": null,
+ "qwen_base": null,
+ "qwen_chat": null,
+ "vivo BlueLM-V": null,
+ "01-ai/Yi-9B": null,
+ "30B-Lazarus": {
+  "repo": "CalderaAI/30B-Lazarus",
+  "gated": false,
+  "parameters": 32528947456,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "AI4Chem/ChemLLM-7B-Chat": null,
+ "AXCXEPT/EZO-Qwen2.5-72B-Instruct": null,
+ "AXCXEPT/Llama-3.1-8B-EZO-1.1-it": null,
+ "AXCXEPT/Qwen3-EZO-8B-beta": null,
+ "AXCXEPT/Qwen3-EZO-8B-beta-nothink": null,
+ "Aeala/GPT4-x-AlpacaDente-30b": null,
+ "Aeala/GPT4-x-AlpacaDente2-30b": null,
+ "Aeala/GPT4-x-Alpasta-13b": null,
+ "AlexNet": null,
+ "Aratako/calm3-22b-RP-v2": null,
+ "Aya Expanse 32B": {
+  "repo": "CohereLabs/aya-expanse-32b",
+  "gated": "auto",
+  "parameters": 32296476672
+ },
+ "BAAI/JudgeLM-7B-v1.0": null,
+ "BASALT/BC-Baseline": null,
+ "BASALT/Dopamind": null,
+ "BASALT/GoUp": null,
+ "BASALT/JustATry": null,
+ "BASALT/KABasalt": null,
+ "BASALT/KAIROS": null,
+ "BASALT/Li_and_Ivan": null,
+ "BASALT/Miner007": null,
+ "BASALT/Random": null,
+ "BASALT/TheRealMiners": null,
+ "BASALT/UniTeam": null,
+ "BASALT/corianas": null,
+ "BASALT/pm": null,
+ "BASALT/voggite": null,
+ "BASALT/yamato.kataoka": null,
+ "Baichuan 2-7B": {
+  "repo": "baichuan-inc/Baichuan2-7B-Chat",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Baichuan2-13B": {
+  "repo": "baichuan-inc/Baichuan2-13B-Chat",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": null
+ },
+ "CalderaAI/13B-BlueMethod": null,
+ "CalderaAI/13B-Legerdemain-L2": null,
+ "CalderaAI/13B-Ouroboros": null,
+ "CausalLM 14B": {
+  "repo": "CausalLM/14B",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 8192
+ },
+ "ChatGLM3-6B": {
+  "repo": "zai-org/chatglm3-6b",
+  "gated": false,
+  "parameters": 6243584032,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": null
+ },
+ "CobraMamba/mamba-gpt-3b": null,
+ "CobraMamba/mamba-gpt-3b-v2": null,
+ "CobraMamba/mamba-gpt-3b-v3": null,
+ "Code Llama-7B": {
+  "repo": "codellama/CodeLlama-7b-hf",
+  "gated": false,
+  "parameters": 6738546688,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "CogVideo": null,
+ "Cohere: Command R+": null,
+ "CohereForAI/aya-23-35b": null,
+ "CohereForAI/c4ai-command-r-plus": null,
+ "CohereForAI/c4ai-command-r-plus-08-2024": null,
+ "Command A": null,
+ "Command R": null,
+ "Command R+": null,
+ "Corianas/111m": null,
+ "Corianas/Quokka_1.3b": null,
+ "Corianas/Quokka_2.7b": null,
+ "Corianas/Quokka_590m": null,
+ "Corianas/gpt-j-6B-Dolly": null,
+ "DIABETES": null,
+ "DataPilot/ArrowPro-7B-KUJIRA": null,
+ "DataPilot/ArrowPro-7B-RobinHood": null,
+ "DeepSeek-R1-Distill-Llama-8B": {
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "gated": false,
+  "parameters": 8030261248,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "DeepSeek-R1-Distill-Qwen-32B": {
+  "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+  "gated": false,
+  "parameters": 32763876352,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "DeepSeek-V2.5": {
+  "repo": "deepseek-ai/DeepSeek-V2.5",
+  "gated": false,
+  "parameters": 235741434880,
+  "n_experts": 160,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "DeepSeek-V3.1-Terminus": {
+  "repo": "deepseek-ai/DeepSeek-V3.1-Terminus",
+  "gated": false,
+  "parameters": 684531386000,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 163840
+ },
+ "Deepreneur/blue-lizard": null,
+ "EleutherAI/pythia-1.3b": null,
+ "EleutherAI/pythia-1.4b-deduped": null,
+ "EleutherAI/pythia-12b-deduped": null,
+ "EleutherAI/pythia-160m-deduped": null,
+ "EleutherAI/pythia-1b-deduped": null,
+ "EleutherAI/pythia-2.7b": null,
+ "EleutherAI/pythia-2.8b-deduped": null,
+ "EleutherAI/pythia-410m-deduped": null,
+ "EleutherAI/pythia-6.7b": null,
+ "EleutherAI/pythia-6.9b-deduped": null,
+ "EleutherAI/pythia-70m-deduped": null,
+ "FuseAI/FuseO1-DeepSeekR1-QwQ-SkyT1-32B-Preview": null,
+ "GLM-5.3": {
+  "repo": "zai-org/GLM-5.3",
+  "gated": false,
+  "parameters": 753329940480,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "GLM-5.3-Flash": {
+  "repo": "zai-org/GLM-5.3-Flash",
+  "gated": false,
+  "parameters": 321323031390,
+  "n_experts": 288,
+  "architecture": "moe",
+  "context_window": 1048576
+ },
+ "GPT-Neo-1.3B": {
+  "repo": "EleutherAI/gpt-neo-1.3B",
+  "gated": false,
+  "parameters": 1365907456,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 2048
+ },
+ "GPT-Neo-125M": {
+  "repo": "EleutherAI/gpt-neo-125m",
+  "gated": false,
+  "parameters": 150364416,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 2048
+ },
+ "GPT-Neo-2.7B": {
+  "repo": "EleutherAI/gpt-neo-2.7B",
+  "gated": false,
+  "parameters": 2718416384,
+  "n_experts": null,
+  "architecture": null,
+  "context_window": 2048
+ },
+ "Gemma 4 26B A4B": {
+  "repo": "google/gemma-4-26B-A4B-it",
+  "gated": false,
+  "parameters": 25805936206,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Gemma 4 E4B IT": null,
+ "GeorgiaTechResearchInstitute/galpaca-30b": null,
+ "GeorgiaTechResearchInstitute/starcoder-gpteacher-code-instruct": null,
+ "Hermes 3 70B": null,
+ "HiTZ/alpaca-lora-65b-en-pt-es-ca": null,
+ "HuggingFaceH4/starchat-beta": null,
+ "KN5 LM + RNN 400/10 (WSJ)": null,
+ "LFM2-24B-A2B": null,
+ "LLMs/AlpacaGPT4-7B-elina": null,
+ "LLMs/WizardLM-13B-V1.0": null,
+ "LLaMA-7B (protein-oriented instruction-tuned)": null,
+ "LLaVA": null,
+ "Lajonbot/Llama-2-13b-hf-instruct-pl-lora_unload": null,
+ "Lajonbot/Llama-2-7b-chat-hf-instruct-pl-lora_unload": null,
+ "Lajonbot/tableBeluga-7B-instruct-pl-lora_unload": null,
+ "Lajonbot/vicuna-13b-v1.3-PL-lora_unload": null,
+ "Lajonbot/vicuna-7b-v1.5-PL-lora_unload": null,
+ "Lazycuber/Janemalion-6B": null,
+ "Lazycuber/pyg-instruct-wizardlm": null,
+ "LiquidAI/LFM2-1.2B": null,
+ "LiquidAI/LFM2-2.6B": null,
+ "LiquidAI/LFM2-350M": null,
+ "LiquidAI/LFM2-350M-ENJP-MT": null,
+ "LiquidAI/LFM2-8B-A1B": null,
+ "Llama 3.1 405B Instruct Turbo": null,
+ "Llama 4 Maverick 17B 128E Instruct": null,
+ "Llama-3.1-Nemotron-70B-Instruct": {
+  "repo": "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
+  "gated": false,
+  "parameters": 70553706496,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Llemma 34B": {
+  "repo": "EleutherAI/llemma_34b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Llemma 7B": {
+  "repo": "EleutherAI/llemma_7b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "MayaPH/FinOPT-Franklin": null,
+ "MayaPH/FinOPT-Lincoln": null,
+ "MayaPH/FinOPT-Washington": null,
+ "MayaPH/GodziLLa-30B": null,
+ "MayaPH/GodziLLa-30B-plus": null,
+ "MayaPH/GodziLLa2-70B": null,
+ "Meta Llama 3.1 8B Instruct Turbo": null,
+ "MiniMax-M2.5": {
+  "repo": "MiniMaxAI/MiniMax-M2.5",
+  "gated": false,
+  "parameters": 228689764864,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 196608
+ },
+ "MiniMax-Text-01": {
+  "repo": "MiniMaxAI/MiniMax-Text-01-hf",
+  "gated": false,
+  "parameters": 456089655296,
+  "n_experts": 32,
+  "architecture": "moe",
+  "context_window": 10240000
+ },
+ "Ministral 3 14B Instruct": null,
+ "Mistral Nemo": {
+  "repo": "mistralai/Mistral-Nemo-Instruct-2407",
+  "gated": false,
+  "parameters": 12247782400,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "NVLM-D 72B": {
+  "repo": "nvidia/NVLM-D-72B",
+  "gated": false,
+  "parameters": 79379593344,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Nanbeige/Nanbeige4-3B-Thinking-2511": null,
+ "Nanbeige/Nanbeige4.1-3B": null,
+ "Nanbeige2-16B-Chat": null,
+ "Neko-Institute-of-Science/metharme-7b": null,
+ "Neko-Institute-of-Science/pygmalion-7b": null,
+ "Nemotron 3 Nano 30B A3B": null,
+ "Nexusflow/Athene-V2-Chat": null,
+ "Nous-Hermes-2-Yi-34B": {
+  "repo": "NousResearch/Nous-Hermes-2-Yi-34B",
+  "gated": false,
+  "parameters": 34388917248,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Nous: Hermes 3 405B Instruct (retires Nov 2)": null,
+ "NousResearch/Nous-Hermes-Llama2-13b": null,
+ "NousResearch/Nous-Hermes-llama-2-7b": null,
+ "NousResearch/Redmond-Puffin-13B": null,
+ "Nvidia Nemotron 70b": null,
+ "OLMo-7B": {
+  "repo": "allenai/OLMo-7B-0724-hf",
+  "gated": false,
+  "parameters": 6888095744,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "OmniGen": null,
+ "Open Mistral Nemo": null,
+ "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5": null,
+ "OpenBuddy/openbuddy-llama-65b-v8-bf16": null,
+ "OpenBuddy/openbuddy-llama2-13b-v8.1-fp16": null,
+ "OpenBuddyEA/openbuddy-llama-30b-v7.1-bf16": null,
+ "OpenChat-13b": null,
+ "OptimalScale/robin-13b-v2-delta": null,
+ "OptimalScale/robin-65b-v2-delta": null,
+ "OptimalScale/robin-7b-v2-delta": null,
+ "Orca 2-13B": {
+  "repo": "microsoft/Orca-2-13b",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "Phi 4 Mini": {
+  "repo": "microsoft/Phi-4-mini-instruct",
+  "gated": false,
+  "parameters": 3836021760,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Phi 4 Multimodal": {
+  "repo": "microsoft/Phi-4-multimodal-instruct",
+  "gated": false,
+  "parameters": 5574460384,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "Phi-1": {
+  "repo": "microsoft/phi-1",
+  "gated": false,
+  "parameters": 1418270720,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Phi-1.5": {
+  "repo": "microsoft/phi-1_5",
+  "gated": false,
+  "parameters": 1418270720,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Phi-2": {
+  "repo": "microsoft/phi-2",
+  "gated": false,
+  "parameters": 2779683840,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "Phi-4-Reasoning": {
+  "repo": "microsoft/Phi-4-reasoning",
+  "gated": false,
+  "parameters": 14659507200,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Polyglot-Ko-12.8B": {
+  "repo": "EleutherAI/polyglot-ko-12.8b",
+  "gated": false,
+  "parameters": 13061377280,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 2048
+ },
+ "PygmalionAI/metharme-1.3b": null,
+ "PygmalionAI/pygmalion-1.3b": null,
+ "PygmalionAI/pygmalion-2.7b": null,
+ "PygmalionAI/pygmalion-350m": null,
+ "PygmalionAI/pygmalion-6b": null,
+ "Qwen 3 235b A22B 2507": null,
+ "Qwen-7B": {
+  "repo": "Qwen/Qwen-7B",
+  "gated": false,
+  "parameters": 7721324544,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Qwen/Qwen1.5-32B-Chat": {
+  "repo": "Qwen/Qwen1.5-32B-Chat",
+  "gated": false,
+  "parameters": 32512218112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Qwen/Qwen2-7B-Instruct": null,
+ "Qwen/Qwen2.5-1.5B-Instruct": null,
+ "Qwen/Qwen2.5-14B-Instruct": null,
+ "Qwen/Qwen2.5-32B-Instruct-GPTQ-Int8": null,
+ "Qwen/Qwen3-235B-A22B-nothink": null,
+ "Qwen/Qwen3-30B-A3B-nothink": null,
+ "Qwen/Qwen3-8B-nothink": null,
+ "Qwen/Qwen3.6-27B-32k": null,
+ "Qwen/Qwen3.6-27B-nothink": null,
+ "Qwen1.5-32B": {
+  "repo": "Qwen/Qwen1.5-32B-Chat",
+  "gated": false,
+  "parameters": 32512218112,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Qwen2-72B": {
+  "repo": "Qwen/Qwen2-72B-Instruct",
+  "gated": false,
+  "parameters": 72706203648,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 32768
+ },
+ "Qwen3 30B A3B Instruct 2507": {
+  "repo": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "gated": false,
+  "parameters": 30532122624,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Qwen3 30B A3b fp8": {
+  "repo": "Qwen/Qwen3-30B-A3B-FP8",
+  "gated": false,
+  "parameters": 30533947392,
+  "n_experts": 128,
+  "architecture": "moe",
+  "context_window": 40960
+ },
+ "Qwen3.5 122B-A10B FP8": {
+  "repo": "Qwen/Qwen3.5-122B-A10B-FP8",
+  "gated": false,
+  "parameters": 125086497008,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Qwen3.5-2B": {
+  "repo": "Qwen/Qwen3.5-2B",
+  "gated": false,
+  "parameters": 2274069824,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Qwen3.5-4B": {
+  "repo": "Qwen/Qwen3.5-4B",
+  "gated": false,
+  "parameters": 4659865088,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Qwen3.6 27B": {
+  "repo": "Qwen/Qwen3.6-27B",
+  "gated": false,
+  "parameters": 27781427952,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 262144
+ },
+ "Qwen3.6 35B-A3B": {
+  "repo": "Qwen/Qwen3.6-35B-A3B",
+  "gated": false,
+  "parameters": 35951822704,
+  "n_experts": 256,
+  "architecture": "moe",
+  "context_window": 262144
+ },
+ "Rachneet/gpt2-xl-alpaca": null,
+ "Rakuten/RakutenAI-2.0-8x7B-instruct": null,
+ "Rakuten/RakutenAI-2.0-mini-instruct": null,
+ "Rakuten/RakutenAI-7B-chat": null,
+ "SakanaAI/TinySwallow-1.5B-Instruct": null,
+ "Shisa V2 Llama 3.3 70B": {
+  "repo": "shisa-ai/shisa-v2-llama3.3-70b",
+  "gated": false,
+  "parameters": 70553706496,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "StarCoder 2 15B": {
+  "repo": "bigcode/starcoder2-15b",
+  "gated": false,
+  "parameters": 15957889024,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "StarCoder 2 3B": {
+  "repo": "bigcode/starcoder2-3b",
+  "gated": false,
+  "parameters": 3030371328,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "StarCoder 2 7B": {
+  "repo": "bigcode/starcoder2-7b",
+  "gated": false,
+  "parameters": 7173923840,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 16384
+ },
+ "Starling-LM-7B-alpha": null,
+ "THUDM/glm-4-9b-chat": null,
+ "Tap-M/Luna-AI-Llama2-Uncensored": null,
+ "TigerResearch/tigerbot-7b-sft": null,
+ "Tincando/fiction_story_generator": null,
+ "TinyPixel/llama2-7b-instruct": null,
+ "VGG16": null,
+ "VMware/open-llama-0.7T-7B-open-instruct-v1.1": null,
+ "ViT-Base/32": null,
+ "WeOpenML/PandaLM-7B-v1": null,
+ "WizardLM 13B v1.2": {
+  "repo": "WizardLMTeam/WizardLM-13B-V1.2",
+  "gated": false,
+  "parameters": null,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 4096
+ },
+ "WizardLM-2 8x22B": {
+  "repo": "alpindale/WizardLM-2-8x22B",
+  "gated": false,
+  "parameters": 140620634112,
+  "n_experts": 8,
+  "architecture": "moe",
+  "context_window": 65536
+ },
+ "WizardLM/WizardCoder-15B-V1.0": null,
+ "WizardLM/WizardLM-13B-V1.1": null,
+ "WizardLM/WizardLM-70B-V1.0": null,
+ "abeja/ABEJA-QwQ32b-Reasoning-Japanese-v1.0": null,
+ "abeja/ABEJA-Qwen2.5-32b-Japanese-v0.1": null,
+ "abeja/ABEJA-Qwen2.5-32b-Japanese-v1.0": null,
+ "abhiramtirumala/DialoGPT-sarcastic-medium": null,
+ "acrastt/RedPajama-INCITE-Chat-Instruct-3B-V1": null,
+ "acrastt/Vicuna-3B": null,
+ "allenai/Llama-3.1-Tulu-3-70B": null,
+ "allenai/Llama-3.1-Tulu-3-8B": null,
+ "allenai/Llama-3.1-Tulu-3.1-8B": null,
+ "allenai/Olmo-3-7B-Instruct": null,
+ "andreaskoepf/oasst-1_12b_7000": null,
+ "anthropic/claude-instant-v1": null,
+ "augmxnt/shisa-7b-v1": null,
+ "augmxnt/shisa-7b-v1-run2": null,
+ "augmxnt/shisa-gamma-7b-v1": null,
+ "augtoma/qCammel-13": null,
+ "augtoma/qCammel-70-x": null,
+ "baidu/ERNIE-4.5-21B-A3B-PT": null,
+ "baidu/ERNIE-4.5-VL-28B-A3B-PT": null,
+ "beomi/KoAlpaca-Polyglot-5.8B": null,
+ "beomi/llama-2-ko-7b": null,
+ "bigcode/gpt_bigcode-santacoder": null,
+ "bigcode/starcoder2-15b-instruct-v0.1": null,
+ "bigcode/tiny_starcoder_py": null,
+ "camel-ai/CAMEL-13B-Combined-Data": null,
+ "camel-ai/CAMEL-13B-Role-Playing-Data": null,
+ "camel-ai/CAMEL-33B-Combined-Data": null,
+ "clibrain/Llama-2-7b-ft-instruct-es": null,
+ "codellama/CodeLlama-70b-Python-hf": null,
+ "cognitivecomputations/dolphin-2.9.2-qwen2-7b": null,
+ "cyberagent/Llama-3.1-70B-Japanese-Instruct-2407": null,
+ "cyberagent/Mistral-Nemo-Japanese-Instruct-2408": null,
+ "cyberagent/calm2-7b-chat": null,
+ "cyberagent/calm3-22b-chat": null,
+ "dahara1/DeepSeek-R1-Distill-Qwen-14B-unsloth-jpn": null,
+ "databricks/dolly-v2-12b": null,
+ "databricks/dolly-v2-3b": null,
+ "databricks/dolly-v2-7b": null,
+ "deepnight-research/llama-2-70B-inst": null,
+ "dvruette/oasst-pythia-12b-6000-steps": null,
+ "edor/Hermes-Platypus2-mini-7B": null,
+ "edor/Stable-Platypus2-mini-7B": null,
+ "elyza/ELYZA-Shortcut-1.0-Qwen-32B": null,
+ "elyza/ELYZA-Thinking-1.0-Qwen-32B": null,
+ "elyza/ELYZA-japanese-Llama-2-13b-instruct": null,
+ "elyza/ELYZA-japanese-Llama-2-7b-instruct": null,
+ "elyza/Llama-3-ELYZA-JP-8B": null,
+ "fireworks_ai/accounts__fireworks__models__llama-v3p1-405b-instruct": null,
+ "fireworks_ai/accounts__fireworks__models__llama-v3p1-70b-instruct": null,
+ "fireworks_ai/accounts__fireworks__models__llama-v3p1-8b-instruct": null,
+ "flux-inc/Flux-Japanese-Qwen2.5-32B-Instruct-V1.0": null,
+ "garage-bAInd/Camel-Platypus2-13B": null,
+ "golaxy/gogpt-3b-bloom": null,
+ "golaxy/gogpt-7b": null,
+ "golaxy/gogpt-7b-bloom": null,
+ "golaxy/gogpt2-7b": null,
+ "golaxy/goims": null,
+ "golaxy/gowizardlm": null,
+ "google/flan-t5-xxl": null,
+ "google/gemini-1.0-pro-vision-001": null,
+ "google/gemini-2.0-flash-lite-001": null,
+ "google/gemma-3-270m-it": null,
+ "google/translategemma-12b-it": null,
+ "illuin/test-custom-llama": null,
+ "inclusionAI/Ling-1T-FP8": null,
+ "inclusionAI/Ling-flash-2.0": null,
+ "insilicomedicine/nach0_base": null,
+ "jarradh/llama2_70b_chat_uncensored": null,
+ "jlevin/guanaco-13b-llama-2": null,
+ "jlevin/guanaco-unchained-llama-2-7b": null,
+ "jordiclive/Llama-2-70b-oasst-1-200": null,
+ "jordiclive/gpt4all-alpaca-oa-codealpaca-lora-13b": null,
+ "jphme/orca_mini_v2_ger_7b": null,
+ "jxhong/CAlign-alpaca-7b": null,
+ "karakuri-ai/karakuri-lm-70b-chat-v0.1": null,
+ "karakuri-ai/karakuri-lm-8x7b-chat-v0.1": null,
+ "karakuri-ai/karakuri-lm-8x7b-instruct-v0.1": null,
+ "kevinpro/Vicuna-13B-CoT": null,
+ "keyfan/vicuna-chinese-replication-v1.1": null,
+ "kfkas/Llama-2-ko-7b-Chat": null,
+ "kinokokoro/cyberagent-mistral-nemo-webnovels": null,
+ "kinokokoro/cyberagent-mistral-nemo-webnovels-cp2460": null,
+ "layoric/llama-2-13b-code-alpaca": null,
+ "lgaalves/gpt2-dolly": null,
+ "lightblue/20240422": null,
+ "lightblue/ao-karasu-72B": null,
+ "lightblue/qarasu-14B-chat-plus-unleashed": null,
+ "lightblue/starlingbeta_cult_dsir_megagon_final": null,
+ "lilloukas/GPlatty-30B": null,
+ "lilloukas/Platypus-30B": null,
+ "lite/20250725-openhands-Qwen3-Coder-480B-A35B": null,
+ "lite/20251221-MITIBM-agent-seedoss36b": null,
+ "liuxiang886/llama2-70B-qlora-gpt4": null,
+ "llm-jp/llm-jp-3-172b-beta2-instruct2": null,
+ "llm-jp/llm-jp-3-7.2b-instruct3": null,
+ "llm-jp/llm-jp-3.1-13b-instruct4": null,
+ "llm-jp/llm-jp-3.1-8x13b-instruct4": null,
+ "llm-jp/llm-jp-4-32b-a3b-thinking": null,
+ "llm-jp/llm-jp-4-8b-thinking": null,
+ "lvkaokao/llama2-7b-hf-instruction-lora": null,
+ "meta-llama/Llama-3.1-405B-Instruct-FP8": null,
+ "meta-llama/Llama-4-Scout-17B-16E": null,
+ "meta-llama/llama-3-8b-chat-hf": null,
+ "meta/llama-3-8b-instruct-turbo": null,
+ "microsoft/Phi-4-reasoning-nothink": null,
+ "microsoft/Phi-4-reasoning-oldct": null,
+ "microsoft/llava-1.5-13b-hf": null,
+ "mistralai/Codestral-22B-v0.1": null,
+ "mistralai/Ministral-3-3B-Instruct-2512": null,
+ "mistralai/Ministral-3-8B-Instruct-2512": null,
+ "mistralai/Ministral-8B-Instruct-2410": null,
+ "models/chat-bison-001": null,
+ "mosaicml/mpt-30b-instruct": null,
+ "mosaicml/mpt-7b-instruct": null,
+ "mosaicml/mpt-7b-storywriter": null,
+ "nectec/OpenThaiLLM-Prebuilt-7B": null,
+ "nectec/Pathumma-llm-text-1.0.0": null,
+ "neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8": null,
+ "notstoic/PygmalionCoT-7b": null,
+ "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16-nothink": null,
+ "nvidia_nim/nvidia__nemotron-4-340b-instruct": null,
+ "openai/gpt-4-vision-preview": null,
+ "openbmb/MiniCPM4.1-8B": null,
+ "openrouter/pony-alpha": null,
+ "openrouter/quasar-alpha": null,
+ "osunlp/LlaSMol-Mistral-7B": null,
+ "predictions/baseline_343.json": null,
+ "predictions/v18_fixed_364.json": null,
+ "predictions/v19_primary_370.json": null,
+ "predictions/v20_strict_363.json": null,
+ "predictions/v9_strict_350.json": null,
+ "pythainlp/wangchanglm-7.5B-sft-en-sharded": null,
+ "pythainlp/wangchanglm-7.5B-sft-enth": null,
+ "quantumaikr/KoreanLM-hf": null,
+ "quantumaikr/QuantumLM-70B-hf": null,
+ "quantumaikr/llama-2-70b-fb16-guanaco-1k": null,
+ "quantumaikr/open_llama_7b_hf": null,
+ "rednote-hilab/dots.llm1.inst": null,
+ "sbintuitions/sarashina2.2-3b": null,
+ "sbintuitions/sarashina2.2-3b-instruct-v0.1": null,
+ "sbintuitions/sarashina2.2-3b-instruct-v0.1.run2": null,
+ "shareAI/bimoGPT-llama2-13b": null,
+ "shareAI/llama2-13b-Chinese-chat": null,
+ "shb777/Llama-3.3-8B-Instruct": null,
+ "shibing624/chinese-alpaca-plus-13b-hf": null,
+ "shibing624/chinese-alpaca-plus-7b-hf": null,
+ "shibing624/chinese-llama-plus-13b-hf": null,
+ "shisa-ai/022-llama3.1-8b-v2new-sft": null,
+ "shisa-ai/024-llama3.1-8b-v2new-dpo405b": null,
+ "shisa-ai/052-llama3.1-8b-base-v2new-sft": {
+  "repo": "shisa-ai/052-llama3.1-8b-base-v2new-sft",
+  "gated": false,
+  "parameters": 8030261248,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "shisa-ai/053-llama3.1-8b-base-v2new-dpo405b": {
+  "repo": "shisa-ai/053-llama3.1-8b-base-v2new-dpo405b",
+  "gated": false,
+  "parameters": 266240,
+  "n_experts": null,
+  "architecture": "dense",
+  "context_window": 131072
+ },
+ "shisa-ai/079-qwen3-30b-a3b-v2new-sft-v2.1-dpo.8xMI300X.dsz3": null,
+ "shisa-ai/090-llama3.2-1b-v2.1-dpo": null,
+ "shisa-ai/114-qwen3-30b-a3b-v2.1-sft-megablocks": null,
+ "shisa-ai/133-lfm2-1.2b-v2.1-sft-5e-5": null,
+ "shisa-ai/143-lfm2-1.2b-v2.1-dpo-8e-7": null,
+ "shisa-ai/144-lfm2-1.2b-v2.1-dpo-1e-6": null,
+ "shisa-ai/152-unphi4-14b-dpo2.1-1.5e7": null,
+ "shisa-ai/154-llama3.2-3b-v2.1-dpo": null,
+ "shisa-ai/160-llama3.2-3b-v2.1-153sft-dpo-4e7": null,
+ "shisa-ai/162-qwen3-8b-v2.1-dpo": null,
+ "shisa-ai/163-qwen3-30b-a3b-v2.1-sft-megablocks": null,
+ "shisa-ai/165-qwen3-30b-a3b-v2.1-dpo-2e7": null,
+ "shisa-ai/166-qwen3-30b-a3b-v2.1-dpo-1.2e7": null,
+ "shisa-ai/167-qwen3-30b-a3b-v2.1-dpo-4e7": null,
+ "shisa-ai/168-llama3.3-70b-v2.1-sft": null,
+ "shisa-ai/169-lfm2-1.2b-v2.1-dpo-1e-6": null,
+ "shisa-ai/170-qwen3-8b-v2.1-dpo-1.2e7": null,
+ "shisa-ai/171-llama3.2-3b-v2.1-153sft-dpo-2e7": null,
+ "shisa-ai/172-shisa-v1-7b-v2.1-midtrain": null,
+ "shisa-ai/173-shisa-v1-7b-v2.1-midtrain-sft": null,
+ "shisa-ai/174-shisa-7b-v1-v2.1-dpo": null,
+ "shisa-ai/176-llama3.3-70b-v2.1-dpo-6e8": null,
+ "shisa-ai/179-llama3.1-8b-v2.1-sft": null,
+ "shisa-ai/180-llama3.1-8b-v2.1-dpo-1.2e7": null,
+ "shisa-ai/181-llama3.1-8b-v2.1o-dpo-1.2e7": null,
+ "shisa-ai/182-llama3.1-8b-v2.1o-dpo-2e7": null,
+ "shisa-ai/183-llama3.1-8b-v2.1o-dpo-7e8": null,
+ "shisa-ai/184-llama3.1-8b-v2.1o-dpo-5e8": null,
+ "shisa-ai/185-qwen3-8b-v2.1o-dpo-7e8": null,
+ "shisa-ai/186-lfm2-1.2b-v2.1o-dpo-2.4e7": null,
+ "shisa-ai/187-llama3.3-70b-v2.1o-dpo-2.4e8": null,
+ "shisa-ai/188-lfm2-1.2b-v2.1o-dpo-1.6e7": null,
+ "shisa-ai/189-qwen3-8b-v2.1o-dpo-2e7": null,
+ "shisa-ai/191-qwen3-30b-a3b-v2.1o-dpo-1.2e7": null,
+ "shisa-ai/192-llama3.3-70b-v2.1o-dpo-1e8": null,
+ "shisa-ai/193-qwen3-30b-a3b-v2.1-dpo-1.2e7": null,
+ "shisa-ai/194-shisa-7b-v1-v2.1o-dpo": null,
+ "shisa-ai/196-ministral3-3b-v2.1-sft": null,
+ "shisa-ai/197-nanbeige4-3b-v2.1-sft": null,
+ "shisa-ai/198-nanbeige4-3b-v2.1-sft": null,
+ "shisa-ai/199-nanbeige4-3b-v2.1-dpo": null,
+ "shisa-ai/200-nanbeige4-3b-v2.1-dpo": null,
+ "shisa-ai/chotto-14b-202060107-dpo": null,
+ "shisa-ai/chotto-14b-202060107-sft": null,
+ "shisa-ai/chotto-14b-20250922": null,
+ "shisa-ai/chotto-14b-20250922-W8A8-INT8-smooth": null,
+ "shisa-ai/chotto-14b-20250922-W8A8-INT8-spin": null,
+ "shisa-ai/chotto-14b-20251007-dpo-openrlhf": null,
+ "shisa-ai/chotto-14b-20251007-sft": null,
+ "shisa-ai/chotto-14b-20251013-dpo": null,
+ "shisa-ai/chotto-14b-20251013-sft": null,
+ "shisa-ai/llama3.2-3b-merge-nuslerp-160-154-153": null,
+ "shisa-ai/llama3.2-3b-merge-nuslerp-171-160-153": null,
+ "shisa-ai/llama3.3-70b-merge-nuslerp-168-176-base": null,
+ "shisa-ai/phi4mm-shisa-text-merged": null,
+ "shisa-ai/qwen3-30b-a3b-1ep-checkpoint-18320": null,
+ "shisa-ai/qwen3-30b-a3b-merge-nuslerp-166-165-164": null,
+ "shisa-ai/qwen3-30b-a3b-v2.1-unsloth-1e4-1epoch": null,
+ "shisa-ai/qwen3-30b-a3b-v2.1-unsloth-3e5-1epoch": null,
+ "shisa-ai/qwen3-30b-a3b-v2.1-unsloth-5e5-1epoch": null,
+ "shisa-ai/qwen3-8b-merge-nuslerp-170-162-161": null,
+ "shisa-ai/qwen3-8b-merge-nuslerp-189-170-161": null,
+ "shisa-ai/shisa-gemma-7b-v1": null,
+ "shisa-ai/shisa-llama3-70b-v1": null,
+ "shisa-ai/shisa-llama3-8b-v1": null,
+ "shisa-ai/shisa-llama3-8b-v1.fp0.5": null,
+ "shisa-ai/shisa-phi4-mm-text": null,
+ "shisa-ai/shisa-phi4mm-textmerge-gad": null,
+ "shisa-ai/shisa-swallowmx-13a47b-v1": null,
+ "shisa-ai/shisa-v1-llama3-70b": null,
+ "shisa-ai/shisa-v1-llama3-70b.8e6": null,
+ "shisa-ai/shisa-v1-llama3-8b": null,
+ "shisa-ai/shisa-v1-llama3-8b.cosine": null,
+ "shisa-ai/shisa-v1-llama3-8b.lr-2e4": null,
+ "shisa-ai/shisa-v1-llama3-8b.lr-2e5": null,
+ "shisa-ai/shisa-v1-llama3-8b.lr-2e6": null,
+ "shisa-ai/shisa-v1-llama3-8b.lr-5e5": null,
+ "shisa-ai/shisa-v1-llama3-8b.lr-5e6": null,
+ "shisa-ai/shisa-v1-llama3-8b.lr-8e6": null,
+ "shisa-ai/shisa-v1-llama3-8b.neftune": null,
+ "shisa-ai/shisa-v1-llama3-8b.sharegpt_filtered": null,
+ "shisa-ai/shisa-v1-llama3-8b.sharegpt_filtered_appended": null,
+ "shisa-ai/shisa-v1-llama3-8b.sharegpt_mix": null,
+ "shisa-ai/shisa-v1-llama3-8b.sharegpt_original": null,
+ "shisa-ai/shisa-v1-llama3-8b.wd-0.05": null,
+ "shisa-ai/shisa-v1-mistral0.3-7b": null,
+ "shisa-ai/shisa-v1-phi3-14b": null,
+ "shisa-ai/shisa-v1-qwen2-7b": null,
+ "shisa-ai/shisa-v1-smaug-llama3-70b": null,
+ "shisa-ai/shisa-v2-llama3.1-405b": null,
+ "shisa-ai/shisa-v2-llama3.1-8b": null,
+ "shisa-ai/shisa-v2-llama3.1-8b-sft-a163": null,
+ "shisa-ai/shisa-v2-llama3.3-70b-FP8-block": null,
+ "shisa-ai/shisa-v2-llama3.3-70b-W8A8-INT8": null,
+ "shisa-ai/shisa-v2-qwen2.5-32b": null,
+ "shisa-ai/shisa-v2-qwen2.5-7b": null,
+ "shisa-ai/shisa-v2-unphi4-14b": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted-chotto-dpo": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted-chotto-dpo-kiseki-dpo": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted-chotto-kiseki-dpo": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted-chotto-sft-1epoch-dpo": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted-chotto-sft-2epoch-dpo": null,
+ "shisa-ai/shisa-v2-unphi4-14b-denoted-chotto-sft-3epoch-dpo": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-152-155-149-model_stock": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-152-155-149-nuslerp": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-FP8-dynamic": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-W8A8-INT8-smooth": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-denoted-stage3-to50": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-denoted-stage4-to25": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-denoted-stage6-to50-more": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-denoted-stage6-to50-more-2e6": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-denoted-stage6-to50-more-3e6": null,
+ "shisa-ai/shisa-v2.1-unphi4-14b-denoted-stage6-to50-more-3e6-beta005": null,
+ "shisa-ai/shisa-v2.1c-lfm2-350m": null,
+ "shisa-ai/shisa-v2.1c2-phi4-mini-3.8b-sft": null,
+ "shisa-ai/shisa-v2.1c2-phi4-mini-3.8b-sft-epoch1": null,
+ "shisa-ai/shisa-v2.1c2-phi4-mini-3.8b-sft-gad-dpo": null,
+ "shisa-ai/shisa-yi1.5-9b-v1": null,
+ "stockmark/Stockmark-2-100B-Instruct": null,
+ "stockmark/Stockmark-2-100B-Instruct-beta": null,
+ "tiiuae/Falcon-H1-0.5B-Instruct": null,
+ "tiiuae/Falcon3-10B-Instruct": null,
+ "timdettmers/guanaco-33b-merged": null,
+ "tokyotech-llm/Llama-3.1-Swallow-70B-Instruct-v0.3": null,
+ "tokyotech-llm/Llama-3.1-Swallow-8B-Instruct-v0.3": null,
+ "tokyotech-llm/Llama-3.1-Swallow-8B-Instruct-v0.5": null,
+ "tokyotech-llm/Llama-3.3-Swallow-70B-Instruct-v0.4": null,
+ "tokyotech-llm/Swallow-70b-instruct-v0.1": null,
+ "tokyotech-llm/Swallow-7b-instruct-v0.1": null,
+ "ubitus/alice-v3-1-405b-instruct-rc1": null,
+ "umiyuki/Llama-3-Umievo-itr014-Shizuko-8b": null,
+ "umiyuki/Umievo-itr012-Gleipnir-7B": null,
+ "unsloth/Phi-3-mini-4k-instruct-bnb-4bit": null,
+ "unsloth/llama-3-70b-Instruct-bnb-4bit": null,
+ "unsloth/llama-3-8b-Instruct-bnb-4bit": null,
+ "upstage/Llama-2-70b-instruct": null,
+ "upstage/Llama-2-70b-instruct-v2": null,
+ "upstage/llama-30b-instruct": null,
+ "upstage/llama-65b-instruct": null,
+ "uw-madison/llava-v1.6-vicuna-13b-hf": null,
+ "vicgalle/gpt2-alpaca": null,
+ "vicgalle/gpt2-alpaca-gpt4": null,
+ "victor123/WizardLM-13B-1.0": null,
+ "voter_predictions/mmoral_results_g10a_signature.json": null,
+ "voter_predictions/mmoral_results_g10b_bilateral.json": null,
+ "voter_predictions/mmoral_results_g11a_ssv.json": null,
+ "voter_predictions/mmoral_results_g11b_hpv.json": null,
+ "voter_predictions/mmoral_results_g11c_vdv.json": null,
+ "voter_predictions/mmoral_results_g11d_pfsv.json": null,
+ "voter_predictions/mmoral_results_g11e_asv.json": null,
+ "voter_predictions/mmoral_results_g12a_champion.json": null,
+ "voter_predictions/mmoral_results_g12b_domain.json": null,
+ "voter_predictions/mmoral_results_g12c_hunter.json": null,
+ "voter_predictions/mmoral_results_g13a_ctov.json": null,
+ "voter_predictions/mmoral_results_g13b_nav.json": null,
+ "voter_predictions/mmoral_results_g13c_iocv.json": null,
+ "voter_predictions/mmoral_results_g14a_clahe.json": null,
+ "voter_predictions/mmoral_results_g14b_quadrant.json": null,
+ "voter_predictions/mmoral_results_g14c_invert.json": null,
+ "voter_predictions/mmoral_results_g15a_exhaustive_clahe.json": null,
+ "voter_predictions/mmoral_results_g15b_grid_clahe.json": null,
+ "voter_predictions/mmoral_results_g16a_argagainst.json": null,
+ "voter_predictions/mmoral_results_g16b_cove.json": null,
+ "voter_predictions/mmoral_results_g16c_caption.json": null,
+ "voter_predictions/mmoral_results_g16e_testprior.json": null,
+ "voter_predictions/mmoral_results_g17a_csp.json": null,
+ "voter_predictions/mmoral_results_g18a_fdi_verify.json": null,
+ "voter_predictions/mmoral_results_g18b_count.json": null,
+ "voter_predictions/mmoral_results_g18c_negflip.json": null,
+ "voter_predictions/mmoral_results_g19a_teeth_fdi.json": null,
+ "voter_predictions/mmoral_results_g19b_gestalt.json": null,
+ "voter_predictions/mmoral_results_g19c_langlais.json": null,
+ "voter_predictions/mmoral_results_g19d_freeform.json": null,
+ "voter_predictions/mmoral_results_g19e_incidental.json": null,
+ "voter_predictions/mmoral_results_g20a_atlas.json": null,
+ "voter_predictions/mmoral_results_g20b_signature.json": null,
+ "voter_predictions/mmoral_results_g20c_compose.json": null,
+ "voter_predictions/mmoral_results_g21_atlas_v2_codex_full.json": null,
+ "voter_predictions/mmoral_results_g21_atlas_v2_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g21_atlas_v2_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g21_atlas_v2_pilot30.json": null,
+ "voter_predictions/mmoral_results_g21_atlas_v2_smoke.json": null,
+ "voter_predictions/mmoral_results_g22_micro_atlas_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g23_option_crop_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g23_option_crop_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g23b_option_crop_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g23b_option_crop_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g24_grid_fdi_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g24_grid_fdi_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g25_skewer_fdi_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g25_skewer_fdi_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g25b_skewer_fdi_fast_pilot30.json": null,
+ "voter_predictions/mmoral_results_g25b_skewer_fdi_fast_smoke.json": null,
+ "voter_predictions/mmoral_results_g25c_skewer_fdi_medium_pilot30.json": null,
+ "voter_predictions/mmoral_results_g26_sidecar_roi_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g26_sidecar_roi_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g28_visual_contract_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g28_visual_contract_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g28s_visual_contract_specialist.json": null,
+ "voter_predictions/mmoral_results_g29_self_curriculum_codex_pilot30.json": null,
+ "voter_predictions/mmoral_results_g29_self_curriculum_codex_smoke.json": null,
+ "voter_predictions/mmoral_results_g29s_self_curriculum_specialist.json": null,
+ "voter_predictions/mmoral_results_g30_caries.json": null,
+ "voter_predictions/mmoral_results_g31_apical.json": null,
+ "voter_predictions/mmoral_results_g32_wisdom.json": null,
+ "voter_predictions/mmoral_results_g4a_elimination.json": null,
+ "voter_predictions/mmoral_results_g4b_ddx.json": null,
+ "voter_predictions/mmoral_results_g4c_catfocus.json": null,
+ "voter_predictions/mmoral_results_g4d_devil.json": null,
+ "voter_predictions/mmoral_results_g5_judge.json": null,
+ "voter_predictions/mmoral_results_g5_tmr.json": null,
+ "voter_predictions/mmoral_results_g6a_grid.json": null,
+ "voter_predictions/mmoral_results_g6b_answer.json": null,
+ "voter_predictions/mmoral_results_g6c_minimal.json": null,
+ "voter_predictions/mmoral_results_g7a_exhaustive.json": null,
+ "voter_predictions/mmoral_results_g7b_fdi.json": null,
+ "voter_predictions/mmoral_results_g8a_catalog.json": null,
+ "voter_predictions/mmoral_results_g8b_triples.json": null,
+ "voter_predictions/mmoral_results_g9a_hires.json": null,
+ "voter_predictions/mmoral_results_g9b_literal.json": null,
+ "voter_predictions/mmoral_results_h1_verify_expert.json": null,
+ "voter_predictions/mmoral_results_h2_verify_ontology.json": null,
+ "voter_predictions/mmoral_results_h3_expert_structured.json": null,
+ "weblab-GENIAC/Tanuki-8B-dpo-v1.0": null,
+ "weblab-GENIAC/Tanuki-8x8B-dpo-v1.0": null,
+ "writer/palmyra-vision-003": null,
+ "xverse/XVERSE-13B-Chat": null
+}

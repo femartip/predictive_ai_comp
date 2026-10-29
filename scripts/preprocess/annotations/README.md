@@ -83,6 +83,15 @@ bash scripts/preprocess/annotations/sync_code.sh vent                  # -> ~/ad
 bash scripts/preprocess/annotations/sync_code.sh cluster <upv-user>    # -> /data/<upv-user>@upvnet.upv.es/adele_bank/code
 ```
 
+## At prediction time (the submission)
+
+`item_annotation.py` runs the same annotator inside the CodaBench submission, so each hidden item gets the levels its
+benchmark's items got here (method in its docstring). `add_to_submission.py <submission.zip>` copies it, with
+`adele_prompt.py` and the rubrics, into a submission zip, adds the two repositories to `models.txt` and the step to
+`model.py`. Checked on vent's 5090 against bank tables annotated on the cluster (15 items of phyblock, sciarena,
+matharena_platform, 2026-10-28): same token counts; mean |Δ expected level| 0.028, as between the two engines here;
+about 4.5 s per item of 3k tokens and up to 60 s for one of 32k.
+
 ## Safety on a shared machine
 
 | guard | what it does |

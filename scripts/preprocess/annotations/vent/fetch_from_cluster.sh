@@ -12,8 +12,16 @@ source "$(dirname "$0")/env.sh"
 C="$USER_UPV@upvnet.upv.es@vrhpcadm1.dsic.upv.es"
 R="/data/$USER_UPV@upvnet.upv.es/adele_bank/annotations"
 BENCH=$(grep -v '^\s*\(#\|$\)' "$LIST" | tr '\n' ' ')
+# the stream goes through a temporary file: when nothing is finished it is empty, and tar would fail on it
+TMP=$(mktemp)
+trap 'rm -f "$TMP"' EXIT
 ssh "$C" "cd '$R' && for b in $BENCH; do if [ -f \$b/adele_v1.parquet ]; then echo \$b/adele_v1.parquet \$b/done.json; \
-          else echo \"not finished: \$b\" >&2; fi; done | xargs -r tar cf -" | tar xf - -C "$ROOT"
+          else echo \"not finished: \$b\" >&2; fi; done | xargs -r tar cf -" > "$TMP"
+if [ -s "$TMP" ]; then
+  tar xf "$TMP" -C "$ROOT"
+else
+  echo "nothing finished on the cluster yet: no table fetched"
+fi
 for b in $BENCH; do
   if [ -f "$ROOT/$b/adele_v1.parquet" ]; then echo "  fetched: $b"; fi
 done

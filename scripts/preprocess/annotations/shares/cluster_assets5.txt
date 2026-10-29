@@ -1,0 +1,25 @@
+# Asset benchmarks, fifth batch (2026-10-28): one job mixing four conversion runs. Each benchmark was selected
+# beforehand from its own run folder; send the list with any JSONL_DIR (select_items.py skips selected benchmarks).
+# Assets reach the annotator as text: image/audio descriptions, and inlined files (CSV, SQLite tables, NDJSON, PDF text),
+# which the converter cuts at about 24,400 tokens. No prompt reaches the 32,767-token window.
+#
+# Batch 4 again (its first submission failed on a mistyped list name): asset-image, asset-audio
+rclicks
+brace
+# asset-text and asset-application, mostly within the annotator's reach (0-15% of items cut by the converter)
+genai_learning
+llmail_inject
+qatch
+babilong
+goodai_ltm_benchmark
+# Every item cut by the converter at ~24,400 tokens, far beyond the annotator's 4,096-token training length:
+# included by team decision (2026-10-28) so text and application assets are represented in training
+enginemt_qa
+alpha_sql
+dataclawbench
+legal_rag_bench
+chipbench
+# Left off in batch 3, included now (team decision, 2026-10-28): median 14,668 tokens, 97% over 4,096
+mtbbench
+# Not included: fewer than 80 items, too small to evaluate (live_agent_risk 73, auditing_sabotage_bench 68,
+# ehrflowbench 20, scbench_long 4). Their items are selected on vent if they are wanted later for training.

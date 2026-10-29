@@ -14,7 +14,7 @@ For every repetition, regime and cell:
      <run>/cache/<regime>/rep<r>_<cell>/, so a later run with more assessors fits only the new ones;
   4. with --tune, each predictor's test-time scales are chosen on the tuning draws (TAU_GRID), else config.TAU;
   5. every predictor whose assessor was fitted is scored on the evaluation draws (streaming.py).
-Outputs in results/assessors_router/<run>/ (default run name: <K>_tiers): records_rep<r>_<regime>.parquet (as v3);
+Outputs in results/assessors_router/<run>/ (default run name: general): records_rep<r>_<regime>.parquet (as v3);
 benchmarks.csv and models.csv (the loaded data's benchmarks, and the model table given to S1);
 routes_rep<r>_<regime>.parquet (one row per cell and test subject: known model, router and true tiers, model
 performance); importance.csv; tau.json; checks.json; meta.json; report/ (report_router.py). Resumable.
@@ -78,15 +78,17 @@ def build_cell(d, R, cell, k, parts, n_eval, n_tune, cdir, oracle, n_jobs, devic
         return bundle
     info = [R.pair(b, s) for b, s in groups]
     test_rows = np.unique(np.concatenate([np.concatenate([p["acq_rows"], p["eval_rows"]]) for p in info]))
-    rt = cached(cdir / f"routing_k{k}_{tag}_cv.pkl",          # _cv: training values by cross-validation
+    rt = cached(cdir / f"routing_k{k}_{tag}_cv3.pkl",         # cv3: CV training values, completeness
                 lambda: route(d, R, cell, [s for _, s in groups], oracle, k, n_jobs))
     jobs = {"v3_assessor": lambda: A.fit_v3(d, R, cell, test_rows, n_jobs, device),
             "tier_assessors": lambda: A.fit_tiers(d, R, cell, rt, test_rows, n_jobs, device),
-            "general_assessor": lambda: A.fit_general(d, R, cell, rt, test_rows, n_jobs, device, oracle=False),
-            "general_assessor_oracle": lambda: A.fit_general(d, R, cell, rt, test_rows, n_jobs, device, oracle=True)}
+            "general_assessor": lambda: A.fit_general(d, R, cell, rt, test_rows, n_jobs, device, "used"),
+            "general_assessor_oracle": lambda: A.fit_general(d, R, cell, rt, test_rows, n_jobs, device, "oracle")}
     fits = {}
     for part in parts:
-        version = {"tier_assessors": f"_k{k}", "general_assessor": "_cv", "general_assessor_oracle": "_cv"}
+        # _inf: subject features from inference fields only
+        version = {"tier_assessors": f"_k{k}", "general_assessor": "_cv2_inf_kept",   # _kept: trees and features
+                   "general_assessor_oracle": "_cv2_inf"}
         fits[part] = cached(cdir / f"{part}{version.get(part, '')}_{tag}.pkl", jobs[part])
     if "tier_assessors" in fits and any(f is None for f in fits["tier_assessors"]) and "v3_assessor" not in fits:
         fits["v3_assessor"] = cached(cdir / f"v3_assessor_{tag}.pkl", jobs["v3_assessor"])   # for an empty tier
@@ -112,6 +114,10 @@ def build_cell(d, R, cell, k, parts, n_eval, n_tune, cdir, oracle, n_jobs, devic
                                       "eval": np.stack([f["z"][ie] for f in fs]),
                                       "starts": np.array([f["start"] for f in fs])}
         bundle["pairs"][(b, sj)] = pair
+    if "general_assessor" in fits:      # B0 as predict() builds it, per draw and budget (assessors.evidence_logits)
+        by_group = dict(zip(groups, info))
+        bundle["evidence"] = {key: [A.evidence_logits(d, fits["general_assessor"], pos, draw, by_group, C.BUDGETS)
+                                    for draw in dr[key]] for key in ("draws", "tune_draws")}
     for part, f in fits.items():
         for j, fj in (enumerate(f) if part == "tier_assessors" else [(None, f)]):
             if fj is not None and len(fj["importance"]):
@@ -126,7 +132,8 @@ def build_cell(d, R, cell, k, parts, n_eval, n_tune, cdir, oracle, n_jobs, devic
 def score_cells(bundles, key, predictors, taus, n_jobs):
     """Run the simulator on every cell's draws (key = 'draws' or 'tune_draws'), in parallel over cells."""
     jobs = [b for b in bundles if b[key]]
-    outs = Parallel(n_jobs=n_jobs)(delayed(run_draws)(b[key], b["pairs"], predictors, taus) for b in jobs)
+    outs = Parallel(n_jobs=n_jobs)(delayed(run_draws)(b[key], b["pairs"], predictors, taus,
+                                                      evidence=b.get("evidence", {}).get(key)) for b in jobs)
     for b, o in zip(jobs, outs):
         o["cell"] = cell_name(b["cell"])
     return pd.concat(outs, ignore_index=True) if outs else pd.DataFrame()
@@ -153,8 +160,9 @@ def tune(bundles, predictors, n_jobs):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--k", type=int, default=S.K_TIERS, help="performance tiers")
-    ap.add_argument("--parts", nargs="+", default=list(A.PARTS), choices=A.PARTS, help="assessors to fit")
-    ap.add_argument("--name", default=None, help="run folder in results/assessors_router (default: <K>_tiers)")
+    ap.add_argument("--parts", nargs="+", choices=A.PARTS, help="assessors to fit (default: all but tier_assessors)",
+                    default=[p for p in A.PARTS if p != "tier_assessors"])
+    ap.add_argument("--name", default="general", help="run folder in results/assessors_router")
     ap.add_argument("--regimes", nargs="+", default=["primary", "secondary"], choices=["primary", "secondary"])
     ap.add_argument("--reps", type=int, default=C.REPS, help="repetitions 0..reps-1 (D4)")
     ap.add_argument("--draws", type=int, default=C.EVAL_DRAWS, help="evaluation draws per repetition and regime")
@@ -170,7 +178,7 @@ def main():
     check_start_ram()
     a.data = a.data or builds()[-1]
     predictors = list(BASELINES) + [p for p in PART if PART[p] in a.parts]
-    name = a.name or f"{a.k}_tiers"
+    name = a.name
     out = S.RESULTS / name
     out.mkdir(parents=True, exist_ok=True)
     device = lgb_device(S.DEVICE, a.n_jobs)

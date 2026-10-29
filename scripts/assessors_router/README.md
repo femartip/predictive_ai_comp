@@ -71,7 +71,8 @@ Expected gains:
   specialists or only the model's level.
   - *Known model:* its values measured on the training data.
   - *Unknown model:* its values predicted from the subject fields (a regression version of the router).
-  - A third input says which of the two it is (model known or not).
+  - A third input says which of the two it is (model known or not), and a fourth how well the model is described
+    (how many of provider, parameters and release date are known): a predicted value built on nothing is a guess.
   - *Training rows* get their values the same way, by cross-validation over the training benchmarks: a row's model
     gets its values measured on the other folds if it appears there, otherwise values predicted from its fields. The
     assessor thus trains on both cases, as it meets them at test time, and learns how much to trust each.

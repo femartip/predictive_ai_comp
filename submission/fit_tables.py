@@ -25,7 +25,6 @@ from pathlib import Path
 import sys
 import tempfile
 
-import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
@@ -33,11 +32,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/assessors_router'))
 sys.path.insert(0, str(ROOT / 'submission/submission'))
 import settings as S  # noqa: E402  (first: puts assessors_v3 on sys.path)
+import assessors as A  # noqa: E402
 import components  # noqa: E402
 from bank import BankData, builds  # noqa: E402
 from common import log, logit  # noqa: E402
 from config import ADELE_CODES, LGBM_PARAMS, TAU, TRAIN_PAIRS_PER_BENCHMARK  # noqa: E402
-from prior import Context, benchmark_weights, fit_prior, sample_rows  # noqa: E402
+from prior import Context, fit_prior, sample_rows  # noqa: E402
 from protocol import sibling_groups  # noqa: E402
 from strength import (MEASURES, Router, _tables, completeness, measures, model_weights,  # noqa: E402
                       train_values)
@@ -89,8 +89,8 @@ def group_table(d, tr, rate):
 
 def fit_assessor(d, rate, meas, n_jobs=S.N_JOBS):
     """The general assessor on all the data: assessors.fit_general's features for its training rows (M1 from
-    train_values), then prior.fit_prior's training, keeping the booster. Checked against fit_prior itself on a probe
-    of rows. Returns the booster's feature columns."""
+    train_values), trained by assessors.fit_prior_kept (fit_prior, keeping the booster). Checked against fit_prior
+    itself on a probe of rows. Returns the booster's feature columns."""
     P = d.P
     R = AllTraining(d)
     tv = train_values(d, R, np.arange(len(P)), rate, n_jobs)
@@ -107,31 +107,19 @@ def fit_assessor(d, rate, meas, n_jobs=S.N_JOBS):
     spec = S.PRIOR + '+M1'
     components.FEATURES['M1'] = m1               # registered for this fit only
     try:
-        _, comps = components.parse(spec)
         tr = training_rows(d)
         probe = tr[:: max(1, len(tr) // 5000)]
-        ctx = Context(d, SEED, R.siblings)
-        ctx.rate = rate
-        parts = [components.FEATURES[c](ctx, tr, probe) for c in comps]
-        X_tr = pd.concat([a for a, _ in parts], axis=1).astype(np.float32)
-        X_te = pd.concat([b for _, b in parts], axis=1).astype(np.float32)
-        assert not set(X_tr.columns) & components.CATEGORICAL, 'the general assessor has no categorical feature'
-        y = (P['s'].to_numpy()[tr] / P['n'].to_numpy()[tr]).astype(float)
-        params = {k: v for k, v in LGBM_PARAMS.items() if k != 'n_estimators'}
-        params.update({'seed': SEED, 'num_threads': n_jobs, 'device_type': 'cpu'})
-        data = lgb.Dataset(X_tr, label=y, weight=benchmark_weights(P, tr),
-                           init_score=logit(rate.reindex(bench[tr]).to_numpy()))
-        booster = lgb.train(params, data, num_boost_round=LGBM_PARAMS['n_estimators'])
-        mine = booster.predict(X_te, raw_score=True) + float(logit(rate.mean()))
+        fit = A.fit_prior_kept(d, R, CELL, spec, probe, n_jobs, 'cpu', seed=SEED)
+        assert fit['train_rows'] == len(tr), 'fit_prior_kept trained on other rows than training_rows'
         ref = fit_prior(d, R, CELL, spec, probe, n_jobs=n_jobs, device='cpu', seed=SEED)
-        diff = float(np.abs(mine - ref['z']).max())
+        diff = float(np.abs(fit['z'] - ref['z']).max())
         assert diff < 1e-6, f'the final fit differs from fit_prior on {len(probe)} rows (max {diff})'
     finally:
         del components.FEATURES['M1']
-    booster.save_model(str(OUT / 'assessor.txt'))
-    log(f'assessor: {len(tr):,} training rows, {X_tr.shape[1]} features; the same as fit_prior on {len(probe)} rows '
-        f'(max difference {diff:.1e})')
-    return list(X_tr.columns)
+    fit['booster'].save_model(str(OUT / 'assessor.txt'))
+    log(f'assessor: {len(tr):,} training rows, {fit["X"].shape[1]} features; the same as fit_prior on {len(probe)} '
+        f'rows (max difference {diff:.1e})')
+    return list(fit['X'].columns)
 
 
 def fit(d, build):

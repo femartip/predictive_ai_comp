@@ -10,6 +10,7 @@ results/
 
 # Distribution / packaging
 *.zip
+*.log
 .Python
 build/
 develop-eggs/

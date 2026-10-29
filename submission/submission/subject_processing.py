@@ -127,18 +127,18 @@ def model_info(name, provider='', release_date=''):
     out = {'model_key': name or None, 'model_info_source': 'none', **{row: None for row, _ in columns().values()}}
     if not name:
         return out
-    db, keys = database()
-    hit = name if name in db.index else keys.get(key(name))
-    try:
+    try:                                         # any failure leaves the model's attributes empty, never the run
+        db, keys = database()
+        hit = name if name in db.index else keys.get(key(name))
         if hit is not None:
-            values, out['model_key'], out['model_info_source'] = db.loc[hit], hit, 'database'
+            values, model_key, source = db.loc[hit], hit, 'database'
         else:
-            values, out['model_info_source'] = catalogue_row(name, provider, release_date), 'catalogues'
+            values, model_key, source = catalogue_row(name, provider, release_date), name, 'catalogues'
+        filled = {row: convert(values[c], kind) for c, (row, kind) in columns().items()}
     except Exception as error:
         logger.warning('No model attributes for %s: %s: %s', name, type(error).__name__, error)
         return out
-    out.update({row: convert(values[c], kind) for c, (row, kind) in columns().items()})
-    return out
+    return {**out, **filled, 'model_key': model_key, 'model_info_source': source}
 
 
 def process_subject(subject: dict) -> dict:

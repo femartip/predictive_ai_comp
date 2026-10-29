@@ -1,0 +1,3 @@
+[     35s] data 20261026T160351Z_94d3eae4: 178 benchmarks (89 evaluable), 2,451,847 pairs, 92,962 items, 11,387 subjects, 3,235 models
+[     60s] assessor: 1,404,729 training rows, 41 features; the same as fit_prior on 5017 rows (max difference 8.9e-16)
+[     60s] wrote /home/felix/predictive_ai_comp/submission/submission/assessor: r1 0.2235, 3235 models, 1,404,729 training rows

@@ -4,7 +4,7 @@
 
 Reads results/assessors_router/NAME/ and turns the per-draw records into tables and figures: the same outputs as
 assessors_v3/report.py (whose scoring and cluster bootstrap it uses, protocol v3 sections 7 and 8),
-plus the routing diagnostics. Writes RESULTS/NAME/report/:
+plus diagnostics of the model values. Writes RESULTS/NAME/report/:
     summary.csv        per regime and predictor: Brier ALC and ECE ALC (mean over draws), with each repetition's value
     per_budget.csv     per regime, predictor and budget: Brier and ECE (mean over draws of the mean over pairs), s.e.
     paired.csv         per regime: each predictor minus B3 and minus v3_assessor on the same draws, 95%
@@ -14,11 +14,12 @@ plus the routing diagnostics. Writes RESULTS/NAME/report/:
     by_benchmark.csv   Brier ALC per benchmark and predictor
     by_draw_size.csv   Brier ALC by number of benchmarks in the draw
     by_route.csv       Brier ALC for agentic and non-agentic benchmarks
-    routing.csv        per regime, known vs unknown test subjects: router accuracy against the oracle tier, mean
-                       probability of the oracle tier, error and rank correlation of each measure as the submission
-                       would know it (measured if known, else predicted)
-    tiers.csv          router vs oracle tier of the unknown test subjects
-    <regime>_brier.png, <regime>_ece.png   per-budget curves (as assessors_v3), every trained predictor
+    model_values.csv   per regime, known vs unknown test subjects: error and rank correlation against the true values
+                       of each measure as general_assessor gets it (measured if known, else predicted)
+    unknown_models.csv test pairs whose model is unknown, by how its model is described (parameters known, release
+                       date known, provider known, completeness): pairs, and the Brier ALC gain of each general
+                       assessor over v3_assessor
+    <regime>_brier.png, <regime>_ece.png   per-budget curves (as assessors_v3): v3 and general assessors
     compare.png        per-budget Brier (primary regime) and each assessor minus v3_assessor with 95% intervals, both
                        regimes (as assessors_v3/compare_plot.py)
 """
@@ -41,12 +42,14 @@ from config import BUDGETS  # noqa: E402
 from simulate import draw_scores  # noqa: E402
 from strength import MEASURES  # noqa: E402
 
-# assessors_v3's palette and surface colours; one fixed colour per trained predictor, baselines in grey
-SERIES = {"v3_assessor": "#2a78d6", "tier_router_assessor": "#eb6834", "tier_router_assessor_oracle": "#eda100",
-          "general_assessor": "#1baf7a", "general_assessor_oracle": "#008300"}
-LABELS = {"v3_assessor": "v3 assessor | T2", "tier_router_assessor": "tier router assessor | T2",
-          "tier_router_assessor_oracle": "tier router assessor, true tier | T2",
-          "general_assessor": "general assessor | T2", "general_assessor_oracle": "general assessor, true values | T2",
+# assessors_v3's palette and surface colours; one fixed colour per plotted predictor, baselines in grey (the tier
+# assessors are no longer plotted: focus on the general assessor)
+SERIES = {"v3_assessor": "#2a78d6", "general_assessor": "#1baf7a", "general_assessor_oracle": "#008300",
+          "general_assessor_inference": "#eb6834"}
+GENERAL = ["general_assessor", "general_assessor_oracle", "general_assessor_inference"]
+LABELS = {"v3_assessor": "v3 assessor | T2", "general_assessor": "general assessor | T2",
+          "general_assessor_oracle": "general assessor, true values | T2",
+          "general_assessor_inference": "general assessor, B0 as at inference | T2",
           "B3": "B3: R1 | T1 (no trained prior)",
           "oracle": "oracle level", "B2": "B2: running mean", "B1": "B1: 0.5"}
 BASE_STYLE = {"B3": (0, (5, 3)), "oracle": (0, (1, 2))}
@@ -141,17 +144,41 @@ def plot_compare(per, paired, path):
     plt.close(fig)
 
 
-def routing_table(routes):
+def model_values(routes):
+    """How close the model values the general assessors get are to the true ones."""
     rows = []
     for (regime, known), g in routes.groupby(["regime", "known"]):
-        p_true = g.apply(lambda r: r[f"p{int(r['tier_oracle'])}"], axis=1)
-        row = {"regime": regime, "known": known, "subjects": len(g),
-               "router_accuracy": (g["tier_router"] == g["tier_oracle"]).mean(), "p_oracle_tier": p_true.mean()}
+        row = {"regime": regime, "known": known, "subjects": len(g)}
         for m in MEASURES:
             row[f"{m}_mae"] = (g[f"{m}_used"] - g[f"{m}_oracle"]).abs().mean()
             row[f"{m}_spearman"] = g[f"{m}_used"].corr(g[f"{m}_oracle"], method="spearman")
         rows.append(row)
     return pd.DataFrame(rows)
+
+
+def unknown_models(pa, routes, models):
+    """Gain of each general assessor over v3_assessor on the test pairs of unknown models, by model description."""
+    w = pa.pivot_table(index=["rep", "regime", "cell", "draw", "benchmark", "subject_id"], columns="predictor",
+                       values="brier_alc").reset_index()
+    r = routes.drop_duplicates(["rep", "regime", "cell", "subject_id"])
+    w = w.merge(r, on=["rep", "regime", "cell", "subject_id"])
+    w = w[~w["known"]]
+    m = models.set_index("normalized_name").reindex(w["model_name"])
+    w["parameters_known"] = m["parameters"].notna().to_numpy()
+    w["release_date_known"] = m["release_date"].notna().to_numpy()
+    w["provider_known"] = (m["provider"].fillna("(unknown)") != "(unknown)").to_numpy()
+    w["completeness"] = w[["parameters_known", "release_date_known", "provider_known"]].sum(axis=1)
+    keys = ["parameters_known", "release_date_known", "provider_known", "completeness"]
+    out = []
+    for k in keys:
+        for (regime, v), g in w.groupby(["regime", k]):
+            row = {"regime": regime, "split": k, "value": v, "pairs": len(g),
+                   "share": len(g) / (w["regime"] == regime).sum()}
+            for p in GENERAL:
+                if p in g:
+                    row[f"{p} - v3"] = (g[p] - g["v3_assessor"]).mean()
+            out.append(row)
+    return pd.DataFrame(out)
 
 
 def report(name):
@@ -195,12 +222,10 @@ def report(name):
         pa.groupby(["regime", "route", "predictor"])["brier_alc"].mean().unstack("predictor") \
             .to_csv(out / "by_route.csv")
 
-    rt = routing_table(routes)
-    rt.to_csv(out / "routing.csv", index=False)
-    unk = routes[~routes["known"]]
-    tiers = pd.crosstab([unk["regime"], unk["tier_oracle"]], unk["tier_router"], rownames=["regime", "oracle tier"],
-                        colnames=["router tier"])
-    tiers.to_csv(out / "tiers.csv")
+    mv = model_values(routes)
+    mv.to_csv(out / "model_values.csv", index=False)
+    um = unknown_models(pa, routes, pd.read_csv(S.RESULTS / name / "models.csv"))
+    um.to_csv(out / "unknown_models.csv", index=False)
 
     for regime in per["regime"].unique():
         plot_budget(per, regime, "brier", out / f"{regime}_brier.png")
@@ -213,9 +238,10 @@ def report(name):
     print(paired.round(4).to_string(index=False))
     print("\nbudget 0: Brier = level + rest")
     print(b0.round(4).to_string(index=False))
-    print("\nrouting")
-    print(rt.round(3).to_string(index=False))
-    print(f"\nrouter vs oracle tier, unknown test subjects\n{tiers.to_string()}")
+    print("\nmodel values against the true ones")
+    print(mv.round(3).to_string(index=False))
+    print("\nunknown models: gain over v3_assessor by model description")
+    print(um.round(4).to_string(index=False))
     print(f"wrote {out}")
 
 

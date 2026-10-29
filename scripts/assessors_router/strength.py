@@ -109,7 +109,8 @@ def route(d, R, cell, test_subj, oracle, k=S.K_TIERS, n_jobs=4):
                       measure and model_known (see train_values)
         test_value    measure -> per subject code, its value for a test subject: measured on the training rows if its
                       model is known, else predicted from its fields;  test_known: per subject code, 1 if known
-        oracle        the oracle measures (all the data), per model code
+        completeness  per subject code, how many of provider, parameters and release date are known (0-3)
+        oracle        the oracle measures (all the data, the hidden benchmarks included), per model code
         test          one row per test subject: known, tier probabilities p0..p{k-1} (one-hot for a known model), router
                       and oracle tiers, and for each measure its oracle, predicted and used value"""
     P = d.P
@@ -147,7 +148,15 @@ def route(d, R, cell, test_subj, oracle, k=S.K_TIERS, n_jobs=4):
         test.update({f"{m}_oracle": o_te[m].to_numpy(), f"{m}_pred": pred, f"{m}_used": used})
     return {"r1": float(logit(rate.mean())), "model_tier": model_tier, "cuts": cuts,
             "train_values": train_values(d, R, rows, rate, n_jobs), "test_value": test_value,
-            "test_known": test_known, "oracle": oracle, "test": pd.DataFrame(test)}
+            "test_known": test_known, "completeness": completeness(d), "oracle": oracle, "test": pd.DataFrame(test)}
+
+
+def completeness(d):
+    """Per subject code: how many of provider, parameters and release date are known (0-3), from S1's table. Tells the
+    general assessor how much a predicted strength rests on: with nothing known it is close to a guess."""
+    X = system_table(d)
+    return ((X["provider"] != "(unknown)").astype(int) + np.isfinite(X["log_params"]).astype(int)
+            + X["release_years"].notna().astype(int)).to_numpy(float)
 
 
 def train_values(d, R, rows, rate, n_jobs):

@@ -9,15 +9,15 @@ order, and its start.
 
 Columns (assessor/meta.json lists them in order):
     I2   <code>_exp           the item's 18 ADeLe v1 levels (item_annotation)
-    B0   bench_<code>_exp     its benchmark's mean levels, as far as predict() can know them: over the distinct items of
-                              its benchmark_id seen so far (a running mean; levels without annotation are skipped). At
-                              budget 0 (no labels yet) an item gets the mean at its first arrival (the first item: its
-                              own levels); later, the mean over every item seen. Kept in an SQLite file across worker
-                              restarts (ASSESSOR_STATE).
+    B0   bench_<code>_exp     its benchmark's mean levels, from the call's own evidence only (the platform forbids
+                              relying on earlier calls): for the target row, the mean over its item and the distinct
+                              labeled items of the same benchmark_id; for a labeled row, the mean over those labeled
+                              items. At budget 0 (no labels) that is the item's own levels. Levels without annotation
+                              are skipped, as in training (components.bench_profiles).
     G1   group_rel            how the model's group (provider x size tier x reasoning) beats or trails the training
                               benchmarks' base rates (assessor/groups.parquet); missing for a group never seen
     M1   strength, mean_score the model's values on the training data if known (assessor/models.parquet, by model_key),
-                              else predicted from its fields (assessor/router_<measure>.txt); model_known (1 / 0);
+                              else predicted from its fields (assessor/router_<measure>.txt, by lgb_numpy); model_known;
                               completeness (how many of provider, parameters and release date are known, 0-3)
     start                     R1: the logit of the mean base rate of the training benchmarks
     keys                      T2's levels: benchmark_id; the subject (all its competition fields) on that benchmark;
@@ -32,16 +32,15 @@ from functools import lru_cache
 import hashlib
 import json
 import math
-import os
 from pathlib import Path
 import re
-import sqlite3
 
 import numpy as np
 import pandas as pd
 
+from lgb_numpy import Model
+
 ASSESSOR = Path(__file__).with_name('assessor')
-STATE = Path(os.getenv('ASSESSOR_STATE', Path(__file__).with_name('.assessor_state') / 'b0.sqlite3'))
 CODES = ['AS', 'AT', 'CEc', 'CEe', 'CL', 'KNa', 'KNc', 'KNf', 'KNn', 'KNs', 'MCr', 'MCt', 'MCu', 'MS', 'QLl', 'QLq',
          'SNs', 'VO']
 LEVELS = [f'{c}_exp' for c in CODES]
@@ -91,11 +90,10 @@ def system_row(subject):
 
 @lru_cache(maxsize=1)
 def tables():
-    import lightgbm as lgb
     meta = json.loads((ASSESSOR / 'meta.json').read_text(encoding='utf-8'))
     models = pd.read_parquet(ASSESSOR / 'models.parquet').set_index('model_key')
     groups = pd.read_parquet(ASSESSOR / 'groups.parquet').set_index('group')['group_rel']
-    routers = {m: lgb.Booster(model_file=str(ASSESSOR / f'router_{m}.txt')) for m in MEASURES}
+    routers = {m: Model(ASSESSOR / f'router_{m}.txt') for m in MEASURES}
     return meta, models, groups, routers
 
 
@@ -110,47 +108,10 @@ def model_columns(subject):
     if known:
         values = {m: float(models.at[key, m]) for m in MEASURES}
     else:
-        x = pd.DataFrame([s1])[meta['router_columns']]
-        for c in x.columns:
-            x[c] = (pd.Categorical(x[c], categories=meta['router_levels'][c]) if c in meta['router_levels']
-                    else x[c].astype(np.float32))
-        values = {m: float(routers[m].predict(x)[0]) for m in MEASURES}
+        values = {m: float(routers[m].raw_score([s1])[0]) for m in MEASURES}
     completeness = ((s1['provider'] != '(unknown)') + math.isfinite(s1['log_params'])
                     + (not math.isnan(s1['release_years'])))
     return {'group_rel': float(group_rel), **values, 'model_known': float(known), 'completeness': float(completeness)}
-
-
-class BenchmarkState:
-    """The distinct items seen per benchmark_id, in arrival order, with their levels (SQLite, so it survives the
-    prediction workers' restarts at each checkpoint)."""
-
-    def __init__(self, path=STATE):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(path, timeout=60, isolation_level=None)
-        self.db.execute('CREATE TABLE IF NOT EXISTS items (bench TEXT, item TEXT, seq INTEGER, levels TEXT, '
-                        'PRIMARY KEY (bench, item))')
-
-    def b0(self, bench, item, levels, budget0):
-        self.db.execute('BEGIN IMMEDIATE')
-        try:
-            self.db.execute('INSERT OR IGNORE INTO items SELECT ?, ?, COALESCE(MAX(seq), 0) + 1, ? FROM items '
-                            'WHERE bench = ?', (bench, item, json.dumps(levels), bench))
-            seq = self.db.execute('SELECT seq FROM items WHERE bench = ? AND item = ?', (bench, item)).fetchone()[0]
-            rows = self.db.execute('SELECT levels FROM items WHERE bench = ?' + (' AND seq <= ?' if budget0 else ''),
-                                   (bench, seq) if budget0 else (bench,)).fetchall()
-            self.db.execute('COMMIT')
-        except Exception:
-            self.db.execute('ROLLBACK')
-            raise
-        V = np.array([[np.nan if v is None else v for v in json.loads(r[0])] for r in rows], float)
-        with np.errstate(invalid='ignore'):
-            mean = np.nanmean(V, 0) if np.isfinite(V).any() else np.full(len(LEVELS), np.nan)
-        return {f'bench_{c}': float(v) for c, v in zip(LEVELS, mean)}
-
-
-@lru_cache(maxsize=1)
-def state():
-    return BenchmarkState()
 
 
 def item_key(item):
@@ -168,13 +129,26 @@ def subject_key(subject):
     return hashlib.sha256(json.dumps(fields, sort_keys=True).encode()).hexdigest()
 
 
-def row(value, budget0):
+def levels_of(item):
+    return [None if item.get(c) is None else float(item[c]) for c in LEVELS]
+
+
+def mean_levels(items):
+    """B0 columns: the mean of each level over the given items' levels, skipping missing ones."""
+    V = np.array([[np.nan if v is None else v for v in lv] for lv in items], float).reshape(-1, len(LEVELS))
+    with np.errstate(invalid='ignore'):
+        mean = np.nanmean(V, 0) if np.isfinite(V).any() else np.full(len(LEVELS), np.nan)
+    return {f'bench_{c}': float(v) for c, v in zip(LEVELS, mean)}
+
+
+def row(value, evidence):
+    """The input row of a [subject, item] pair; evidence: the call's distinct labeled items of each benchmark_id
+    (item key -> levels), the pair's own item added for its B0 when it is the target."""
     subject, item = value
     bench, key = text(item.get('benchmark_id')), item_key(item)
-    levels = [None if item.get(c) is None else float(item[c]) for c in LEVELS]
+    levels = levels_of(item)
     i2 = {c: (float('nan') if v is None else v) for c, v in zip(LEVELS, levels)}
-    b0 = state().b0(bench, key, levels, budget0)
-    features = {**i2, **b0, **model_columns(subject)}
+    features = {**i2, **mean_levels(evidence.get(bench, {}).values()), **model_columns(subject)}
     meta = tables()[0]
     assert list(features) == meta['columns'], 'feature columns differ from the trained ones'
     # T2's levels (testtime.keys): the benchmark, the subject on that benchmark, the item
@@ -183,6 +157,12 @@ def row(value, budget0):
 
 
 def build(input: list, labeled=None):
-    """Input rows of the target pair and of the labeled pairs. Budget 0 = no labels yet."""
-    budget0 = not labeled
-    return row(input, budget0), (None if labeled is None else [row(value, budget0) for value, _ in labeled])
+    """Input rows of the target pair and of the labeled pairs, from this call's input and labeled pairs only."""
+    labeled_items = {}
+    for (_, item), _label in labeled or []:
+        labeled_items.setdefault(text(item.get('benchmark_id')), {})[item_key(item)] = levels_of(item)
+    target_item = input[1]
+    bench = text(target_item.get('benchmark_id'))
+    own = {item_key(target_item): levels_of(target_item)}
+    with_target = {**labeled_items, bench: {**labeled_items.get(bench, {}), **own}}
+    return row(input, with_target), (None if labeled is None else [row(value, labeled_items) for value, _ in labeled])

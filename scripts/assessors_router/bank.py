@@ -9,7 +9,8 @@ What changes against assessors_v3's own build (build_data.py), and why:
               predictor; evaluable benchmarks are at least 90% binary).
     model     the subject's model_key (a model identity for every subject; model_key_source in the build), not
               normalized_name: strengths, tiers and the model folds cover every subject.
-    subjects  normalized_name = model_key, so components.S1 reads the recovered name; and a model table
+    subjects  only the fields predict() gets on the platform: normalized_name = model_key, so components.S1 reads the
+              recovered name; model_name and thinking are left empty (not given at inference); and a model table
               (model_key -> provider, release_date, parameters) is passed to S1 as components.MODELS_CSV: the
               bank's provider and release date where given, else the curated model_provider / model_release_date.
     items     text_hash and the I0 statistics from the item's question (assessors_v3/build_data.py's functions); the
@@ -86,11 +87,12 @@ class BankData(Data):
         self.P["model"] = self.subj_model[self.P["subj"].to_numpy()]
         self.items = items[["text_hash", *ITEM_STAT_COLS]].reset_index(drop=True)
         self.adele = items[EXP].reset_index(drop=True)
+        # Only what predict() gets on the platform (its subject fields, normalized_name as model_key): the bank's
+        # model_name and thinking are not given there, so S1 (components.system_table) never sees them.
         self.subjects = pd.DataFrame({
-            "subject_id": subj["subject_id"], "model_name": subj["model_name"], "normalized_name": subj["model_key"],
+            "subject_id": subj["subject_id"], "model_name": None, "normalized_name": subj["model_key"],
             "reasoning_effort": subj["reasoning_effort"], "harness": subj["harness"],
-            "harness_version": subj["harness_version"], "access_date": subj["access_date"],
-            "thinking": subj["thinking"].map(lambda v: None if pd.isna(v) else str(bool(v)).lower())})
+            "harness_version": subj["harness_version"], "access_date": subj["access_date"], "thinking": None})
 
         # model table for S1: the bank's provider / release date where a subject of the model has them, else curated
         first = lambda v: v.dropna().iloc[0] if v.notna().any() else None   # noqa: E731

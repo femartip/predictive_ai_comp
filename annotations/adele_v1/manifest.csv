@@ -1,5 +1,6 @@
 benchmark,run,items,texts,truncated_items
 genai_learning,asset-application,162,162,0
+legal_rag_bench,asset-application,300,100,0
 llmail_inject,asset-application,600,600,0
 brace,asset-audio,600,600,0
 ai2d_test,asset-image,600,600,0

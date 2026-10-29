@@ -1,4 +1,7 @@
 benchmark,run,items,texts,truncated_items
+genai_learning,asset-application,162,162,0
+llmail_inject,asset-application,600,600,0
+brace,asset-audio,600,600,0
 ai2d_test,asset-image,600,600,0
 averimatec,asset-image,152,152,0
 chartmuseum,asset-image,162,162,0
@@ -21,6 +24,11 @@ multimodal_stem_ai,asset-image,249,249,0
 naep_llm_students,asset-image,488,488,0
 ocrbench_v2,asset-image,600,600,0
 phyblock,asset-image,600,564,0
+rclicks,asset-image,600,580,0
+babilong,asset-text,600,600,0
+chipbench,asset-text,200,23,0
+goodai_ltm_benchmark,asset-text,452,327,0
+qatch,asset-text,600,580,0
 abstract_reason,no-assets,600,600,0
 adaptivestep,no-assets,600,600,0
 aegis,no-assets,600,600,0

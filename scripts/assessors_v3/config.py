@@ -3,7 +3,7 @@
 Every path can be overridden with an environment variable, so the same code runs on vent, cremaet or a laptop:
 
     ASSESSOR_JSONL_DIR    converter runs (scripts/preprocess/measurement_db.py), ':'-separated: <benchmark>.jsonl
-    ASSESSOR_ADELE_DIR    ADeLe v1 tables, <run>/<benchmark>.parquet (run = no-assets, asset-image), one row per
+    ASSESSOR_ADELE_DIR    ADeLe v1 tables, <run>/<benchmark>.parquet (run = no-assets, asset-image, asset-audio, asset-text, asset-application), one row per
                           annotated item (default: the repo's annotations/adele_v1 if it exists, else the shared
                           folder on vent)
     ASSESSOR_MODELS_CSV   optional model attributes (scripts/preprocess/epoch_models_csv.py), joined on normalized_name
@@ -19,13 +19,15 @@ from pathlib import Path
 ROOT = next((p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists()),
             Path(__file__).resolve().parents[2])      # the repository (or two levels up outside a clone)
 
-# Converter runs to read, ':'-separated: by default the no-assets, asset-image and asset-audio runs on vent (a benchmark
-# is taken from the first folder that has its JSONL)
+# Converter runs to read, ':'-separated: by default the no-assets, asset-image, asset-audio, asset-text and
+# asset-application runs on vent (a benchmark is taken from the first folder that has its JSONL)
 JSONL_DIRS = [Path(p) for p in os.environ.get(
     "ASSESSOR_JSONL_DIR",
     "/data/datasets/measurement_db/no-assets/20261022T205359Z_b5a02e2a:"
     "/data/datasets/measurement_db/asset-image/20261023T110411Z_26fccf60:"
-    "/data/datasets/measurement_db/asset-audio/20261026T125726Z_995632fe").split(":") if p]
+    "/data/datasets/measurement_db/asset-audio/20261026T125726Z_995632fe:"
+    "/data/datasets/measurement_db/asset-text/20261027T103034Z_ce7897ad:"
+    "/data/datasets/measurement_db/asset-application/20261027T154359Z_f18ff986").split(":") if p]
 _REPO_ADELE = ROOT / "annotations" / "adele_v1"
 ADELE_DIR = Path(os.environ.get("ASSESSOR_ADELE_DIR",
                                 _REPO_ADELE if _REPO_ADELE.exists() else "/data/datasets/annotations/adele_v1"))
